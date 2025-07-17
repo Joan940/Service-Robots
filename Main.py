@@ -49,60 +49,51 @@ def pencetButton(text):
 #                                        TEXT ACTION MENU                                         #
 ###################################################################################################
 
-def fillText(inp, inputUser):
+def fillText(inp_key, inputUser_rects):
 
-    # BOOLEAN
-    varGlobals.hapus = True
+    while True:
+        
+        varGlobals.screen.blit(varGlobals.bgConfig, (0, 0))
 
-    # INPUT TEXT
-    if inp == varGlobals.IP:
-        print("IP Address")
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_BACKSPACE:
-                            varGlobals.IP = varGlobals.IP[:-1]
-                        elif event.key == pygame.K_RETURN:
-                            return
-                        else:
-                            varGlobals.IP += event.unicode
-                if event.type == pygame.MOUSEBUTTONDOWN:
+        pygame.draw.rect(varGlobals.screen, cc.FTEK2, inputUser_rects['Save'], 3, border_radius=20)
+        tts("Save", cc.RED_BROWN, inputUser_rects['Save'], varGlobals.screen, 50)
+       
+        for key, rect in inputUser_rects.items():
+            if key in ["IP", "PORT"]:
+                current_value = ""
+                if key == "IP":
+                    current_value = varGlobals.IP
+                elif key == "PORT":
+                    current_value = varGlobals.PORT
+                
+                if key == inp_key:
+                    pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, border_radius = 20)
+                    tts(current_value, cc.WHITE, rect, varGlobals.screen, 60)
+                else:
+                    pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 3, border_radius = 20)
+                    tts(current_value, cc.RED_BROWN, rect, varGlobals.screen, 50)
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    if inp_key == "IP":
+                        varGlobals.IP = varGlobals.IP[:-1]
+                    elif inp_key == "PORT":
+                        varGlobals.PORT = varGlobals.PORT[:-1]
+                elif event.key == pygame.K_RETURN:
                     return
-            pygame.draw.rect(varGlobals.screen, 
-                             cc.FTEK2, 
-                             inputUser[inp], 
-                             border_radius = 20)
-            tts(varGlobals.IP, cc.WHITE, inputUser[inp], varGlobals.screen, 30)
-            
-            pygame.display.flip()
-            varGlobals.clock.tick(120)
-
-    elif inp == varGlobals.PORT:
-        print("Port Address")
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_BACKSPACE:
-                            varGlobals.PORT = varGlobals.PORT[:-1]
-                        elif event.key == pygame.K_RETURN:
-                            return
-                        else:
+                else:
+                    if inp_key == "IP":
+                        varGlobals.IP += event.unicode
+                    elif inp_key == "PORT":
+                        if event.unicode.isdigit():
                             varGlobals.PORT += event.unicode
-                if event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if not inputUser_rects[inp_key].collidepoint(event.pos):
                     return
-            pygame.draw.rect(varGlobals.screen, 
-                             cc.FTEK2,
-                             inputUser[inp], 
-                             border_radius = 20)
-            tts(varGlobals.PORT, cc.WHITE, inputUser[inp], varGlobals.screen, 30)
-            
-            pygame.display.flip()
-            varGlobals.clock.tick(120)
 
-    else:
-        print('Wrong Place')
+        pygame.display.flip()
+        varGlobals.clock.tick(120)
 
 
 ###################################################################################################
@@ -119,40 +110,36 @@ def configuration():
 
     # WINDOW
     window_rect = pygame.Surface.get_rect(varGlobals.screen)
-    varGlobals.screen.blit(varGlobals.bgConfig, (0, 0))
 
-    # UKURAN BUTTON
+    # SET UP POSISI TEXT & UKURAN BUTTON
     PANJANG_BUTTON = varGlobals.res[0] * 0.094
     LEBAR_BUTTON = varGlobals.res[1] * 0.06
     PANJANG_INP_BUTTON = varGlobals.res[0] * 0.1
     LEBAR_INP_BUTTON = varGlobals.res[1] * 0.06
 
     # POSISI BUTTON
-    SAVE = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (-1.75)),
-                            window_rect.centery - LEBAR_BUTTON * (-5),
-                            PANJANG_BUTTON * 2, LEBAR_BUTTON * 1.7)
-
-    # BUTTON
-    buttons = {
-        "Save" : SAVE
-    }
+    SAVE_RECT = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (-1.42)),
+                                 window_rect.centery - LEBAR_BUTTON * (-5),
+                                 PANJANG_BUTTON * 2, LEBAR_BUTTON * 1.7)
 
     # POSISI INPUT USER
-    INP_IP = pygame.rect.Rect(window_rect.centerx - (PANJANG_INP_BUTTON * (-1.07)),
-                            window_rect.centery - LEBAR_INP_BUTTON * (1.9),
-                            PANJANG_INP_BUTTON * 3, LEBAR_INP_BUTTON * 1.7)
+    INP_IP_RECT = pygame.rect.Rect(window_rect.centerx - (PANJANG_INP_BUTTON * (-0.78)),
+                                   window_rect.centery - (LEBAR_INP_BUTTON * 1.66),
+                                   PANJANG_INP_BUTTON * 3, LEBAR_INP_BUTTON * 1.7)
     
-    INP_PORT = pygame.rect.Rect(window_rect.centerx - (PANJANG_INP_BUTTON * (-1.07)),
-                            window_rect.centery - LEBAR_INP_BUTTON * (-2.25),
-                            PANJANG_INP_BUTTON * 3, LEBAR_INP_BUTTON * 1.7)
+    INP_PORT_RECT = pygame.rect.Rect(window_rect.centerx - (PANJANG_INP_BUTTON * (-0.78)),
+                                     window_rect.centery - LEBAR_INP_BUTTON * (-1.8),
+                                     PANJANG_INP_BUTTON * 3, LEBAR_INP_BUTTON * 1.7)
 
-    # INPUT TEXT IP ADDRESS & PORT
     inputUser = {
-        varGlobals.IP : INP_IP, 
-        varGlobals.PORT : INP_PORT
+        "Save" : SAVE_RECT,
+        "IP" : INP_IP_RECT,
+        "PORT" : INP_PORT_RECT
     }
 
     while varGlobals.runConfig:
+        varGlobals.screen.blit(varGlobals.bgConfig, (0, 0))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 varGlobals.runConfig = False
@@ -161,34 +148,30 @@ def configuration():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 click = True
 
-        # LOGIKA TOMBOL
         mx, my = pygame.mouse.get_pos()
-        for button in buttons:
-            if buttons[button].collidepoint(mx, my):
-                pygame.draw.rect(varGlobals.screen, cc.FTEK2, buttons[button], border_radius = 20)
-                tts(button, cc.WHITE, buttons[button], varGlobals.screen, 30)
-                if click:
-                    pencetButton(button)
-            else:
-                pygame.draw.rect(varGlobals.screen, cc.FTEK, buttons[button], border_radius = 20)
-                tts(button, cc.FTEK2, buttons[button], varGlobals.screen, 30)
 
-        # INPUT TEXT
-        for text in inputUser:
-            if inputUser[text].collidepoint(mx, my):
-                pygame.draw.rect(varGlobals.screen, cc.FTEK2, inputUser[text], border_radius = 20)
-                tts(text, cc.WHITE, inputUser[text], varGlobals.screen, 30)
+        for key, rect in inputUser.items():
+            display_text = key
+            if key == "IP":
+                display_text = varGlobals.IP
+            elif key == "PORT":
+                display_text = varGlobals.PORT
+            
+            if rect.collidepoint(mx, my):
+                pygame.draw.rect(varGlobals.screen, cc.FTEK2, rect, 5, border_radius = 20)
+                tts(display_text, cc.RED_BROWN, rect, varGlobals.screen, 60)
                 if click:
-                    fillText(text, inputUser)
+                    if key in ["IP", "PORT"]:
+                        fillText(key, inputUser)
+                    elif key == "Save":
+                        pencetButton(key)
             else:
-                pygame.draw.rect(varGlobals.screen, cc.FTEK, inputUser[text], border_radius = 20)
-                tts(text, cc.FTEK2, inputUser[text], varGlobals.screen, 30)
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 3, border_radius = 20)
+                tts(display_text, cc.RED_BROWN, rect, varGlobals.screen, 50)
 
+        click = False
+        varGlobals.clock.tick(120)
         pygame.display.flip()
-        varGlobals.clock.tick(60)
-
-    pygame.display.flip()
-    varGlobals.clock.tick(60)
 
 
 ###################################################################################################
@@ -205,11 +188,13 @@ def mainMenu():
 
     # WINDOW
     window_rect = pygame.Surface.get_rect(varGlobals.screen)
-    varGlobals.screen.blit(varGlobals.bgMenu, (0, 0))
+    mainClock = pygame.time.Clock()
 
-    # UKURAN BUTTON
+    # SET UP POSISI TEXT & UKURAN BUTTON
     PANJANG_BUTTON = varGlobals.res[0] * 0.1
     LEBAR_BUTTON = varGlobals.res[1] * 0.06
+    PANJANG_STATUS = varGlobals.res[0] * 0.064
+    LEBAR_STATUS = varGlobals.res[1] * 0.02
 
     # POSISI BUTTON
     RUN = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (-0.8)),
@@ -223,18 +208,26 @@ def mainMenu():
                             PANJANG_BUTTON * 3, LEBAR_BUTTON * 1.7)
 
     # PESAN DISCONNECT DAN CONNECTED
-    status_msg_x = varGlobals.screen.get_width() - 600
-    status_msg_y = 900
-    status_rect = pygame.Rect(status_msg_x, status_msg_y, 180, 30)
+    STATUS = pygame.rect.Rect(window_rect.centerx - (PANJANG_STATUS * (-2.6)),
+                            window_rect.centery - (LEBAR_STATUS * (-15.5)),
+                            PANJANG_STATUS * 2, LEBAR_STATUS * 1.7)
     
     # BUTTON
     buttons = {
         "Run" : RUN,
         "Configuration" : CONFIGURATION,
-        "Exit" : EXIT
+        "Exit" : EXIT,
+    }
+
+    # STATUS
+    status = {
+        varGlobals.conServiceBot : STATUS
     }
 
     while varGlobals.runMenu:
+
+        varGlobals.screen.blit(varGlobals.bgMenu, (0, 0))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 varGlobals.runMenu = False
@@ -243,30 +236,31 @@ def mainMenu():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 click = True
 
-        varGlobals.screen.blit(varGlobals.bgMenu, (0, 0))
-
         # LOGIKA TOMBOL
         mx, my = pygame.mouse.get_pos()
         for button in buttons:
             if buttons[button].collidepoint(mx, my):
-                pygame.draw.rect(varGlobals.screen, cc.FTEK2, buttons[button], border_radius = 20)
-                tts(button, cc.WHITE, buttons[button], varGlobals.screen, 30)
+                pygame.draw.rect(varGlobals.screen, cc.FTEK2, buttons[button], 5, border_radius = 20)
+                tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 60)
                 if click:
                     pencetButton(button)
             else:
-                pygame.draw.rect(varGlobals.screen, cc.FTEK, buttons[button], border_radius = 20)
-                tts(button, cc.FTEK2, buttons[button], varGlobals.screen, 30)
+                pygame.draw.rect(varGlobals.screen, cc.FTEK2, buttons[button], 3, border_radius = 20)
+                tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 50)
 
-        if varGlobals.serviceBot:
-            status_text = "Connected"
-            tts(status_text, cc.GREEN, status_rect, varGlobals.screen, 30)
-        else:
-            status_text = "Disconnected"
-            tts(status_text, cc.RED, status_rect, varGlobals.screen, 30)
+        for myStatus in status:
+            if varGlobals.serviceBot:
+                varGlobals.conServiceBot = "Connected"
+                pygame.draw.rect(varGlobals.screen, cc.GREEN, status[myStatus], border_radius = 20)
+                tts(varGlobals.conServiceBot, cc.WHITE, status[myStatus], varGlobals.screen, 30)
+            else:
+                varGlobals.conServiceBot = "Disconnected"
+                pygame.draw.rect(varGlobals.screen, cc.RED, status[myStatus], border_radius = 20)
+                tts(varGlobals.conServiceBot, cc.WHITE, status[myStatus], varGlobals.screen, 30)
 
         click = False
+        mainClock.tick(60)
         pygame.display.flip()
-        varGlobals.clock.tick(60)
 
 def simulation():
 
@@ -280,12 +274,15 @@ def simulation():
     window_rect = pygame.Surface.get_rect(varGlobals.screen)
     varGlobals.screen.blit(varGlobals.bgSim, (0, 0))
 
-    back_x = varGlobals.screen.get_width() - 200
-    back_y = 20
-    back_pos = pygame.Rect(back_x, back_y, 180, 130)
+    # SET UP POSISI TEXT
+    X = varGlobals.screen.get_width()
+    Y = varGlobals.screen.get_height()
+
+    # POSISI TEXT
+    BACK = pygame.Rect(X -200, Y - 1060, 180, 130)
 
     buttons = {
-        "Back" : back_pos
+        "Back" : BACK
     }
 
     while varGlobals.runSim:

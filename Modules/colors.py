@@ -3,7 +3,7 @@ import Modules.varGlobals as varGlobals
 
 class colors:
     RED = (255, 0, 0)
-    GREEN = (0, 255, 0)
+    GREEN = (70, 205, 0)
     BLUE = (0, 0, 255)
     BLACK = (0, 0, 0)
     WHITE = (245, 245, 245)
@@ -20,7 +20,7 @@ class colors:
 
 
 def tts(text, color, rect, surface, font_size):
-    font = pygame.font.Font("C:\BMP-Robotics\Assets\Romantic Christmas.otf", font_size)
+    font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", font_size)
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect(center=rect.center)
     surface.blit(text_surface, text_rect)
