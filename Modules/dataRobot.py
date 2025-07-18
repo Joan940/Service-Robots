@@ -3,10 +3,11 @@ service_bot_ip = ''
 kompas = 0
 xpos = 0
 ypos = 0
+battery = 0
 connect = 0
 
 def robotService(data, address):
-    global service_bot_ip, kompas, xpos, ypos, connect
+    global service_bot_ip, kompas, xpos, ypos, connect, battery
 
     service_bot_ip = address[0]
 
@@ -18,4 +19,6 @@ def robotService(data, address):
     xpos = (data[2] << 8) | data[3]
     ypos = (data[4] << 8) | data[5]
 
-    connect = data[6]
+    battery = data[6]
+
+    connect = data[7]

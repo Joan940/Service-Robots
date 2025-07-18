@@ -1,7 +1,7 @@
 import pygame
 import Modules.varGlobals as varGlobals
 
-class colors:
+class custom:
     RED = (255, 0, 0)
     GREEN = (70, 205, 0)
     BLUE = (0, 0, 255)

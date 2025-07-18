@@ -10,7 +10,6 @@ def runCom():
     varGlobals.udp = True
     threading.Thread(target = getUDP, daemon = True).start()
     print("Masuk Thread")
-    # time.sleep(0.25)
 
 
 ###################################################################################################
@@ -33,12 +32,12 @@ def getUDP():
             data, address = get.recvfrom(1024)
             print("Data : ", data)
             
-            if len(data) == 7:
-                if data[6] == 1:
+            if len(data) == 8:
+                if data[7] == 1:
                     varGlobals.serviceBot = True
                     varGlobals.conServiceBot = 'Connected'
                     dataRobot.robotService(data, address)
-                elif data[6] == 0:
+                elif data[7] == 0:
                     varGlobals.serviceBot = False
 
         except Exception as e:
