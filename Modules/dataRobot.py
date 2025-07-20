@@ -1,3 +1,5 @@
+import Modules.varGlobals as varGlobals
+
 # VARIABLE GLOBAL
 service_bot_ip = ''
 kompas = 0

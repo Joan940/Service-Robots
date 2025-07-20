@@ -35,6 +35,7 @@ def pencetButton(text):
     # PAKSA HURUF KECIL
     text = text.lower()
     if text == "run":
+        runCom()
         simulation()
 
     elif text == "back":
@@ -277,6 +278,7 @@ def mainMenu():
 def simulation():
 
     # BOOLEAN
+    gerak = False
     click = False
     varGlobals.runSim = True
     varGlobals.runMenu = False
@@ -286,9 +288,6 @@ def simulation():
     window_rect = pygame.Surface.get_rect(varGlobals.screen)
 
     # SET UP POSISI TEXT
-    X = varGlobals.screen.get_width()
-    Y = varGlobals.screen.get_height()
-
     PANJANG_BUTTON = varGlobals.res[0] * 0.1
     LEBAR_BUTTON = varGlobals.res[1] * 0.06
 
@@ -297,18 +296,28 @@ def simulation():
                             window_rect.centery - LEBAR_BUTTON * 7.8,
                             PANJANG_BUTTON * 1, LEBAR_BUTTON * 1.2)
     
-    # SIMULASI MODE DEMO
-    DEMO_1 = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (4.7)),
-                            window_rect.centery - LEBAR_BUTTON * (-6.5),
-                            PANJANG_BUTTON * 1.5, LEBAR_BUTTON * 1.2)
-    DEMO_2 = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (3)),
-                            window_rect.centery - LEBAR_BUTTON * (-6.5),
-                            PANJANG_BUTTON * 1.5, LEBAR_BUTTON * 1.2)
+    # POSISI MODE DEMO
+    DEMO_1 = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (4.5)),
+                            window_rect.centery - LEBAR_BUTTON * (-6.85),
+                            PANJANG_BUTTON, LEBAR_BUTTON * 0.8)
+    
+    DEMO_2 = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (3.5)),
+                            window_rect.centery - LEBAR_BUTTON * (-6.85),
+                            PANJANG_BUTTON, LEBAR_BUTTON * 0.8)
 
     buttons = {
         "Back" : BACK,
         "Demo 1" : DEMO_1,
         "Demo 2" : DEMO_2
+    }
+
+    keys_pressed = {
+        pygame.K_UP : False,
+        pygame.K_DOWN : False,
+        pygame.K_LEFT : False,
+        pygame.K_RIGHT : False,
+        pygame.K_LSHIFT : False,
+        pygame.K_LCTRL : False
     }
     
     while varGlobals.runSim:
@@ -326,23 +335,65 @@ def simulation():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 click = True
+            if event.type == pygame.KEYDOWN:
+
+                # PENANGANAN BOOLEAN (PRESS BUTTON)
+                if event.key == pygame.K_DOWN:
+                    keys_pressed[pygame.K_DOWN] = True
+                elif event.key == pygame.K_UP:
+                    keys_pressed[pygame.K_UP] = True
+                elif event.key == pygame.K_LEFT:
+                    keys_pressed[pygame.K_LEFT] = True
+                elif event.key == pygame.K_RIGHT:
+                    keys_pressed[pygame.K_RIGHT] = True
+                elif event.key == pygame.K_LSHIFT:
+                    keys_pressed[pygame.K_LSHIFT] = True
+                elif event.key == pygame.K_LCTRL:
+                    keys_pressed[pygame.K_LCTRL] = True
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_DOWN:
+                    keys_pressed[pygame.K_DOWN] = False
+                elif event.key == pygame.K_UP:
+                    keys_pressed[pygame.K_UP] = False
+                elif event.key == pygame.K_LEFT:
+                    keys_pressed[pygame.K_LEFT] = False
+                elif event.key == pygame.K_RIGHT:
+                    keys_pressed[pygame.K_RIGHT] = False
+                elif event.key == pygame.K_LSHIFT:
+                    keys_pressed[pygame.K_LSHIFT] = False
+                elif event.key == pygame.K_LCTRL:
+                    keys_pressed[pygame.K_LCTRL] = False
+
+        # MENGGERAKKAN ROBOT DENGAN ARROW [KIRI, KANAN, ATAS, BAWAH]
+        if keys_pressed[pygame.K_DOWN]:
+            dataRobot.xpos += 1
+        if keys_pressed[pygame.K_UP]:
+            dataRobot.xpos -= 1
+        if keys_pressed[pygame.K_LEFT]:
+            dataRobot.ypos -= 1
+        if keys_pressed[pygame.K_RIGHT]:
+            dataRobot.ypos += 1
+        if keys_pressed[pygame.K_LSHIFT]:
+            dataRobot.kompas += 1
+        if keys_pressed[pygame.K_LCTRL]:
+            dataRobot.kompas -= 1
 
         varGlobals.screen.blit(varGlobals.bgSim, (0, 0))
         
-        # # COBA OFFSET
-        # pygame.draw.line(varGlobals.screen, cc.RED, (0, varGlobals.offsetY), (varGlobals.res[0], varGlobals.offsetY), 2)
-        # pygame.draw.line(varGlobals.screen, cc.RED, (varGlobals.offsetX, 0), (varGlobals.offsetX, varGlobals.res[1]), 2)
+        # COBA OFFSET
+        pygame.draw.line(varGlobals.screen, cc.RED, (0, varGlobals.offsetY), (varGlobals.res[0], varGlobals.offsetY), 2)
+        pygame.draw.line(varGlobals.screen, cc.RED, (varGlobals.offsetX, 0), (varGlobals.offsetX, varGlobals.res[1]), 2)
 
         # LOGIKA TOMBOL
         mx, my = pygame.mouse.get_pos()
         for button in buttons:
             if buttons[button].collidepoint(mx, my):
-                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 5, border_radius = 20)
+                # pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 5, border_radius = 20)
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 60)
                 if click:
                     pencetButton(button)
             else:
-                pygame.draw.rect(varGlobals.screen, cc.FTEK2, buttons[button], 3, border_radius = 20)
+                # pygame.draw.rect(varGlobals.screen, cc.FTEK2, buttons[button], 3, border_radius = 20)
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 50)
 
         # for text_line, pos in infoRobot:
@@ -352,10 +403,10 @@ def simulation():
         Xbot = varGlobals.offsetX + (dataRobot.ypos * varGlobals.skala) - varGlobals.offsetResetPosX
         Ybot = varGlobals.offsetY + (dataRobot.xpos * varGlobals.skala) - varGlobals.offsetResetPosY
         rotatedImage(varGlobals.bot, Xbot, Ybot, dataRobot.kompas + 90)
-        rotatedImage(varGlobals.arrow, 1185, 275, dataRobot.kompas)
+        rotatedImage(varGlobals.arrow, 1175, 275, dataRobot.kompas + 90)
 
         click = False
         pygame.display.flip()
         varGlobals.clock.tick(60)
 
-simulation()
+mainMenu()

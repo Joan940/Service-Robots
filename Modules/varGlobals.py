@@ -37,7 +37,7 @@ udp = bool
 
 # NUMERIK
 offsetX= res[0] / 13.5
-offsetY= res[1] / 7.1
+offsetY= res[1] / 5.69
 skala = res[1] / 1200
 
 offsetResetPosX = 50 * skala

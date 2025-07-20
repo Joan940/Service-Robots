@@ -13,7 +13,7 @@ def demoMode():
     data[5] = 5
     data[6] = 0
     data[7] = 1
-    time.sleep(0.15)
+    time.sleep(0.25)
     send(data)
 
 def send(data):
