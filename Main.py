@@ -11,7 +11,8 @@ from Skills.demoMode import (
     demo1
 )
 from Modules.algorithm import (
-    rotatedImage
+    rotatedImage,
+    gridMap
 )
 from Modules.colors import custom as cc, tts
 
@@ -278,7 +279,6 @@ def mainMenu():
 def simulation():
 
     # BOOLEAN
-    gerak = False
     click = False
     varGlobals.runSim = True
     varGlobals.runMenu = False
@@ -300,24 +300,10 @@ def simulation():
     DEMO_1 = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (4.5)),
                             window_rect.centery - LEBAR_BUTTON * (-6.85),
                             PANJANG_BUTTON, LEBAR_BUTTON * 0.8)
-    
-    DEMO_2 = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (3.5)),
-                            window_rect.centery - LEBAR_BUTTON * (-6.85),
-                            PANJANG_BUTTON, LEBAR_BUTTON * 0.8)
 
     buttons = {
         "Back" : BACK,
-        "Demo 1" : DEMO_1,
-        "Demo 2" : DEMO_2
-    }
-
-    keys_pressed = {
-        pygame.K_UP : False,
-        pygame.K_DOWN : False,
-        pygame.K_LEFT : False,
-        pygame.K_RIGHT : False,
-        pygame.K_LSHIFT : False,
-        pygame.K_LCTRL : False
+        "Demo 1" : DEMO_1
     }
     
     while varGlobals.runSim:
@@ -335,54 +321,78 @@ def simulation():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 click = True
+            
+            # PENANGANAN BOOLEAN (PRESS BUTTON)
             if event.type == pygame.KEYDOWN:
-
-                # PENANGANAN BOOLEAN (PRESS BUTTON)
-                if event.key == pygame.K_DOWN:
-                    keys_pressed[pygame.K_DOWN] = True
-                elif event.key == pygame.K_UP:
-                    keys_pressed[pygame.K_UP] = True
-                elif event.key == pygame.K_LEFT:
-                    keys_pressed[pygame.K_LEFT] = True
-                elif event.key == pygame.K_RIGHT:
-                    keys_pressed[pygame.K_RIGHT] = True
-                elif event.key == pygame.K_LSHIFT:
-                    keys_pressed[pygame.K_LSHIFT] = True
-                elif event.key == pygame.K_LCTRL:
-                    keys_pressed[pygame.K_LCTRL] = True
+                if event.key in varGlobals.keys_pressed:
+                    varGlobals.keys_pressed[event.key] = True
+                    varGlobals.notAutonomus = True
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_DOWN:
-                    keys_pressed[pygame.K_DOWN] = False
-                elif event.key == pygame.K_UP:
-                    keys_pressed[pygame.K_UP] = False
-                elif event.key == pygame.K_LEFT:
-                    keys_pressed[pygame.K_LEFT] = False
-                elif event.key == pygame.K_RIGHT:
-                    keys_pressed[pygame.K_RIGHT] = False
-                elif event.key == pygame.K_LSHIFT:
-                    keys_pressed[pygame.K_LSHIFT] = False
-                elif event.key == pygame.K_LCTRL:
-                    keys_pressed[pygame.K_LCTRL] = False
+                if event.key in varGlobals.keys_pressed:
+                    varGlobals.keys_pressed[event.key] = False
+                    varGlobals.notAutonomus = False
+
+        # MENGIRIM DATA PRESS ARROW 
+        data = bytearray(2)
+        keys = pygame.key.get_pressed()
+        for key in varGlobals.keys_pressed.keys():
+            if keys[key]:
+                if pygame.key.name(key) == "down":
+                    data[0] = 99
+                    data[1] = 55
+                    send(data)
+                    print(data[0], data[1])
+                elif pygame.key.name(key) == "up":
+                    data[0] = 99
+                    data[1] = 56
+                    send(data)
+                    print(data[0], data[1])
+                elif pygame.key.name(key) == "left":
+                    data[0] = 99
+                    data[1] = 57
+                    send(data)
+                    print(data[0], data[1])
+                elif pygame.key.name(key) == "right":
+                    data[0] = 99
+                    data[1] = 58
+                    send(data)
+                    print(data[0], data[1])
 
         # MENGGERAKKAN ROBOT DENGAN ARROW [KIRI, KANAN, ATAS, BAWAH]
-        if keys_pressed[pygame.K_DOWN]:
-            dataRobot.xpos += 1
-        if keys_pressed[pygame.K_UP]:
-            dataRobot.xpos -= 1
-        if keys_pressed[pygame.K_LEFT]:
-            dataRobot.ypos -= 1
-        if keys_pressed[pygame.K_RIGHT]:
-            dataRobot.ypos += 1
-        if keys_pressed[pygame.K_LSHIFT]:
-            dataRobot.kompas += 1
-        if keys_pressed[pygame.K_LCTRL]:
-            dataRobot.kompas -= 1
+        # if varGlobals.keys_pressed[pygame.K_DOWN]:
+        #     if dataRobot.xpos < varGlobals.res[1] - 1 and dataRobot.xpos <= 600:
+        #         dataRobot.xpos += 1
+        #         if dataRobot.xpos > 600:
+        #             dataRobot.xpos = 600
+        # if varGlobals.keys_pressed[pygame.K_UP]:
+        #     if dataRobot.xpos > 0 and dataRobot.ypos <= 600:
+        #         dataRobot.xpos -= 1
+        #     if dataRobot.xpos > 0 and dataRobot.ypos > 600 and dataRobot.xpos > 200:
+        #         dataRobot.xpos -= 1
+        #         if dataRobot.xpos < 201:
+        #             dataRobot.xpos = 201
+        # if varGlobals.keys_pressed[pygame.K_LEFT]:
+        #     if dataRobot.ypos > 0:
+        #         dataRobot.ypos -= 1
+        # if varGlobals.keys_pressed[pygame.K_RIGHT]:
+        #     if dataRobot.ypos < varGlobals.res[0] - 1 and dataRobot.ypos <= 600 and dataRobot.xpos <= 200:
+        #         dataRobot.ypos += 1
+        #         if dataRobot.ypos > 600:
+        #             dataRobot.ypos = 600
+        #     elif dataRobot.ypos < varGlobals.res[0] - 1 and dataRobot.ypos <= 1000 and dataRobot.xpos > 200:
+        #         dataRobot.ypos += 1
+        #         if dataRobot.ypos > 1000:
+        #             dataRobot.ypos = 1000
+        # if varGlobals.keys_pressed[pygame.K_LSHIFT]:
+        #     dataRobot.kompas += 1
+        #     if dataRobot.kompas > 360:
+        #         dataRobot.kompas = 0
+        # if varGlobals.keys_pressed[pygame.K_LCTRL]:
+        #     dataRobot.kompas -= 1
+        #     if dataRobot.kompas < 0:
+        #         dataRobot.kompas = 360
 
         varGlobals.screen.blit(varGlobals.bgSim, (0, 0))
-        
-        # COBA OFFSET
-        pygame.draw.line(varGlobals.screen, cc.RED, (0, varGlobals.offsetY), (varGlobals.res[0], varGlobals.offsetY), 2)
-        pygame.draw.line(varGlobals.screen, cc.RED, (varGlobals.offsetX, 0), (varGlobals.offsetX, varGlobals.res[1]), 2)
 
         # LOGIKA TOMBOL
         mx, my = pygame.mouse.get_pos()
@@ -396,14 +406,16 @@ def simulation():
                 # pygame.draw.rect(varGlobals.screen, cc.FTEK2, buttons[button], 3, border_radius = 20)
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 50)
 
-        # for text_line, pos in infoRobot:
-        #     tts(text_line, cc.RED_BROWN, pygame.Rect(pos[0], pos[1], 10, 10), varGlobals.screen, 30)
+        for text_line, pos in infoRobot:
+            tts(text_line, cc.RED_BROWN, pygame.Rect(pos[0], pos[1], 10, 10), varGlobals.screen, 30)
         
         # ROTASI IMAGE
-        Xbot = varGlobals.offsetX + (dataRobot.ypos * varGlobals.skala) - varGlobals.offsetResetPosX
-        Ybot = varGlobals.offsetY + (dataRobot.xpos * varGlobals.skala) - varGlobals.offsetResetPosY
-        rotatedImage(varGlobals.bot, Xbot, Ybot, dataRobot.kompas + 90)
-        rotatedImage(varGlobals.arrow, 1175, 275, dataRobot.kompas + 90)
+        Xbot = varGlobals.offsetX + (dataRobot.ypos * varGlobals.skala)
+        Ybot = varGlobals.offsetY + (dataRobot.xpos * varGlobals.skala)
+        rotatedImage(varGlobals.bot, Xbot, Ybot, dataRobot.kompas)
+        rotatedImage(varGlobals.arrow, 220, 220, dataRobot.kompas)
+
+        # gridMap(varGlobals.runSim, varGlobals.offsetX, varGlobals.offsetY, 50)
 
         click = False
         pygame.display.flip()

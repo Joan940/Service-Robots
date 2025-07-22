@@ -27,10 +27,12 @@ def getUDP():
     # req = struct.pack('4sl', socket.inet_aton(varGlobals.IP), socket.INADDR_ANY)
     # get.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, req)
 
+    printed = False
+
     while varGlobals.udp:
         try:
             data, address = get.recvfrom(1024)
-            print("Data : ", data)
+            print("Data diterima : ", data)
             
             if len(data) == 8:
                 if data[7] == 1:
@@ -41,7 +43,9 @@ def getUDP():
                     varGlobals.serviceBot = False
 
         except Exception as e:
-            print("Data tidak diterima")
+            if not printed:
+                print("Data tidak diterima")
+                printed = True
 
     get.close()
     print("Socket sudah ditutup")

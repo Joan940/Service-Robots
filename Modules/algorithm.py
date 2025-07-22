@@ -14,3 +14,11 @@ def rotatedImage(image, x, y, angle):
 
     varGlobals.screen.blit(rotated_image, new_rect)
 
+def gridMap(screen, x, y, grid_interval = 50):
+    # HORIZONTAL
+    for hor in range(y, varGlobals.res[1], grid_interval):
+        pygame.draw.line(screen, cc.RED, (0, hor), (varGlobals.res[0], hor), 2)
+    
+    # VERTIKAL
+    for ver in range(x, varGlobals.res[0], grid_interval):
+        pygame.draw.line(screen, cc.RED, (ver, 0), (ver, varGlobals.res[1]), 2)

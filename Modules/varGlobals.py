@@ -28,6 +28,7 @@ IP = ''
 PORT = ''
 
 # BOOLEAN
+notAutonomus = bool
 serviceBot = False
 runConfig = bool
 runMenu = bool
@@ -36,12 +37,22 @@ hapus = bool
 udp = bool
 
 # NUMERIK
-offsetX= res[0] / 13.5
-offsetY= res[1] / 5.69
+offsetX= res[0] / 14.53
+offsetY= res[1] / 2.68
 skala = res[1] / 1200
 
-offsetResetPosX = 50 * skala
-offsetResetPosY = 50 * skala
+# offsetResetPosX = 50 * skala
+# offsetResetPosY = 50 * skala
+
+# TEKAN KEYBOARD
+keys_pressed = {
+        pygame.K_UP : False,
+        pygame.K_DOWN : False,
+        pygame.K_LEFT : False,
+        pygame.K_RIGHT : False,
+        pygame.K_LSHIFT : False,
+        pygame.K_LCTRL : False
+    }
 
 # TEXT
 conServiceBot = 'Disconnected' 
