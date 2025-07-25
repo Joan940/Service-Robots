@@ -40,8 +40,8 @@ def pencetButton(text):
         simulation()
 
     elif text == "back":
-        # mainMenu()
-        sys.exit(0)
+        mainMenu()
+        # sys.exit(0)
 
     elif text == "configuration":
         print("configuration")
@@ -296,22 +296,33 @@ def simulation():
                             window_rect.centery - LEBAR_BUTTON * 7.8,
                             PANJANG_BUTTON * 1, LEBAR_BUTTON * 1.2)
     
-    # POSISI MODE DEMO
-    DEMO_1 = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (4.5)),
-                            window_rect.centery - LEBAR_BUTTON * (-6.85),
+    # POSISI TEXT + KOTAK
+    DEMO_1 = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * 0.95),
+                            window_rect.centery - (LEBAR_BUTTON * 1.5),
                             PANJANG_BUTTON, LEBAR_BUTTON * 0.8)
+    TAMBAH_PESANAN = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
+                            window_rect.centery - LEBAR_BUTTON * (5.85),
+                            PANJANG_BUTTON * 3, LEBAR_BUTTON * 1.7)
+    HAPUS_PESANAN = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
+                            window_rect.centery - LEBAR_BUTTON * (3.85),
+                            PANJANG_BUTTON * 3, LEBAR_BUTTON * 1.7)
 
     buttons = {
-        "Back" : BACK,
-        "Demo 1" : DEMO_1
+        "Back" : BACK
+    }
+
+    kotak_button = {
+        "Demo 1" : DEMO_1,
+        "Add Order" : TAMBAH_PESANAN,
+        "Delete Order" : HAPUS_PESANAN
     }
     
     while varGlobals.runSim:
 
         infoRobot = [
-            ("" + str(dataRobot.kompas), (80, 30)),
-            ("" + str(dataRobot.xpos), (80, 76)),
-            ("" + str(dataRobot.ypos), (80, 122))
+            ("Compass   : " + str(dataRobot.kompas), (220, 60)),
+            ("X     : " + str(dataRobot.xpos), (150, 990)),
+            ("Y     : " + str(dataRobot.ypos), (350, 990))
         ]
 
         for event in pygame.event.get():
@@ -398,13 +409,22 @@ def simulation():
         mx, my = pygame.mouse.get_pos()
         for button in buttons:
             if buttons[button].collidepoint(mx, my):
-                # pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 5, border_radius = 20)
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 60)
                 if click:
                     pencetButton(button)
             else:
-                # pygame.draw.rect(varGlobals.screen, cc.FTEK2, buttons[button], 3, border_radius = 20)
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 50)
+            
+        for button in kotak_button:
+            if kotak_button[button].collidepoint(mx, my):
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, kotak_button[button], 5, border_radius = 20)
+                tts(button, cc.RED_BROWN, kotak_button[button], varGlobals.screen, 60)
+                if click:
+                    pencetButton(button)
+            else:
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, kotak_button[button], 3, border_radius = 20)
+                tts(button, cc.RED_BROWN, kotak_button[button], varGlobals.screen, 50)
+                
 
         for text_line, pos in infoRobot:
             tts(text_line, cc.RED_BROWN, pygame.Rect(pos[0], pos[1], 10, 10), varGlobals.screen, 30)
@@ -421,4 +441,4 @@ def simulation():
         pygame.display.flip()
         varGlobals.clock.tick(60)
 
-mainMenu()
+simulation()
