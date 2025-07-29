@@ -23,26 +23,33 @@ print(int(screen_width),int(screen_height))
 #                                            VARIABLE                                             #
 ###################################################################################################
 
-# IP DAN PORT
+# KOSONGAN
 IP = ''
 PORT = ''
+jumlah = ''
+nomorMeja = ''
+
+# NONE
+input = None
+pesanan = None
 
 # BOOLEAN
 notAutonomus = bool
 serviceBot = False
 runConfig = bool
+runOrder = bool
 runMenu = bool
 runSim = bool
 hapus = bool
 udp = bool
 
-# NUMERIK
-offsetX= res[0] / 14.53
-offsetY= res[1] / 2.68
+# RESOLUSI WINDOW
+offsetX = res[0] / 14.53
+offsetY = res[1] / 2.68
 skala = res[1] / 1200
 
-# offsetResetPosX = 50 * skala
-# offsetResetPosY = 50 * skala
+# NUMERIK
+antrian = 1
 
 # TEKAN KEYBOARD
 keys_pressed = {
@@ -58,29 +65,20 @@ keys_pressed = {
 conServiceBot = 'Disconnected' 
 
 # FONT
-font = pygame.font.Font("/media/joan/Windows-SSD/BMP-Robotics/Assets/Oregano-Regular.ttf", 50)
+font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 50)
 
 
 ###################################################################################################
 #                                           BACKGROUND                                            #
 ###################################################################################################
 
-# bgMenu = pygame.image.load("C:\BMP-Robotics\Assets\menu.png").convert_alpha()
-# bgConfig = pygame.image.load("C:\BMP-Robotics\Assets\configuration.png").convert_alpha()
-# bgSim = pygame.image.load("C:\BMP-Robotics\Assets\simulator.png").convert_alpha()
+bgMenu = pygame.image.load("C:\BMP-Robotics\Assets\menu.png").convert_alpha()
+bgConfig = pygame.image.load("C:\BMP-Robotics\Assets\configuration.png").convert_alpha()
+bgSim = pygame.image.load("C:\BMP-Robotics\Assets\simulator.png").convert_alpha()
+bgOrder = pygame.image.load("C:\BMP-Robotics\Assets\order.png").convert_alpha()
 
-# bot = pygame.image.load(r"C:\BMP-Robotics\Assets\bot.png").convert_alpha()
-# bot = pygame.transform.scale(bot, (40, 40))
-
-# arrow = pygame.image.load(r"C:\BMP-Robotics\Assets\arrow.png").convert_alpha()
-# arrow = pygame.transform.scale(arrow, (100, 100))
-
-bgMenu = pygame.image.load("/media/joan/Windows-SSD/BMP-Robotics/Assets/menu.png").convert_alpha()
-bgConfig = pygame.image.load("/media/joan/Windows-SSD/BMP-Robotics/Assets/configuration.png").convert_alpha()
-bgSim = pygame.image.load("/media/joan/Windows-SSD/BMP-Robotics/Assets/simulator.png").convert_alpha()
-
-bot = pygame.image.load(r"/media/joan/Windows-SSD/BMP-Robotics/Assets/bot.png").convert_alpha()
+bot = pygame.image.load(r"C:\BMP-Robotics\Assets\bot.png").convert_alpha()
 bot = pygame.transform.scale(bot, (40, 40))
 
-arrow = pygame.image.load(r"/media/joan/Windows-SSD/BMP-Robotics/Assets/arrow.png").convert_alpha()
+arrow = pygame.image.load(r"C:\BMP-Robotics\Assets\arrow.png").convert_alpha()
 arrow = pygame.transform.scale(arrow, (100, 100))

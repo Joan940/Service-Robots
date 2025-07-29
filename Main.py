@@ -11,8 +11,11 @@ from Skills.demoMode import (
     demo1
 )
 from Modules.algorithm import (
-    rotatedImage,
-    gridMap
+    rotatedImage
+)
+from Modules.database import (
+    addOrders,
+    getOrders
 )
 from Modules.colors import custom as cc, tts
 
@@ -23,6 +26,7 @@ from Modules.colors import custom as cc, tts
 
 varGlobals.IP = '127.0.0.1'
 varGlobals.PORT = '8081'
+order_list = []
 
 
 ###################################################################################################
@@ -39,10 +43,6 @@ def pencetButton(text):
         runCom()
         simulation()
 
-    elif text == "back":
-        mainMenu()
-        # sys.exit(0)
-
     elif text == "configuration":
         print("configuration")
         configuration()
@@ -52,8 +52,15 @@ def pencetButton(text):
         runCom()
         mainMenu()
 
+    elif text == "back":
+        mainMenu()
+        # sys.exit(0)
+
     elif text == "demo 1":
         demo1()
+
+    elif text == "add order":
+        order()
 
     elif text == "exit":
         sys.exit(0)
@@ -120,6 +127,7 @@ def configuration():
     click = False
     varGlobals.runSim = False
     varGlobals.runMenu = False
+    varGlobals.runOrder = False
     varGlobals.runConfig = True
 
     # WINDOW
@@ -189,6 +197,131 @@ def configuration():
 
 
 ###################################################################################################
+#                                            ADD ORDER                                            #
+###################################################################################################
+
+def order():
+    # BOOLEAN
+    click = False
+    varGlobals.runSim = False
+    varGlobals.runMenu = False
+    varGlobals.runOrder = True
+    varGlobals.runConfig = False
+
+    # WINDOW
+    window_rect = pygame.Surface.get_rect(varGlobals.screen)
+
+    # SET UP POSISI TEXT & UKURAN BUTTON
+    PANJANG_BUTTON = varGlobals.res[0] * 0.1
+    LEBAR_BUTTON = varGlobals.res[1] * 0.06
+
+    # POSISI TOMBOL
+    EXIT = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * (-0.8)),
+                            window_rect.centery - (LEBAR_BUTTON * (-2.2)),
+                            PANJANG_BUTTON * 3, LEBAR_BUTTON * 1.7)
+    PIZZA = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * 4.3),
+                            window_rect.centery - (LEBAR_BUTTON * 3),
+                            PANJANG_BUTTON, LEBAR_BUTTON)
+    BURGER = pygame.rect.Rect(window_rect.centerx - (PANJANG_BUTTON * 4.3),
+                            window_rect.centery - (LEBAR_BUTTON * 1.8),
+                            PANJANG_BUTTON, LEBAR_BUTTON)
+
+    buttons = {
+        "Exit": EXIT
+    }
+
+    menu = {
+        "Pizza": PIZZA,
+        "Burger": BURGER
+    }
+
+    # JENDELA TAMBAHAN
+    boxNomorMeja = pygame.Rect(window_rect.centerx - 150, window_rect.centery - 50, 300, 50)
+    boxJumlah = pygame.Rect(window_rect.centerx - 150, window_rect.centery + 50, 300, 50)
+
+    while varGlobals.runOrder:
+
+        varGlobals.screen.blit(varGlobals.bgOrder, (0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                varGlobals.runOrder = False
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                click = True
+
+            if event.type == pygame.KEYDOWN:
+                if varGlobals.pesanan:
+                    if varGlobals.input == "table" and event.unicode.isnumeric():
+                        varGlobals.nomorMeja += event.unicode
+                    elif varGlobals.input == "quantity" and event.unicode.isnumeric():
+                        varGlobals.jumlah += event.unicode
+
+                    if event.key == pygame.K_RETURN:
+                        if varGlobals.input == "table" and varGlobals.nomorMeja:
+                            varGlobals.input = "quantity"
+                        elif varGlobals.input == "quantity" and varGlobals.jumlah:
+                            if varGlobals.nomorMeja and varGlobals.jumlah:
+                                addOrders(varGlobals.nomorMeja, varGlobals.antrian, varGlobals.pesanan, varGlobals.jumlah)
+                                
+                                # RESET
+                                varGlobals.pesanan = None
+                                varGlobals.nomorMeja = ""
+                                varGlobals.jumlah = ""
+                                varGlobals.antrian += 1
+                            else:
+                                print("Tolong gunakan angka yang valid!")
+                    elif event.key == pygame.K_BACKSPACE:
+                        if varGlobals.input == "table" and varGlobals.nomorMeja:
+                            varGlobals.nomorMeja = varGlobals.nomorMeja[:-1]
+                        elif varGlobals.input == "quantity" and varGlobals.jumlah:
+                            varGlobals.jumlah = varGlobals.jumlah[:-1]
+
+        # LOGIKA TOMBOL
+        mx, my = pygame.mouse.get_pos()
+        for button in buttons:
+            if buttons[button].collidepoint(mx, my):
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 5, border_radius=20)
+                tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 60)
+                if click:
+                    pencetButton(button)
+            else:
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 3, border_radius=20)
+                tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 50)
+
+        for button in menu:
+            if menu[button].collidepoint(mx, my):
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, menu[button], border_radius=20)
+                tts(button, cc.WHITE, menu[button], varGlobals.screen, 40)
+                if click:
+                    varGlobals.pesanan = button
+                    varGlobals.input = "table"
+                    varGlobals.nomorMeja = ""
+                    varGlobals.jumlah = ""
+            else:
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, menu[button], border_radius=20)
+                tts(button, cc.WHITE, menu[button], varGlobals.screen, 30)
+
+        # JENDELA TAMBAHAN MUNCUL KETIKA MEMESAN
+        if varGlobals.pesanan:
+            pygame.draw.rect(varGlobals.screen, cc.GRAY_BROWN, boxNomorMeja, border_radius=10)
+            pygame.draw.rect(varGlobals.screen, cc.GRAY_BROWN, boxJumlah, border_radius=10)
+
+            font = varGlobals.font
+            table_text = font.render(f"Table: {varGlobals.nomorMeja or ''}", True, cc.BLACK)
+            quantity_text = font.render(f"Qty: {varGlobals.jumlah or ''}", True, cc.BLACK)
+
+            varGlobals.screen.blit(table_text, (boxNomorMeja.x + 10, boxNomorMeja.y + 10))
+            varGlobals.screen.blit(quantity_text, (boxJumlah.x + 10, boxJumlah.y + 10))
+
+        click = False
+        varGlobals.clock.tick(60)
+        pygame.display.flip()
+
+
+
+###################################################################################################
 #                                            MAIN MENU                                            #
 ###################################################################################################
 
@@ -198,11 +331,11 @@ def mainMenu():
     click = False
     varGlobals.runSim = False
     varGlobals.runMenu = True
+    varGlobals.runOrder = False
     varGlobals.runConfig = False
 
     # WINDOW
     window_rect = pygame.Surface.get_rect(varGlobals.screen)
-    mainClock = pygame.time.Clock()
 
     # SET UP POSISI TEXT & UKURAN BUTTON
     PANJANG_BUTTON = varGlobals.res[0] * 0.1
@@ -273,8 +406,13 @@ def mainMenu():
                 tts(varGlobals.conServiceBot, cc.WHITE, status[myStatus], varGlobals.screen, 30)
 
         click = False
-        mainClock.tick(60)
+        varGlobals.clock.tick(60)
         pygame.display.flip()
+
+
+###################################################################################################
+#                                            SIMULATION                                           #
+###################################################################################################
 
 def simulation():
 
@@ -282,6 +420,7 @@ def simulation():
     click = False
     varGlobals.runSim = True
     varGlobals.runMenu = False
+    varGlobals.runOrder = False
     varGlobals.runConfig = False
 
     # WINDOW
@@ -327,7 +466,7 @@ def simulation():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                varGlobals.runMenu = False
+                varGlobals.runSim = False
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -435,10 +574,8 @@ def simulation():
         rotatedImage(varGlobals.bot, Xbot, Ybot, dataRobot.kompas)
         rotatedImage(varGlobals.arrow, 220, 220, dataRobot.kompas)
 
-        # gridMap(varGlobals.runSim, varGlobals.offsetX, varGlobals.offsetY, 50)
-
         click = False
         pygame.display.flip()
         varGlobals.clock.tick(60)
 
-simulation()
+mainMenu()
