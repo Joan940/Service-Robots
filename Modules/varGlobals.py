@@ -10,13 +10,13 @@ if sys.platform in ["win32", "win64"]: os.environ["SDL_VIDEO_CENTERED"] = "1"
 pygame.init()
 clock = pygame.time.Clock()
 
-os.environ['SDL_VIDEO_CENTERED']='1'
+os.environ['SDL_VIDEO_CENTERED'] = '1'
 info = pygame.display.Info()
-screen_width,screen_height = info.current_w, info.current_h
-res = (screen_width,screen_height)
+screen_width, screen_height = info.current_w, info.current_h
+res = (screen_width, screen_height)
 
-screen =pygame.display.set_mode(res)
-print(int(screen_width),int(screen_height))
+screen = pygame.display.set_mode(res)
+print(int(screen_width), int(screen_height))
 
 
 ###################################################################################################

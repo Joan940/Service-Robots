@@ -1,4 +1,5 @@
 import sys
+import time
 import pygame
 import Modules.dataRobot as dataRobot
 import Modules.varGlobals as varGlobals
@@ -262,7 +263,6 @@ def order():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                click = True
                 mx, my = pygame.mouse.get_pos()
 
                 for button_name in buttons:
@@ -278,15 +278,9 @@ def order():
                         varGlobals.nomorMeja = ""
                         varGlobals.jumlah = ""
 
+                        # POSISI POP UP
                         varGlobals.popupX = rect.right + 20
                         varGlobals.popupY = rect.centery - (varGlobals.tinggiPopup // 2)
-
-                        if varGlobals.popupX + varGlobals.lebarPopup > varGlobals.screen_width:
-                            varGlobals.popupX = rect.left - varGlobals.lebarPopup - 20
-                        if varGlobals.popupY < 0:
-                            varGlobals.popupY = 0
-                        if varGlobals.popupY + varGlobals.tinggiPopup > varGlobals.screen_height:
-                            varGlobals.popupY = varGlobals.screen_height - varGlobals.tinggiPopup
                         
                         varGlobals.input = "table"
 
@@ -312,8 +306,6 @@ def order():
                             varGlobals.input = None
                         else:
                             print("Nomor meja dan jumlah harus diisi!")
-                    else:
-                        pass
 
             if event.type == pygame.KEYDOWN:
                 if varGlobals.pesanan:
@@ -384,6 +376,8 @@ def order():
             elif varGlobals.input == "quantity":
                 pygame.draw.rect(varGlobals.screen, cc.BLACK, boxJumlah, 3, border_radius=8)
             elif varGlobals.input == "confirm":
+                pygame.draw.rect(varGlobals.screen, cc.BLACK, boxConfirm, 5, border_radius=8)
+                time.sleep(0.0001)
                 pygame.draw.rect(varGlobals.screen, cc.BLACK, boxConfirm, 3, border_radius=8)
             
             # JUDUL UNTUK KOTAK POP UP BESAR
