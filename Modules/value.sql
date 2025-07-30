@@ -9,5 +9,4 @@ CREATE TABLE orders (
     item_name VARCHAR(255) NOT NULL, -- Nama item
     quantity INT DEFAULT 1,          -- Jumlah item
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Waktu pembuatan pesanan
-    order_group INT DEFAULT NULL     -- Kelompok pesanan (opsional)
 );

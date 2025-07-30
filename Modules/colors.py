@@ -17,6 +17,7 @@ class custom:
     COFFEE_BROWN = (111, 78, 55)
     COPPER_BROWN = (184, 115, 51)
     LIGHT_RED_BROWN = (193, 154, 107)
+    
 
 
 def tts(text, color, rect, surface, font_size):

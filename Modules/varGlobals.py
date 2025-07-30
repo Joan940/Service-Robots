@@ -48,10 +48,18 @@ offsetX = res[0] / 14.53
 offsetY = res[1] / 2.68
 skala = res[1] / 1200
 
-# NUMERIK
-antrian = 1
+# UKURAN BUTTON
+PANJANG_BUTTON = res[0] * 0.1
+LEBAR_BUTTON = res[1] * 0.06
 
-# TEKAN KEYBOARD
+# NUMERIK
+popupX = 0
+popupY = 0
+antrian = 1
+lebarPopup = 350
+tinggiPopup = 170
+
+# KEYBOARD
 keys_pressed = {
         pygame.K_UP : False,
         pygame.K_DOWN : False,
@@ -65,7 +73,7 @@ keys_pressed = {
 conServiceBot = 'Disconnected' 
 
 # FONT
-font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 50)
+font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 20)
 
 
 ###################################################################################################
