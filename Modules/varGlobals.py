@@ -31,6 +31,7 @@ nomorMeja = ''
 
 # NONE
 input = None
+warna = None
 pesanan = None
 
 # BOOLEAN
@@ -74,6 +75,10 @@ conServiceBot = 'Disconnected'
 
 # FONT
 font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 20)
+
+# SOUND EFFECT
+trueSound = pygame.mixer.Sound(r"C:\BMP-Robotics\Assets\true.wav")
+falseSound = pygame.mixer.Sound(r"C:\BMP-Robotics\Assets\false.wav")
 
 
 ###################################################################################################

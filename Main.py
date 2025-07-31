@@ -1,5 +1,4 @@
 import sys
-import time
 import pygame
 import Modules.dataRobot as dataRobot
 import Modules.varGlobals as varGlobals
@@ -27,6 +26,8 @@ from Modules.colors import (
 ###################################################################################################
 #                            VARIABLE GLOBAL YANG DIINISIALISASI DIAWAL                           #
 ###################################################################################################
+
+pygame.mixer.init()
 
 varGlobals.IP = '127.0.0.1'
 varGlobals.PORT = '8081'
@@ -172,6 +173,7 @@ def configuration():
     }
 
     while varGlobals.runConfig:
+        varGlobals.trueSound.play()
         varGlobals.screen.blit(varGlobals.bgConfig, (0, 0))
 
         for event in pygame.event.get():
@@ -215,7 +217,6 @@ def configuration():
 def order():
 
     # BOOLEAN
-    click = False
     varGlobals.runSim = False
     varGlobals.runMenu = False
     varGlobals.runOrder = True
@@ -263,7 +264,14 @@ def order():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                
+                varGlobals.trueSound.play()
                 mx, my = pygame.mouse.get_pos()
+
+                # JIKA MENEKAN DI LUAR BUTTON, JENDELA POP UP HILANG 
+                if varGlobals.pesanan and not pygame.Rect(varGlobals.popupX, varGlobals.popupY, varGlobals.lebarPopup + 20, varGlobals.tinggiPopup).collidepoint(mx, my) and not varGlobals.nomorMeja and not varGlobals.jumlah:
+                    varGlobals.pesanan = None
+                    varGlobals.input = None
 
                 for button_name in buttons:
                     if buttons[button_name].collidepoint(mx, my):
@@ -306,36 +314,39 @@ def order():
                             varGlobals.input = None
                         else:
                             print("Nomor meja dan jumlah harus diisi!")
+                            varGlobals.falseSound.play()
 
-            if event.type == pygame.KEYDOWN:
-                if varGlobals.pesanan:
-                    if varGlobals.input == "table":
-                        if event.unicode.isnumeric():
-                            varGlobals.nomorMeja += event.unicode
-                        elif event.key == pygame.K_BACKSPACE and varGlobals.nomorMeja:
-                            varGlobals.nomorMeja = varGlobals.nomorMeja[:-1]
-                        elif event.key == pygame.K_RETURN:
-                            if varGlobals.nomorMeja:
-                                varGlobals.input = "quantity"
-                            else:
-                                print("Nomor meja tidak boleh kosong.")
-                    elif varGlobals.input == "quantity":
-                        if event.unicode.isnumeric():
-                            varGlobals.jumlah += event.unicode
-                        elif event.key == pygame.K_BACKSPACE and varGlobals.jumlah:
-                            varGlobals.jumlah = varGlobals.jumlah[:-1]
-                        elif event.key == pygame.K_RETURN:
-                            if varGlobals.nomorMeja and varGlobals.jumlah:
-                                addOrders(varGlobals.nomorMeja, varGlobals.antrian, varGlobals.pesanan, varGlobals.jumlah)
-                                
-                                # RESET
-                                varGlobals.pesanan = None
-                                varGlobals.nomorMeja = ""
-                                varGlobals.jumlah = ""
-                                varGlobals.antrian += 1
-                                varGlobals.input = None
-                            else:
-                                print("Nomor meja dan jumlah harus diisi!")
+            if event.type == pygame.KEYDOWN and varGlobals.pesanan:
+                if varGlobals.input == "table":
+                    if event.unicode.isnumeric():
+                        varGlobals.nomorMeja += event.unicode
+                    elif event.key == pygame.K_BACKSPACE and varGlobals.nomorMeja:
+                        varGlobals.nomorMeja = varGlobals.nomorMeja[:-1]
+                    elif event.key == pygame.K_RETURN:
+                        if varGlobals.nomorMeja:
+                            varGlobals.input = "quantity"
+                        else:
+                            print("Nomor meja tidak boleh kosong.")
+                            varGlobals.falseSound.play()
+
+                elif varGlobals.input == "quantity":
+                    if event.unicode.isnumeric():
+                        varGlobals.jumlah += event.unicode
+                    elif event.key == pygame.K_BACKSPACE and varGlobals.jumlah:
+                        varGlobals.jumlah = varGlobals.jumlah[:-1]
+                    elif event.key == pygame.K_RETURN:
+                        if varGlobals.nomorMeja and varGlobals.jumlah:
+                            addOrders(varGlobals.nomorMeja, varGlobals.antrian, varGlobals.pesanan, varGlobals.jumlah)
+                            
+                            # RESET
+                            varGlobals.pesanan = None
+                            varGlobals.nomorMeja = ""
+                            varGlobals.jumlah = ""
+                            varGlobals.antrian += 1
+                            varGlobals.input = None
+                        else:
+                            print("Nomor meja dan jumlah harus diisi!")
+                            varGlobals.falseSound.play()
 
         # LOGIKA TOMBOL
         for button_name, rect in buttons.items():
@@ -369,15 +380,13 @@ def order():
             # KOTAK KONFIRMASI
             pygame.draw.rect(varGlobals.screen, cc.WHITE, boxConfirm, border_radius=8)
             pygame.draw.rect(varGlobals.screen, cc.BLACK, boxConfirm, 3, border_radius=8)
-            
+
             # HIGHLIGHT BOX
             if varGlobals.input == "table":
                 pygame.draw.rect(varGlobals.screen, cc.BLACK, boxNomorMeja, 3, border_radius=8)
             elif varGlobals.input == "quantity":
                 pygame.draw.rect(varGlobals.screen, cc.BLACK, boxJumlah, 3, border_radius=8)
             elif varGlobals.input == "confirm":
-                pygame.draw.rect(varGlobals.screen, cc.BLACK, boxConfirm, 5, border_radius=8)
-                time.sleep(0.0001)
                 pygame.draw.rect(varGlobals.screen, cc.BLACK, boxConfirm, 3, border_radius=8)
             
             # JUDUL UNTUK KOTAK POP UP BESAR
@@ -677,4 +686,4 @@ def simulation():
         pygame.display.flip()
         varGlobals.clock.tick(60)
 
-mainMenu()
+order()

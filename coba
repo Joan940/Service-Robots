@@ -1,0 +1,347 @@
+import pygame
+import sys
+
+# --- Asumsi Kelas VarGlobals dan Colors sudah ada dan diperbarui ---
+# Pastikan kelas-kelas ini ada di bagian lain dari kode Anda atau di awal file ini.
+# Saya menyertakannya di sini untuk kelengkapan dan demonstrasi.
+
+class VarGlobals:
+    def __init__(self):
+        pygame.init()
+        self.screen_width = 1200
+        self.screen_height = 800
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        pygame.display.set_caption("Order System")
+        self.font = pygame.font.Font(None, 32)
+        self.big_font = pygame.font.Font(None, 60) # Untuk judul pop-up
+        self.bgOrder = pygame.Surface((self.screen_width, self.screen_height))
+        self.bgOrder.fill((100, 100, 100)) # Latar belakang placeholder
+        self.runSim = False
+        self.runMenu = False
+        self.runOrder = True
+        self.runConfig = False
+        self.PANJANG_BUTTON = 200
+        self.LEBAR_BUTTON = 80
+        self.pesanan = None
+        self.input = "" # Melacak bidang input aktif ('table', 'quantity', 'confirm')
+        self.nomorMeja = ""
+        self.jumlah = ""
+        self.antrian = 1
+        self.clock = pygame.time.Clock()
+
+        # Dimensi pop-up (penting untuk perbaikan tombol 'Done')
+        self.lebarPopup = 350
+        self.tinggiPopup = 250 # Ditingkatkan agar tombol 'Done' pas
+
+        # Untuk efek klik
+        self.last_click_time = {} # Menyimpan waktu (ms) klik terakhir per tombol
+        self.click_effect_duration = 150 # Durasi efek warna klik dalam milidetik
+
+class Colors:
+    def __init__(self):
+        self.RED = (255, 0, 0)
+        self.GREEN = (70, 205, 0)
+        self.BLUE = (0, 0, 255)
+        self.BLACK = (0, 0, 0)
+        self.WHITE = (245, 245, 245)
+        self.FTEK = (209, 107, 2)
+        self.FTEK2 = (150, 77, 2)
+        self.DARK_BROWN = (101, 67, 33)
+        self.LIGHT_BROWN = (181, 101, 29)
+        self.RED_BROWN = (165, 42, 42)
+        self.YELLOW_BROWN = (153, 101, 21)
+        self.GRAY_BROWN = (128, 105, 72)
+        self.COFFEE_BROWN = (111, 78, 55)
+        self.COPPER_BROWN = (184, 115, 51)
+        self.LIGHT_RED_BROWN = (193, 154, 107)
+        self.BRIGHT_YELLOW = (255, 255, 0) # Warna baru untuk efek klik
+
+# Instansiasi objek global (pastikan ini hanya dilakukan sekali di aplikasi Anda)
+varGlobals = VarGlobals()
+cc = Colors()
+
+# Fungsi placeholder (pastikan ini ada di tempat yang dapat diakses)
+def tts(text, color, rect, screen, font_size):
+    font = pygame.font.Font(None, font_size)
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect(center=rect.center)
+    screen.blit(text_surface, text_rect)
+
+def pencetButton(button_name):
+    if button_name == "Exit":
+        varGlobals.runOrder = False
+        print("Exiting order screen.")
+
+def addOrders(nomorMeja, antrian, pesanan, jumlah):
+    print(f"Order added: Table {nomorMeja}, Item: {pesanan}, Quantity: {jumlah}, Queue: {antrian}")
+
+
+---
+
+### Fungsi `order()` dengan Efek Klik
+
+```python
+def order():
+    click = False
+    varGlobals.runSim = False
+    varGlobals.runMenu = False
+    varGlobals.runOrder = True
+    varGlobals.runConfig = False
+
+    window_rect = pygame.Surface.get_rect(varGlobals.screen)
+
+    # POSISI TOMBOL UTAMA
+    EXIT = pygame.rect.Rect(
+        window_rect.centerx - (varGlobals.PANJANG_BUTTON * (-0.8)),
+        window_rect.centery - (varGlobals.LEBAR_BUTTON * (-2.2)),
+        varGlobals.PANJANG_BUTTON * 3,
+        varGlobals.LEBAR_BUTTON * 1.7
+    )
+    PIZZA = pygame.rect.Rect(
+        window_rect.centerx - (varGlobals.PANJANG_BUTTON * 4.3),
+        window_rect.centery - (varGlobals.LEBAR_BUTTON * 3),
+        varGlobals.PANJANG_BUTTON,
+        varGlobals.LEBAR_BUTTON
+    )
+    BURGER = pygame.rect.Rect(
+        window_rect.centerx - (varGlobals.PANJANG_BUTTON * 4.3),
+        window_rect.centery - (varGlobals.LEBAR_BUTTON * 1.8),
+        varGlobals.PANJANG_BUTTON,
+        varGlobals.LEBAR_BUTTON
+    )
+
+    buttons = {
+        "Exit": EXIT
+    }
+
+    menu = {
+        "Pizza": PIZZA,
+        "Burger": BURGER
+    }
+
+    # Inisialisasi variabel kotak agar tidak terjadi error "unbound local"
+    boxNomorMeja = pygame.Rect(0, 0, 0, 0)
+    boxJumlah = pygame.Rect(0, 0, 0, 0)
+    boxConfirm = pygame.Rect(0, 0, 0, 0)
+
+    while varGlobals.runOrder:
+        varGlobals.screen.blit(varGlobals.bgOrder, (0, 0)) # Gambar latar belakang
+
+        # Dapatkan waktu saat ini untuk efek klik
+        current_time = pygame.time.get_ticks()
+
+        # LOGIKA DAN GAMBAR TOMBOL UTAMA (Exit)
+        for button_name, rect in buttons.items():
+            button_color = cc.RED_BROWN # Warna default
+            text_color = cc.WHITE # Warna teks default
+
+            # Cek apakah tombol baru saja diklik
+            if button_name in varGlobals.last_click_time and \
+               current_time - varGlobals.last_click_time[button_name] < varGlobals.click_effect_duration:
+                button_color = cc.BRIGHT_YELLOW # Warna saat diklik
+                text_color = cc.BLACK # Warna teks saat diklik
+            elif rect.collidepoint(pygame.mouse.get_pos()):
+                button_color = cc.COFFEE_BROWN # Warna hover
+            
+            # Gambar tombol
+            pygame.draw.rect(varGlobals.screen, button_color, rect, 5, border_radius=20) # Border lebih tebal untuk hover
+            tts(button_name, text_color, rect, varGlobals.screen, 60 if rect.collidepoint(pygame.mouse.get_pos()) else 50)
+
+        # LOGIKA DAN GAMBAR ITEM MENU (Pizza, Burger)
+        for menu_item, rect in menu.items():
+            button_color = cc.FTEK # Warna default
+            text_color = cc.WHITE # Warna teks default
+
+            # Cek apakah item menu baru saja diklik
+            if menu_item in varGlobals.last_click_time and \
+               current_time - varGlobals.last_click_time[menu_item] < varGlobals.click_effect_duration:
+                button_color = cc.BRIGHT_YELLOW # Warna saat diklik
+                text_color = cc.BLACK # Warna teks saat diklik
+            elif rect.collidepoint(pygame.mouse.get_pos()):
+                button_color = cc.FTEK2 # Warna hover
+            
+            # Gambar item menu
+            pygame.draw.rect(varGlobals.screen, button_color, rect, border_radius=20)
+            tts(menu_item, text_color, rect, varGlobals.screen, 40 if rect.collidepoint(pygame.mouse.get_pos()) else 30)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                varGlobals.runOrder = False
+                pygame.quit()
+                sys.exit()
+            
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                click = True
+                mx, my = pygame.mouse.get_pos()
+
+                # Cek klik tombol utama
+                for button_name in buttons:
+                    if buttons[button_name].collidepoint(mx, my):
+                        varGlobals.last_click_time[button_name] = current_time # Rekam waktu klik
+                        pencetButton(button_name)
+                
+                # Cek klik item menu
+                for menu_item, rect in menu.items():
+                    if rect.collidepoint(mx, my):
+                        varGlobals.last_click_time[menu_item] = current_time # Rekam waktu klik
+
+                        # INISIALISASI AWAL POP-UP
+                        varGlobals.pesanan = menu_item
+                        varGlobals.input = "table" # Mulai input dengan meja
+                        varGlobals.nomorMeja = ""
+                        varGlobals.jumlah = ""
+
+                        # Hitung posisi pop-up relatif terhadap tombol menu yang diklik
+                        varGlobals.popupX = rect.right + 20
+                        varGlobals.popupY = rect.centery - (varGlobals.tinggiPopup // 2)
+
+                        # Sesuaikan posisi pop-up agar tetap di layar
+                        if varGlobals.popupX + varGlobals.lebarPopup > varGlobals.screen_width:
+                            varGlobals.popupX = rect.left - varGlobals.lebarPopup - 20
+                        if varGlobals.popupY < 0:
+                            varGlobals.popupY = 0
+                        if varGlobals.popupY + varGlobals.tinggiPopup > varGlobals.screen_height:
+                            varGlobals.popupY = varGlobals.screen_height - varGlobals.tinggiPopup
+                        
+                        varGlobals.input = "table" # Atur bidang input aktif awal
+
+                # Cek klik di dalam pop-up (kotak input atau tombol "Done")
+                if varGlobals.pesanan: # Hanya jika item menu dipilih dan pop-up terlihat
+                    # Hitung ulang posisi kotak berdasarkan popupX dan popupY saat ini
+                    boxNomorMeja = pygame.Rect(varGlobals.popupX + 20, varGlobals.popupY + 60, varGlobals.lebarPopup - 40, 50)
+                    boxJumlah = pygame.Rect(varGlobals.popupX + 20, varGlobals.popupY + 130, varGlobals.lebarPopup - 40, 50)
+                    
+                    # --- POSISI TOMBOL "DONE" YANG DIPERBAIKI ---
+                    done_button_width = 120
+                    done_button_height = 40
+                    boxConfirm = pygame.Rect(
+                        varGlobals.popupX + (varGlobals.lebarPopup - done_button_width) // 2, # Tengah horizontal
+                        varGlobals.popupY + varGlobals.tinggiPopup - done_button_height - 20, # 20px dari bawah
+                        done_button_width,
+                        done_button_height
+                    )
+                    # --- AKHIR PERBAIKAN ---
+
+                    if boxNomorMeja.collidepoint(mx, my):
+                        varGlobals.input = "table"
+                    elif boxJumlah.collidepoint(mx, my):
+                        varGlobals.input = "quantity"
+                    elif boxConfirm.collidepoint(mx, my):
+                        varGlobals.last_click_time["Done"] = current_time # Rekam waktu klik untuk "Done"
+                        varGlobals.input = "confirm" # Gunakan status berbeda untuk konfirmasi
+                        # Picu logika order segera setelah diklik
+                        if varGlobals.nomorMeja and varGlobals.jumlah:
+                            addOrders(varGlobals.nomorMeja, varGlobals.antrian, varGlobals.pesanan, varGlobals.jumlah)
+                            # RESET
+                            varGlobals.pesanan = None
+                            varGlobals.nomorMeja = ""
+                            varGlobals.jumlah = ""
+                            varGlobals.antrian += 1
+                            varGlobals.input = None # Sembunyikan pop-up
+                        else:
+                            print("Nomor meja dan jumlah harus diisi!")
+                    else:
+                        pass # Diklik di luar kotak input
+
+            if event.type == pygame.KEYDOWN:
+                if varGlobals.pesanan: # Hanya proses input jika item menu dipilih
+                    if varGlobals.input == "table":
+                        if event.unicode.isnumeric():
+                            varGlobals.nomorMeja += event.unicode
+                        elif event.key == pygame.K_BACKSPACE and varGlobals.nomorMeja:
+                            varGlobals.nomorMeja = varGlobals.nomorMeja[:-1]
+                        elif event.key == pygame.K_RETURN:
+                            if varGlobals.nomorMeja:
+                                varGlobals.input = "quantity" # Pindah ke jumlah
+                            else:
+                                print("Nomor meja tidak boleh kosong.")
+                    elif varGlobals.input == "quantity":
+                        if event.unicode.isnumeric():
+                            varGlobals.jumlah += event.unicode
+                        elif event.key == pygame.K_BACKSPACE and varGlobals.jumlah:
+                            varGlobals.jumlah = varGlobals.jumlah[:-1]
+                        elif event.key == pygame.K_RETURN:
+                            # Jika kedua bidang terisi, proses order
+                            if varGlobals.nomorMeja and varGlobals.jumlah:
+                                addOrders(varGlobals.nomorMeja, varGlobals.antrian, varGlobals.pesanan, varGlobals.jumlah)
+                                # RESET
+                                varGlobals.pesanan = None
+                                varGlobals.nomorMeja = ""
+                                varGlobals.jumlah = ""
+                                varGlobals.antrian += 1
+                                varGlobals.input = None # Sembunyikan pop-up
+                            else:
+                                print("Nomor meja dan jumlah harus diisi!")
+                                
+        # JENDELA TAMBAHAN MUNCUL KETIKA MEMESAN (POP-UP)
+        if varGlobals.pesanan:
+            # Menggambar kotak pop-up besar
+            kotakPopup = pygame.Rect(varGlobals.popupX, varGlobals.popupY, varGlobals.lebarPopup, varGlobals.tinggiPopup)
+            pygame.draw.rect(varGlobals.screen, cc.COFFEE_BROWN, kotakPopup, border_radius=15) # Gunakan cokelat kustom
+            pygame.draw.rect(varGlobals.screen, cc.LIGHT_RED_BROWN, kotakPopup, 3, border_radius=15) # Gunakan warna border kustom
+
+            # KOTAK INPUT UNTUK NOMOR MEJA DAN JUMLAH PESANAN
+            boxNomorMeja = pygame.Rect(varGlobals.popupX + 20, varGlobals.popupY + 60, varGlobals.lebarPopup - 40, 50)
+            boxJumlah = pygame.Rect(varGlobals.popupX + 20, varGlobals.popupY + 130, varGlobals.lebarPopup - 40, 50)
+            
+            pygame.draw.rect(varGlobals.screen, cc.WHITE, boxNomorMeja, border_radius=8)
+            pygame.draw.rect(varGlobals.screen, cc.WHITE, boxJumlah, border_radius=8)
+
+            # --- GAMBAR TOMBOL "DONE" DENGAN EFEK KLIK ---
+            done_button_width = 120
+            done_button_height = 40
+            boxConfirm = pygame.Rect(
+                varGlobals.popupX + (varGlobals.lebarPopup - done_button_width) // 2,
+                varGlobals.popupY + varGlobals.tinggiPopup - done_button_height - 20,
+                done_button_width,
+                done_button_height
+            )
+            
+            confirm_button_color = cc.GREEN # Warna default tombol "Done"
+            confirm_text_color = cc.WHITE # Warna teks default tombol "Done"
+
+            if "Done" in varGlobals.last_click_time and \
+               current_time - varGlobals.last_click_time["Done"] < varGlobals.click_effect_duration:
+                confirm_button_color = cc.BRIGHT_YELLOW
+                confirm_text_color = cc.BLACK
+            elif boxConfirm.collidepoint(pygame.mouse.get_pos()): # Hover untuk tombol "Done"
+                confirm_button_color = cc.DARK_BROWN # Gelapkan saat hover
+
+            pygame.draw.rect(varGlobals.screen, confirm_button_color, boxConfirm, border_radius=8)
+            # --- AKHIR EFEK KLIK TOMBOL "DONE" ---
+            
+            # HIGHLIGHT BOX AKTIF
+            if varGlobals.input == "table":
+                pygame.draw.rect(varGlobals.screen, cc.BLUE, boxNomorMeja, 3, border_radius=8) # Biru untuk highlight
+            elif varGlobals.input == "quantity":
+                pygame.draw.rect(varGlobals.screen, cc.BLUE, boxJumlah, 3, border_radius=8)
+            elif varGlobals.input == "confirm":
+                pygame.draw.rect(varGlobals.screen, cc.BLUE, boxConfirm, 3, border_radius=8)
+            
+            # JUDUL UNTUK KOTAK POP-UP BESAR
+            textJudul = varGlobals.big_font.render(f"Order {varGlobals.pesanan}", True, cc.WHITE) # Gunakan big_font, warna putih
+            textPos = textJudul.get_rect(centerx = kotakPopup.centerx, top = varGlobals.popupY + 15) # Sesuaikan Y untuk judul
+            varGlobals.screen.blit(textJudul, textPos)
+
+            # TEKS PADA INPUTAN DAN WARNANYA
+            textMeja = f"Meja    : {varGlobals.nomorMeja}"
+            textJumlah = f"Jumlah : {varGlobals.jumlah}"
+            textConfirm = "Done"
+            
+            ccMeja = varGlobals.font.render(textMeja, True, cc.BLACK)
+            ccJumlah = varGlobals.font.render(textJumlah, True, cc.BLACK)
+            ccConfirm = varGlobals.font.render(textConfirm, True, confirm_text_color) # Gunakan warna teks dinamis
+
+            varGlobals.screen.blit(ccMeja, (boxNomorMeja.x + 10, boxNomorMeja.y + 10))
+            varGlobals.screen.blit(ccJumlah, (boxJumlah.x + 10, boxJumlah.y + 10))
+            
+            # Tengahkan teks "Done" di dalam tombolnya
+            confirm_text_rect = ccConfirm.get_rect(center=boxConfirm.center)
+            varGlobals.screen.blit(ccConfirm, confirm_text_rect)
+
+        click = False
+        varGlobals.clock.tick(60)
+        pygame.display.flip()
+
+if __name__ == '__main__':
+    order()
