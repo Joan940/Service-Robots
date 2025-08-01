@@ -23,7 +23,7 @@ def addOrders(table_number, queue_number, item_name, quantity):
     cursor.close()
     db_connection.close()
 
-# Fungsi untuk mengambil semua pesanan
+# MENGAMBIL DATA PESANAN
 def getOrders():
     db_connection = connect_to_db()
     cursor = db_connection.cursor()

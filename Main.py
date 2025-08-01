@@ -21,6 +21,12 @@ from Modules.colors import (
     custom as cc,
     tts
 )
+from Modules.varGlobals import (
+    orderan as orderButton,
+    main_menu as mmButton,
+    simulasi as simButton,
+    config as confButton
+)
 
 
 ###################################################################################################
@@ -31,7 +37,6 @@ pygame.mixer.init()
 
 varGlobals.IP = '127.0.0.1'
 varGlobals.PORT = '8081'
-order_list = []
 
 
 ###################################################################################################
@@ -59,7 +64,6 @@ def pencetButton(text):
 
     elif text == "back":
         mainMenu()
-        # sys.exit(0)
 
     elif text == "demo 1":
         demo1()
@@ -101,6 +105,7 @@ def fillText(inp_key, inputUser_rects):
 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
+                varGlobals.ketikSound.play()
                 if event.key == pygame.K_BACKSPACE:
                     if inp_key == "IP":
                         varGlobals.IP = varGlobals.IP[:-1]
@@ -135,45 +140,13 @@ def configuration():
     varGlobals.runOrder = False
     varGlobals.runConfig = True
 
-    # WINDOW
-    window_rect = pygame.Surface.get_rect(varGlobals.screen)
-
-    # SET UP POSISI TEXT & UKURAN BUTTON
-    PANJANG_BUTTON = varGlobals.res[0] * 0.094
-    LEBAR_BUTTON = varGlobals.res[1] * 0.06
-    PANJANG_INP_BUTTON = varGlobals.res[0] * 0.1
-    LEBAR_INP_BUTTON = varGlobals.res[1] * 0.06
-
-    # POSISI BUTTON
-    SAVE_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-1.42)),
-        window_rect.centery - LEBAR_BUTTON * (-5),
-        PANJANG_BUTTON * 2,
-        LEBAR_BUTTON * 1.7
-    )
-
-    # POSISI INPUT USER
-    INP_IP_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_INP_BUTTON * (-0.78)),
-        window_rect.centery - (LEBAR_INP_BUTTON * 1.66),
-        PANJANG_INP_BUTTON * 3,
-        LEBAR_INP_BUTTON * 1.7
-    )
-    INP_PORT_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_INP_BUTTON * (-0.78)),
-        window_rect.centery - LEBAR_INP_BUTTON * (-1.8),
-        PANJANG_INP_BUTTON * 3,
-        LEBAR_INP_BUTTON * 1.7
-    )
-
     inputUser = {
-        "Save" : SAVE_RECT,
-        "IP" : INP_IP_RECT,
-        "PORT" : INP_PORT_RECT
+        "Save" : confButton.SAVE_RECT,
+        "IP" : confButton.INP_IP_RECT,
+        "PORT" : confButton.INP_PORT_RECT
     }
 
     while varGlobals.runConfig:
-        varGlobals.trueSound.play()
         varGlobals.screen.blit(varGlobals.bgConfig, (0, 0))
 
         for event in pygame.event.get():
@@ -182,6 +155,7 @@ def configuration():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                varGlobals.trueSound.play()
                 click = True
 
         mx, my = pygame.mouse.get_pos()
@@ -199,8 +173,10 @@ def configuration():
                 if click:
                     if key in ["IP", "PORT"]:
                         fillText(key, inputUser)
-                    elif key == "Save":
+                    elif key == "Save" and (varGlobals.IP and varGlobals.PORT):
                         pencetButton(key)
+                    elif key == "Save" and not (varGlobals.IP and varGlobals.PORT):
+                        varGlobals.falseSound.play()
             else:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 3, border_radius = 20)
                 tts(display_text, cc.RED_BROWN, rect, varGlobals.screen, 50)
@@ -217,41 +193,22 @@ def configuration():
 def order():
 
     # BOOLEAN
+    click = False
     varGlobals.runSim = False
     varGlobals.runMenu = False
     varGlobals.runOrder = True
     varGlobals.runConfig = False
 
-    # WINDOW
-    window_rect = pygame.Surface.get_rect(varGlobals.screen)
-
-    # POSISI TOMBOL
-    EXIT = pygame.rect.Rect(
-        window_rect.centerx - (varGlobals.PANJANG_BUTTON * (-0.8)),
-        window_rect.centery - (varGlobals.LEBAR_BUTTON * (-2.2)),
-        varGlobals.PANJANG_BUTTON * 3,
-        varGlobals.LEBAR_BUTTON * 1.7
-    )
-    PIZZA = pygame.rect.Rect(
-        window_rect.centerx - (varGlobals.PANJANG_BUTTON * 4.3),
-        window_rect.centery - (varGlobals.LEBAR_BUTTON * 3),
-        varGlobals.PANJANG_BUTTON,
-        varGlobals.LEBAR_BUTTON
-    )
-    BURGER = pygame.rect.Rect(
-        window_rect.centerx - (varGlobals.PANJANG_BUTTON * 4.3),
-        window_rect.centery - (varGlobals.LEBAR_BUTTON * 1.8),
-        varGlobals.PANJANG_BUTTON,
-        varGlobals.LEBAR_BUTTON
-    )
-
     buttons = {
-        "Exit": EXIT
+        "Exit": orderButton.EXIT
     }
 
     menu = {
-        "Pizza": PIZZA,
-        "Burger": BURGER
+        "Pizza" : orderButton.MENU_1,
+        "Burger" : orderButton.MENU_2,
+        "Tahu Gimbal" : orderButton.MENU_3,
+        "Spageti" : orderButton.MENU_4,
+        "Nasi Telur" : orderButton.MENU_5
     }
 
     while varGlobals.runOrder:
@@ -264,7 +221,7 @@ def order():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                
+                click = True
                 varGlobals.trueSound.play()
                 mx, my = pygame.mouse.get_pos()
 
@@ -275,7 +232,8 @@ def order():
 
                 for button_name in buttons:
                     if buttons[button_name].collidepoint(mx, my):
-                        pencetButton(button_name)
+                        if click:
+                            pencetButton(button_name)
                 
                 for menu_item, rect in menu.items():
                     if rect.collidepoint(mx, my):
@@ -423,52 +381,17 @@ def mainMenu():
     varGlobals.runMenu = True
     varGlobals.runOrder = False
     varGlobals.runConfig = False
-
-    # WINDOW
-    window_rect = pygame.Surface.get_rect(varGlobals.screen)
-
-    # SET UP POSISI TEXT & UKURAN BUTTON
-    PANJANG_STATUS = varGlobals.res[0] * 0.064
-    LEBAR_STATUS = varGlobals.res[1] * 0.02
-
-    # POSISI BUTTON
-    RUN = pygame.rect.Rect(
-        window_rect.centerx - (varGlobals.PANJANG_BUTTON * (-0.8)),
-        window_rect.centery - varGlobals.LEBAR_BUTTON * 2.6,
-        varGlobals.PANJANG_BUTTON * 3,
-        varGlobals.LEBAR_BUTTON * 1.7
-    )
-    CONFIGURATION = pygame.rect.Rect(
-        window_rect.centerx - (varGlobals.PANJANG_BUTTON * (-0.8)),
-        window_rect.centery - (varGlobals.LEBAR_BUTTON * 0.2),
-        varGlobals.PANJANG_BUTTON * 3,
-        varGlobals.LEBAR_BUTTON * 1.7
-    )
-    EXIT = pygame.rect.Rect(
-        window_rect.centerx - (varGlobals.PANJANG_BUTTON * (-0.8)),
-        window_rect.centery - (varGlobals.LEBAR_BUTTON * (-2.2)),
-        varGlobals.PANJANG_BUTTON * 3,
-        varGlobals.LEBAR_BUTTON * 1.7
-    )
-
-    # PESAN DISCONNECT DAN CONNECTED
-    STATUS = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_STATUS * (-2.6)),
-        window_rect.centery - (LEBAR_STATUS * (-15.5)),
-        PANJANG_STATUS * 2,
-        LEBAR_STATUS * 1.7
-    )
     
     # BUTTON
     buttons = {
-        "Run" : RUN,
-        "Configuration" : CONFIGURATION,
-        "Exit" : EXIT,
+        "Run" : mmButton.RUN,
+        "Configuration" : mmButton.CONFIGURATION,
+        "Exit" : mmButton.EXIT,
     }
 
     # STATUS
     status = {
-        varGlobals.conServiceBot : STATUS
+        varGlobals.conServiceBot : mmButton.STATUS
     }
 
     while varGlobals.runMenu:
@@ -481,6 +404,7 @@ def mainMenu():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                varGlobals.trueSound.play()
                 click = True
 
         # LOGIKA TOMBOL
@@ -523,45 +447,14 @@ def simulation():
     varGlobals.runOrder = False
     varGlobals.runConfig = False
 
-    # WINDOW
-    window_rect = pygame.Surface.get_rect(varGlobals.screen)
-
-    # POSISI TEXT
-    BACK = pygame.rect.Rect(
-        window_rect.centerx - (varGlobals.PANJANG_BUTTON * (-3.75)),
-        window_rect.centery - varGlobals.LEBAR_BUTTON * 7.8,
-        varGlobals.PANJANG_BUTTON,
-        varGlobals.LEBAR_BUTTON * 1.2
-    )
-    
-    # POSISI TEXT + KOTAK
-    DEMO_1 = pygame.rect.Rect(
-        window_rect.centerx - (varGlobals.PANJANG_BUTTON * 0.95),
-        window_rect.centery - (varGlobals.LEBAR_BUTTON * 1.5),
-        varGlobals.PANJANG_BUTTON,
-        varGlobals.LEBAR_BUTTON * 0.8
-    )
-    TAMBAH_PESANAN = pygame.rect.Rect(
-        window_rect.centerx - (varGlobals.PANJANG_BUTTON * (-1.3)),
-        window_rect.centery - varGlobals.LEBAR_BUTTON * (5.85),
-        varGlobals.PANJANG_BUTTON * 3,
-        varGlobals.LEBAR_BUTTON * 1.7
-    )
-    HAPUS_PESANAN = pygame.rect.Rect(
-        window_rect.centerx - (varGlobals.PANJANG_BUTTON * (-1.3)),
-        window_rect.centery - varGlobals.LEBAR_BUTTON * (3.85),
-        varGlobals.PANJANG_BUTTON * 3,
-        varGlobals.LEBAR_BUTTON * 1.7
-    )
-
     buttons = {
-        "Back" : BACK
+        "Back" : simButton.BACK
     }
 
     kotak_button = {
-        "Demo 1" : DEMO_1,
-        "Add Order" : TAMBAH_PESANAN,
-        "Delete Order" : HAPUS_PESANAN
+        "Demo 1" : simButton.DEMO_1,
+        "Add Order" : simButton.TAMBAH_PESANAN,
+        "Delete Order" : simButton.HAPUS_PESANAN
     }
     
     while varGlobals.runSim:
@@ -578,6 +471,7 @@ def simulation():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                varGlobals.trueSound.play()
                 click = True
             
             # PENANGANAN BOOLEAN (PRESS BUTTON)
@@ -616,40 +510,6 @@ def simulation():
                     send(data)
                     print(data[0], data[1])
 
-        # MENGGERAKKAN ROBOT DENGAN ARROW [KIRI, KANAN, ATAS, BAWAH]
-        # if varGlobals.keys_pressed[pygame.K_DOWN]:
-        #     if dataRobot.xpos < varGlobals.res[1] - 1 and dataRobot.xpos <= 600:
-        #         dataRobot.xpos += 1
-        #         if dataRobot.xpos > 600:
-        #             dataRobot.xpos = 600
-        # if varGlobals.keys_pressed[pygame.K_UP]:
-        #     if dataRobot.xpos > 0 and dataRobot.ypos <= 600:
-        #         dataRobot.xpos -= 1
-        #     if dataRobot.xpos > 0 and dataRobot.ypos > 600 and dataRobot.xpos > 200:
-        #         dataRobot.xpos -= 1
-        #         if dataRobot.xpos < 201:
-        #             dataRobot.xpos = 201
-        # if varGlobals.keys_pressed[pygame.K_LEFT]:
-        #     if dataRobot.ypos > 0:
-        #         dataRobot.ypos -= 1
-        # if varGlobals.keys_pressed[pygame.K_RIGHT]:
-        #     if dataRobot.ypos < varGlobals.res[0] - 1 and dataRobot.ypos <= 600 and dataRobot.xpos <= 200:
-        #         dataRobot.ypos += 1
-        #         if dataRobot.ypos > 600:
-        #             dataRobot.ypos = 600
-        #     elif dataRobot.ypos < varGlobals.res[0] - 1 and dataRobot.ypos <= 1000 and dataRobot.xpos > 200:
-        #         dataRobot.ypos += 1
-        #         if dataRobot.ypos > 1000:
-        #             dataRobot.ypos = 1000
-        # if varGlobals.keys_pressed[pygame.K_LSHIFT]:
-        #     dataRobot.kompas += 1
-        #     if dataRobot.kompas > 360:
-        #         dataRobot.kompas = 0
-        # if varGlobals.keys_pressed[pygame.K_LCTRL]:
-        #     dataRobot.kompas -= 1
-        #     if dataRobot.kompas < 0:
-        #         dataRobot.kompas = 360
-
         varGlobals.screen.blit(varGlobals.bgSim, (0, 0))
 
         # LOGIKA TOMBOL
@@ -686,4 +546,5 @@ def simulation():
         pygame.display.flip()
         varGlobals.clock.tick(60)
 
-order()
+
+mainMenu()
