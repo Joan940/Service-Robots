@@ -19,7 +19,8 @@ from Modules.database import (
 )
 from Modules.colors import (
     custom as cc,
-    tts
+    tts,
+    tts2
 )
 from Modules.varGlobals import (
     orderan as orderButton,
@@ -70,6 +71,9 @@ def pencetButton(text):
 
     elif text == "add order":
         order()
+
+    elif text == "coba":
+        simulation()
 
     elif text == "exit":
         sys.exit(0)
@@ -200,7 +204,7 @@ def order():
     varGlobals.runConfig = False
 
     buttons = {
-        "Exit": orderButton.EXIT
+        "coba": orderButton.EXIT
     }
 
     menu = {
@@ -454,10 +458,24 @@ def simulation():
     kotak_button = {
         "Demo 1" : simButton.DEMO_1,
         "Add Order" : simButton.TAMBAH_PESANAN,
-        "Delete Order" : simButton.HAPUS_PESANAN
+        "List Order" : simButton.LIST_PESANAN
     }
     
     while varGlobals.runSim:
+
+        listOrder = getOrders()
+
+        if listOrder:
+            for pesanan in listOrder:
+                noMeja = pesanan[1]
+                namaPesanan = pesanan[3]
+                jumlahPesanan = pesanan[4]
+
+        pesanan = [
+            ("Nomor Meja : " + str(noMeja), (1300, 530)),
+            ("Produk : " + str(namaPesanan), (1300, 560)),
+            ("Jumlah : " + str(jumlahPesanan), (1300, 590))
+        ]
 
         infoRobot = [
             ("Compass   : " + str(dataRobot.kompas), (220, 60)),
@@ -528,6 +546,8 @@ def simulation():
                 tts(button, cc.RED_BROWN, kotak_button[button], varGlobals.screen, 60)
                 if click:
                     pencetButton(button)
+                    if button == "List Order":
+                        varGlobals.list = button
             else:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, kotak_button[button], 3, border_radius = 20)
                 tts(button, cc.RED_BROWN, kotak_button[button], varGlobals.screen, 50)
@@ -541,6 +561,15 @@ def simulation():
         Ybot = varGlobals.offsetY + (dataRobot.xpos * varGlobals.skala)
         rotatedImage(varGlobals.bot, Xbot, Ybot, dataRobot.kompas)
         rotatedImage(varGlobals.arrow, 220, 220, dataRobot.kompas)
+
+        if varGlobals.list:
+
+            # MENGGAMBAR JENDELA POP UP
+            pygame.draw.rect(varGlobals.screen, cc.WHITE, (1300, 440, 400, 600), border_radius = 20)
+            pygame.draw.rect(varGlobals.screen, cc.BLACK, (1300, 440, 400, 600), 3, border_radius = 20)
+
+            for text_line, pos in pesanan:
+                tts2(text_line, cc.RED_BROWN, pygame.Rect(pos[0], pos[1], 10, 10), varGlobals.screen, 30)
 
         click = False
         pygame.display.flip()

@@ -11,7 +11,7 @@ def connect_to_db():
         database="campberingin"
     )
 
-# Fungsi untuk menambahkan pesanan
+# MENAMBAH DATA PESANAN
 def addOrders(table_number, queue_number, item_name, quantity):
     db_connection = connect_to_db()
     cursor = db_connection.cursor()
@@ -37,4 +37,3 @@ def getOrders():
     db_connection.close()
 
     return orders
-

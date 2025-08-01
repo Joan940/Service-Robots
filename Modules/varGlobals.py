@@ -31,6 +31,7 @@ jumlah = ''
 nomorMeja = ''
 
 # NONE
+list = None
 input = None
 warna = None
 pesanan = None
@@ -194,7 +195,7 @@ class simulasi:
         PANJANG_BUTTON * 3,
         LEBAR_BUTTON * 1.7
     )
-    HAPUS_PESANAN = pygame.rect.Rect(
+    LIST_PESANAN = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
         window_rect.centery - LEBAR_BUTTON * (3.85),
         PANJANG_BUTTON * 3,
