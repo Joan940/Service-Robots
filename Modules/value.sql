@@ -8,5 +8,5 @@ CREATE TABLE orders (
     queue_number INT NOT NULL,       -- Nomor antrian
     item_name VARCHAR(255) NOT NULL, -- Nama item
     quantity INT DEFAULT 1,          -- Jumlah item
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Waktu pembuatan pesanan
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Waktu pembuatan pesanan
 );

@@ -15,7 +15,8 @@ from Modules.algorithm import (
 )
 from Modules.database import (
     addOrders,
-    getOrders
+    getOrders,
+    reset_database
 )
 from Modules.colors import (
     custom as cc,
@@ -374,6 +375,31 @@ def order():
 
 
 ###################################################################################################
+#                                       MENAMPILKAN PESANAN                                       #
+###################################################################################################
+
+def render_orders_text(orders_list):
+    orderStack = []
+    yStart = 530
+    ySpacing = 30
+    yGap = 90
+    
+    for pesanan_data in orders_list:
+        noMeja = pesanan_data[1]
+        namaPesanan = pesanan_data[3]
+        jumlahPesanan = pesanan_data[4]
+        
+        # RENDER KE UI
+        orderStack.append(tts2(f"Nomor Meja : {noMeja}", cc.RED_BROWN, 30, (1300, yStart)))
+        orderStack.append(tts2(f"Produk     : {namaPesanan}", cc.RED_BROWN, 30, (1300, yStart + ySpacing)))
+        orderStack.append(tts2(f"Jumlah     : {jumlahPesanan}", cc.RED_BROWN, 30, (1300, yStart + (ySpacing * 2))))
+        
+        yStart += yGap
+        
+    return orderStack
+
+
+###################################################################################################
 #                                            MAIN MENU                                            #
 ###################################################################################################
 
@@ -446,6 +472,7 @@ def simulation():
 
     # BOOLEAN
     click = False
+    varGlobals.list = False
     varGlobals.runSim = True
     varGlobals.runMenu = False
     varGlobals.runOrder = False
@@ -463,19 +490,12 @@ def simulation():
     
     while varGlobals.runSim:
 
-        listOrder = getOrders()
+        varGlobals.updateOrder = True
 
-        if listOrder:
-            for pesanan in listOrder:
-                noMeja = pesanan[1]
-                namaPesanan = pesanan[3]
-                jumlahPesanan = pesanan[4]
-
-        pesanan = [
-            ("Nomor Meja : " + str(noMeja), (1300, 530)),
-            ("Produk : " + str(namaPesanan), (1300, 560)),
-            ("Jumlah : " + str(jumlahPesanan), (1300, 590))
-        ]
+        if varGlobals.updateOrder:
+            listOrder = getOrders()
+            varGlobals.allOrders = render_orders_text(listOrder)
+            varGlobals.updateOrder = False
 
         infoRobot = [
             ("Compass   : " + str(dataRobot.kompas), (220, 60)),
@@ -547,12 +567,13 @@ def simulation():
                 if click:
                     pencetButton(button)
                     if button == "List Order":
-                        varGlobals.list = button
+                        varGlobals.list = not varGlobals.list
             else:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, kotak_button[button], 3, border_radius = 20)
                 tts(button, cc.RED_BROWN, kotak_button[button], varGlobals.screen, 50)
+                if click and varGlobals.list:
+                    varGlobals.list = False
                 
-
         for text_line, pos in infoRobot:
             tts(text_line, cc.RED_BROWN, pygame.Rect(pos[0], pos[1], 10, 10), varGlobals.screen, 30)
         
@@ -568,12 +589,13 @@ def simulation():
             pygame.draw.rect(varGlobals.screen, cc.WHITE, (1300, 440, 400, 600), border_radius = 20)
             pygame.draw.rect(varGlobals.screen, cc.BLACK, (1300, 440, 400, 600), 3, border_radius = 20)
 
-            for text_line, pos in pesanan:
-                tts2(text_line, cc.RED_BROWN, pygame.Rect(pos[0], pos[1], 10, 10), varGlobals.screen, 30)
+            for text_surface, text_rect in varGlobals.allOrders:
+                varGlobals.screen.blit(text_surface, text_rect)
 
         click = False
         pygame.display.flip()
         varGlobals.clock.tick(60)
 
 
+reset_database()
 mainMenu()

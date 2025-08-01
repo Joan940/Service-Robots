@@ -31,7 +31,6 @@ jumlah = ''
 nomorMeja = ''
 
 # NONE
-list = None
 input = None
 warna = None
 pesanan = None
@@ -39,12 +38,17 @@ pesanan = None
 # BOOLEAN
 notAutonomus = bool
 serviceBot = False
+updateOrder = True
 runConfig = bool
 runOrder = bool
 runMenu = bool
 runSim = bool
 hapus = bool
+list = bool
 udp = bool
+
+# STACK
+allOrders = []
 
 # RESOLUSI WINDOW
 offsetX = res[0] / 14.53

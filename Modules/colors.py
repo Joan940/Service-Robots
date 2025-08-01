@@ -35,8 +35,8 @@ def tts(text, color, rect, surface, font_size):
     text_rect = text_surface.get_rect(center=rect.center)
     surface.blit(text_surface, text_rect)
 
-def tts2(text, color, rect, surface, font_size):
+def tts2(text, color, font_size, rect_pos):
     font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", font_size)
     text_surface = font.render(text, True, color)
-    text_rect = text_surface.get_rect(midleft=rect.midleft)
-    surface.blit(text_surface, text_rect)
+    text_rect = text_surface.get_rect(midleft=rect_pos)
+    return text_surface, text_rect
