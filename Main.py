@@ -1,4 +1,5 @@
 import sys
+import time
 import pygame
 import Modules.dataRobot as dataRobot
 import Modules.varGlobals as varGlobals
@@ -11,12 +12,14 @@ from Skills.demoMode import (
     demo1
 )
 from Modules.algorithm import (
-    rotatedImage
+    rotatedImage,
+    drawNumberPad
 )
 from Modules.database import (
     addOrders,
     getOrders,
-    reset_database
+    reset_database,
+    tamilanOrder
 )
 from Modules.colors import (
     custom as cc,
@@ -197,6 +200,9 @@ def configuration():
 
 def order():
 
+    # MENYIMPAN BUTTON TAB ANGKA
+    number_pad_buttons = {}
+
     # BOOLEAN
     click = False
     varGlobals.runSim = False
@@ -220,6 +226,7 @@ def order():
 
         varGlobals.screen.blit(varGlobals.bgOrder, (0, 0))
 
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 varGlobals.runOrder = False
@@ -230,8 +237,14 @@ def order():
                 varGlobals.trueSound.play()
                 mx, my = pygame.mouse.get_pos()
 
+                popupPesanan = pygame.Rect(varGlobals.popupX, varGlobals.popupY, varGlobals.lebarPopup + 20, varGlobals.tinggiPopup)
+                numPad = pygame.Rect(720, 392, 170, 230)
+
                 # JIKA MENEKAN DI LUAR BUTTON, JENDELA POP UP HILANG 
-                if varGlobals.pesanan and not pygame.Rect(varGlobals.popupX, varGlobals.popupY, varGlobals.lebarPopup + 20, varGlobals.tinggiPopup).collidepoint(mx, my) and not varGlobals.nomorMeja and not varGlobals.jumlah:
+                if varGlobals.pesanan and not popupPesanan.collidepoint(mx, my) and not numPad.collidepoint(mx, my) and not varGlobals.nomorMeja and not varGlobals.jumlah:
+                    varGlobals.pesanan = None
+                    varGlobals.input = None
+                elif varGlobals.pesanan and not popupPesanan.collidepoint(mx, my) and not numPad.collidepoint(mx, my) and (varGlobals.nomorMeja or varGlobals.jumlah):
                     varGlobals.pesanan = None
                     varGlobals.input = None
 
@@ -278,6 +291,26 @@ def order():
                         else:
                             print("Nomor meja dan jumlah harus diisi!")
                             varGlobals.falseSound.play()
+
+                if varGlobals.pesanan:
+                    if number_pad_buttons:
+                        for number, rect in number_pad_buttons.items():
+                            if rect.collidepoint(mx, my):
+                                if number.isdigit():
+                                    if varGlobals.input == "table":
+                                        varGlobals.nomorMeja += number
+                                    elif varGlobals.input == "quantity":
+                                        varGlobals.jumlah += number
+                                elif number == "Del":
+                                    if varGlobals.input == "table":
+                                        varGlobals.nomorMeja = varGlobals.nomorMeja[:-1]
+                                    elif varGlobals.input == "quantity":
+                                        varGlobals.jumlah = varGlobals.jumlah[:-1]
+                                elif number == "Clear":
+                                    if varGlobals.input == "table":
+                                        varGlobals.nomorMeja = ""
+                                    elif varGlobals.input == "quantity":
+                                        varGlobals.jumlah = ""
 
             if event.type == pygame.KEYDOWN and varGlobals.pesanan:
                 if varGlobals.input == "table":
@@ -369,34 +402,11 @@ def order():
             varGlobals.screen.blit(ccJumlah, (boxJumlah.x + 10, boxJumlah.y + 10))
             varGlobals.screen.blit(ccConfirm, (boxConfirm.x + 10, boxConfirm.y + 5))
 
+            number_pad_buttons = drawNumberPad(varGlobals.screen, varGlobals.popupX, varGlobals.popupY)
+
         click = False
         varGlobals.clock.tick(60)
         pygame.display.flip()
-
-
-###################################################################################################
-#                                       MENAMPILKAN PESANAN                                       #
-###################################################################################################
-
-def render_orders_text(orders_list):
-    orderStack = []
-    yStart = 530
-    ySpacing = 30
-    yGap = 90
-    
-    for pesanan_data in orders_list:
-        noMeja = pesanan_data[1]
-        namaPesanan = pesanan_data[3]
-        jumlahPesanan = pesanan_data[4]
-        
-        # RENDER KE UI
-        orderStack.append(tts2(f"Nomor Meja : {noMeja}", cc.RED_BROWN, 30, (1300, yStart)))
-        orderStack.append(tts2(f"Produk     : {namaPesanan}", cc.RED_BROWN, 30, (1300, yStart + ySpacing)))
-        orderStack.append(tts2(f"Jumlah     : {jumlahPesanan}", cc.RED_BROWN, 30, (1300, yStart + (ySpacing * 2))))
-        
-        yStart += yGap
-        
-    return orderStack
 
 
 ###################################################################################################
@@ -494,7 +504,7 @@ def simulation():
 
         if varGlobals.updateOrder:
             listOrder = getOrders()
-            varGlobals.allOrders = render_orders_text(listOrder)
+            varGlobals.allOrders = tamilanOrder(listOrder)
             varGlobals.updateOrder = False
 
         infoRobot = [
@@ -589,13 +599,25 @@ def simulation():
             pygame.draw.rect(varGlobals.screen, cc.WHITE, (1300, 440, 400, 600), border_radius = 20)
             pygame.draw.rect(varGlobals.screen, cc.BLACK, (1300, 440, 400, 600), 3, border_radius = 20)
 
+            x_pos = 1310
+            y_pos = 460
+            panjang_bsr = 380
+            panjang_kcl = 100
+            tinggi = 100
+            jarak_antara = 100
+            
             for text_surface, text_rect in varGlobals.allOrders:
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (x_pos, y_pos, panjang_bsr, tinggi), border_radius = 20)
+                pygame.draw.rect(varGlobals.screen, cc.WHITE, (x_pos, y_pos, panjang_kcl, tinggi), border_radius = 20)
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (x_pos, y_pos, panjang_kcl, tinggi), 3, border_radius = 20)
+                
                 varGlobals.screen.blit(text_surface, text_rect)
+
+                y_pos += jarak_antara
 
         click = False
         pygame.display.flip()
         varGlobals.clock.tick(60)
 
-
-reset_database()
+# reset_database()
 mainMenu()

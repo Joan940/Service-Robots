@@ -1,8 +1,17 @@
 import mysql.connector
+import Modules.varGlobals as varGlobals
 
-import mysql.connector
+from Modules.colors import (
+    custom as cc,
+    tts,
+    tts2
+)
 
-# Fungsi untuk menghubungkan ke database
+
+###################################################################################################
+#                                       CONNECT TO DATABASE                                       #
+###################################################################################################
+
 def connect_to_db():
     try:
         connection = mysql.connector.connect(
@@ -15,6 +24,11 @@ def connect_to_db():
     except mysql.connector.Error as err:
         print(f"Error: {err}")
         return None
+    
+
+###################################################################################################
+#                                          RESET DATABASE                                         #
+###################################################################################################
 
 def reset_database():
 
@@ -59,7 +73,10 @@ def reset_database():
         db_connection.close()
         print("Reset database selesai.")
 
-# MENAMBAH DATA PESANAN
+
+###################################################################################################
+#                                        MENAMBAH PESANAN                                         #
+###################################################################################################
 def addOrders(table_number, queue_number, item_name, quantity):
     db_connection = connect_to_db()
     cursor = db_connection.cursor()
@@ -71,7 +88,11 @@ def addOrders(table_number, queue_number, item_name, quantity):
     cursor.close()
     db_connection.close()
 
-# MENGAMBIL DATA PESANAN
+
+###################################################################################################
+#                                      MENGAMBIL DATA PESANAN                                     #
+###################################################################################################
+    
 def getOrders():
     db_connection = connect_to_db()
     cursor = db_connection.cursor()
@@ -85,3 +106,33 @@ def getOrders():
     db_connection.close()
 
     return orders
+
+
+###################################################################################################
+#                                       MENAMPILKAN PESANAN                                       #
+###################################################################################################
+
+def tamilanOrder(orders_list):
+    orderStack = []
+    yStart = 500
+    ySpacing = 25
+    previous_meja = None
+    
+    for pesanan_data in orders_list:
+        meja = pesanan_data[1]  
+        namaPesanan = pesanan_data[3]
+        jumlahPesanan = pesanan_data[4]
+
+        if meja != previous_meja:
+            if previous_meja is not None:
+                yStart += ySpacing * 2
+            
+            orderStack.append(tts2(f"{meja} {namaPesanan} ({jumlahPesanan})", cc.BLACK, 30, (1350, yStart)))
+            yStart += ySpacing
+            
+        # orderStack.append(tts2(f"- {namaPesanan} ({jumlahPesanan})", cc.BLACK, 20, (1420, yStart)))
+        yStart += ySpacing
+
+        previous_meja = meja
+    
+    return orderStack

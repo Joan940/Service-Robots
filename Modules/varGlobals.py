@@ -34,6 +34,8 @@ nomorMeja = ''
 input = None
 warna = None
 pesanan = None
+temporary = None
+meja = None
 
 # BOOLEAN
 notAutonomus = bool
