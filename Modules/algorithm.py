@@ -1,7 +1,8 @@
+import time
 import math
 import pygame
 import Modules.varGlobals as varGlobals
-from Modules.colors import custom as cc, tts
+from Modules.colors import custom as cc, tts2
 
 
 ###################################################################################################
@@ -14,8 +15,12 @@ def rotatedImage(image, x, y, angle):
 
     varGlobals.screen.blit(rotated_image, new_rect)
 
+
+###################################################################################################
+#                                        MENGGAMBAR NUMPAD                                        #
+###################################################################################################
+
 def drawNumberPad(screen, popup_x, popup_y):
-    # INISIALISASI AWAL
     button_size = 50
     gap = 10
     start_x = popup_x + varGlobals.lebarPopup + 20
@@ -74,3 +79,71 @@ def drawNumberPad(screen, popup_x, popup_y):
         "Del": box_del,
         "Clear": box_clear
     }
+
+
+###################################################################################################
+#                                       MENAMPILKAN PESANAN                                       #
+###################################################################################################
+
+def tamilanOrder(orders_list):
+    orderStack = []
+    yStart = 500
+    ySpacing = 2
+    
+    # CEK APAKAH MEJA SUDAH ADA DALAM ARRAY, JIKA BELUM MEJA AKAN DIMAKSUKKAN
+    grouped_orders = {}
+    for pesanan_data in orders_list:
+        meja = pesanan_data[1]
+        namaPesanan = pesanan_data[3]
+        jumlahPesanan = pesanan_data[4]
+        
+        if meja not in grouped_orders:
+            grouped_orders[meja] = []
+        grouped_orders[meja].append({'nama': namaPesanan, 'jumlah': jumlahPesanan})
+
+    # INI DIGUNAKAN UNTUK MENGEMBALIKAN VALUE
+    for meja, items in grouped_orders.items():
+        group_height = 0
+        group_lines = []
+
+        # Baris untuk nomor meja
+        text_surf_meja, text_rect_meja = tts2(f"{meja}", cc.BLACK, 60, (1350, yStart))
+        group_lines.append({'type': 'meja', 'surface': text_surf_meja, 'rect': text_rect_meja})
+        
+        # Baris untuk setiap pesanan
+        for item in items:
+            text_surf_pesanan, text_rect_pesanan = tts2(f"- {item['nama']} ({item['jumlah']})", cc.BLACK, 20, (1420, yStart + group_height - 26))
+            group_lines.append({'type': 'pesanan', 'surface': text_surf_pesanan, 'rect': text_rect_pesanan})
+            group_height += text_rect_pesanan.height + ySpacing
+            
+        # Simpan seluruh grup ke dalam orderStack
+        orderStack.append({'meja': meja, 'height': group_height, 'lines': group_lines})
+        yStart += group_height + (ySpacing * 2)
+            
+    return orderStack
+
+
+###################################################################################################
+#                                       INTERPOLASI LINEAR                                        #
+###################################################################################################
+
+def lerp(start, end, t):
+    return start + (end - start) * t
+
+
+###################################################################################################
+#                                          TRANSISI HALUS                                         #
+###################################################################################################
+
+def easeInOut(t):
+    return t * t * (3 - 2 * t)
+
+
+###################################################################################################
+#                                            SET AWAL                                             #
+###################################################################################################
+
+def setAnimation(index, animations, deklarasi):
+    varGlobals.startProperties = deklarasi.copy()
+    varGlobals.targetPropertis = animations.get(index, animations[0]).copy()
+    varGlobals.startTransisi = time.time()

@@ -106,33 +106,3 @@ def getOrders():
     db_connection.close()
 
     return orders
-
-
-###################################################################################################
-#                                       MENAMPILKAN PESANAN                                       #
-###################################################################################################
-
-def tamilanOrder(orders_list):
-    orderStack = []
-    yStart = 500
-    ySpacing = 25
-    previous_meja = None
-    
-    for pesanan_data in orders_list:
-        meja = pesanan_data[1]  
-        namaPesanan = pesanan_data[3]
-        jumlahPesanan = pesanan_data[4]
-
-        if meja != previous_meja:
-            if previous_meja is not None:
-                yStart += ySpacing * 2
-            
-            orderStack.append(tts2(f"{meja} {namaPesanan} ({jumlahPesanan})", cc.BLACK, 30, (1350, yStart)))
-            yStart += ySpacing
-            
-        # orderStack.append(tts2(f"- {namaPesanan} ({jumlahPesanan})", cc.BLACK, 20, (1420, yStart)))
-        yStart += ySpacing
-
-        previous_meja = meja
-    
-    return orderStack

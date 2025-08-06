@@ -1,3 +1,4 @@
+import time
 import pygame
 import os, sys
 
@@ -31,14 +32,18 @@ jumlah = ''
 nomorMeja = ''
 
 # NONE
+meja = None
 input = None
 warna = None
 pesanan = None
 temporary = None
-meja = None
+startTransisi = None
+startProperties = None
+targetPropertis = None
 
 # BOOLEAN
 notAutonomus = bool
+runMakeOrder = bool
 serviceBot = False
 updateOrder = True
 runConfig = bool
@@ -67,12 +72,33 @@ LEBAR_SAVE_BUTTON = res[1] * 0.06
 PANJANG_INP_BUTTON = res[0] * 0.1
 LEBAR_INP_BUTTON = res[1] * 0.06
 
+# DEKALRASI AWAL MATA
+SET_AWAL = {
+    'eyeOpenY': 150,   # Tinggi mata saat terbuka
+}
+
+# ANIMASI MATA
+ANIMATIONS = {
+    0: {'eyeOpenY': 150},  # wakeup / mata normal
+    1: {'eyeOpenY': 150},  # center_eyes
+    2: {'eyeOpenY': 150},  # move_right
+    3: {'eyeOpenY': 150},  # move_left
+    4: {'eyeOpenY': 10},    # blink
+    5: {'eyeOpenY': 150},  # happy_eye
+    6: {'eyeOpenY': 10}     # sleep
+}
+
 # NUMERIK
 popupX = 0
 popupY = 0
 antrian = 1
+eyeLeftX = 400
+lebarMata = 100
+eyeRightX = 600
 lebarPopup = 350
 tinggiPopup = 170
+durasiTransisi = 0.5
+eyePosY = 400
 
 # KEYBOARD
 keys_pressed = {
@@ -104,6 +130,7 @@ bgMenu = pygame.image.load("C:\BMP-Robotics\Assets\menu.png").convert_alpha()
 bgConfig = pygame.image.load("C:\BMP-Robotics\Assets\configuration.png").convert_alpha()
 bgSim = pygame.image.load("C:\BMP-Robotics\Assets\simulator.png").convert_alpha()
 bgOrder = pygame.image.load("C:\BMP-Robotics\Assets\order.png").convert_alpha()
+bgMakeOrder = pygame.image.load("C:\BMP-Robotics\Assets\makeOrder.png").convert_alpha()
 
 bot = pygame.image.load(r"C:\BMP-Robotics\Assets\bot.png").convert_alpha()
 bot = pygame.transform.scale(bot, (40, 40))
@@ -163,21 +190,27 @@ class main_menu:
         PANJANG_BUTTON * 3,
         LEBAR_BUTTON * 1.7
     )
-    CONFIGURATION = pygame.rect.Rect(
+    SIMULATION = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * (-0.8)),
         window_rect.centery - (LEBAR_BUTTON * 0.2),
         PANJANG_BUTTON * 3,
         LEBAR_BUTTON * 1.7
     )
-    EXIT = pygame.rect.Rect(
+    CONFIGURATION = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * (-0.8)),
         window_rect.centery - (LEBAR_BUTTON * (-2.2)),
         PANJANG_BUTTON * 3,
         LEBAR_BUTTON * 1.7
     )
+    EXIT = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-0.8)),
+        window_rect.centery - (LEBAR_BUTTON * (-4.6)),
+        PANJANG_BUTTON * 3,
+        LEBAR_BUTTON * 1.7
+    )
     STATUS = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_STATUS * (-2.6)),
-        window_rect.centery - (LEBAR_STATUS * (-15.5)),
+        window_rect.centerx - (PANJANG_STATUS * 7.5),
+        window_rect.centery - (LEBAR_STATUS * 23.5),
         PANJANG_STATUS * 2,
         LEBAR_STATUS * 1.7
     )
@@ -194,18 +227,6 @@ class simulasi:
         window_rect.centery - (LEBAR_BUTTON * 1.5),
         PANJANG_BUTTON,
         LEBAR_BUTTON * 0.8
-    )
-    TAMBAH_PESANAN = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
-        window_rect.centery - LEBAR_BUTTON * (5.85),
-        PANJANG_BUTTON * 3,
-        LEBAR_BUTTON * 1.7
-    )
-    LIST_PESANAN = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
-        window_rect.centery - LEBAR_BUTTON * (3.85),
-        PANJANG_BUTTON * 3,
-        LEBAR_BUTTON * 1.7
     )
 
 class config:
@@ -228,4 +249,24 @@ class config:
         window_rect.centery - LEBAR_INP_BUTTON * (-1.8),
         PANJANG_INP_BUTTON * 3,
         LEBAR_INP_BUTTON * 1.7
+    )
+
+class make_order:
+    BACK = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-3.75)),
+        window_rect.centery - LEBAR_BUTTON * 7.8,
+        PANJANG_BUTTON,
+        LEBAR_BUTTON * 1.2
+    )
+    TAMBAH_PESANAN = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
+        window_rect.centery - LEBAR_BUTTON * (5.85),
+        PANJANG_BUTTON * 3,
+        LEBAR_BUTTON * 1.7
+    )
+    LIST_PESANAN = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
+        window_rect.centery - LEBAR_BUTTON * (3.85),
+        PANJANG_BUTTON * 3,
+        LEBAR_BUTTON * 1.7
     )
