@@ -37,15 +37,14 @@ input = None
 warna = None
 pesanan = None
 temporary = None
-startTransisi = None
-startProperties = None
-targetPropertis = None
 
 # BOOLEAN
 notAutonomus = bool
 runMakeOrder = bool
 serviceBot = False
 updateOrder = True
+mouseActive = bool
+isBlinking = bool
 runConfig = bool
 runOrder = bool
 runMenu = bool
@@ -56,6 +55,8 @@ udp = bool
 
 # STACK
 allOrders = []
+startProperties = {}
+targetPropertis = {}
 
 # RESOLUSI WINDOW
 offsetX = res[0] / 14.53
@@ -74,18 +75,21 @@ LEBAR_INP_BUTTON = res[1] * 0.06
 
 # DEKALRASI AWAL MATA
 SET_AWAL = {
-    'eyeOpenY': 150,   # Tinggi mata saat terbuka
+    'eyeHeight': 150,
+    'eyeOffsetX': 0,
+    'eyeOffsetY': 0
 }
 
 # ANIMASI MATA
 ANIMATIONS = {
-    0: {'eyeOpenY': 150},  # wakeup / mata normal
-    1: {'eyeOpenY': 150},  # center_eyes
-    2: {'eyeOpenY': 150},  # move_right
-    3: {'eyeOpenY': 150},  # move_left
-    4: {'eyeOpenY': 10},    # blink
-    5: {'eyeOpenY': 150},  # happy_eye
-    6: {'eyeOpenY': 10}     # sleep
+    0: {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
+    1: {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
+    2: {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
+    3: {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
+    4: {'eyeHeight': 10, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
+    5: {'eyeHeight': 10, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
+    6: {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
+    7: {'eyeHeight': 10, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
 }
 
 # NUMERIK
@@ -96,6 +100,7 @@ eyeLeftX = 400
 lebarMata = 100
 eyeRightX = 600
 lebarPopup = 350
+startTransisi = 0
 tinggiPopup = 170
 durasiTransisi = 0.5
 eyePosY = 400
@@ -145,39 +150,39 @@ arrow = pygame.transform.scale(arrow, (100, 100))
 
 class orderan:
     EXIT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-0.8)),
-        window_rect.centery - (LEBAR_BUTTON * (-2.2)),
+        window_rect.centerx - (PANJANG_BUTTON * (-1.2)),
+        window_rect.centery - (LEBAR_BUTTON * (-3.5)),
         PANJANG_BUTTON * 3,
         LEBAR_BUTTON * 1.7
     )
 
     # SETIAP TURUN DIKURANGI 1.2
     MENU_1 = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 4.3),
+        window_rect.centerx - (PANJANG_BUTTON * (-0.7)),
         window_rect.centery - (LEBAR_BUTTON * 3),
         PANJANG_BUTTON,
         LEBAR_BUTTON
     )
     MENU_2 = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 4.3),
+        window_rect.centerx - (PANJANG_BUTTON * (-0.7)),
         window_rect.centery - (LEBAR_BUTTON * 1.8),
         PANJANG_BUTTON,
         LEBAR_BUTTON
     )
     MENU_3 = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 4.3),
+        window_rect.centerx - (PANJANG_BUTTON * (-0.7)),
         window_rect.centery - (LEBAR_BUTTON * 0.6),
         PANJANG_BUTTON,
         LEBAR_BUTTON
     )
     MENU_4 = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 4.3),
+        window_rect.centerx - (PANJANG_BUTTON * (-0.7)),
         window_rect.centery - (LEBAR_BUTTON * (-0.6)),
         PANJANG_BUTTON,
         LEBAR_BUTTON
     )
     MENU_5 = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 4.3),
+        window_rect.centerx - (PANJANG_BUTTON * (-0.7)),
         window_rect.centery - (LEBAR_BUTTON * (-1.8)),
         PANJANG_BUTTON,
         LEBAR_BUTTON

@@ -145,5 +145,5 @@ def easeInOut(t):
 
 def setAnimation(index, animations, deklarasi):
     varGlobals.startProperties = deklarasi.copy()
-    varGlobals.targetPropertis = animations.get(index, animations[0]).copy()
+    varGlobals.targetPropertis = animations.get(index, animations.get(0)).copy()
     varGlobals.startTransisi = time.time()

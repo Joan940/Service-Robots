@@ -1,112 +1,145 @@
 import pygame
 import time
 import math
+import random
+import sys
 
-# --- Setup Pygame ---
-pygame.init()
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Eye Animations on Screen (Rectangle)")
-clock = pygame.time.Clock()
+# Asumsi: Modul dan variabel global sudah terdefinisi, seperti:
+# varGlobals.screen, varGlobals.res, varGlobals.lebarMata, varGlobals.durasiTransisi, dll.
+# cc.BLACK, cc.WHITE, dll.
+# lerp, easeInOut, setAnimation sudah ada di modul algorithm.py
 
-# --- Warna ---
-class cc:
-    BLACK = (0, 0, 0)
-    WHITE = (255, 255, 255)
-    GRAY = (150, 150, 150)
+def makeOrder():
+    # --- DEKLARASI GLOBAL ---
+    varGlobals.SET_AWAL = {
+        'eye_height': 150,
+        'eye_offset_x': 0,
+        'eye_offset_y': 0,
+    }
+    varGlobals.ANIMATIONS = {
+        0: {'eye_height': 150, 'eye_offset_x': 0, 'eye_offset_y': 0},
+        1: {'eye_height': 150, 'eye_offset_x': 0, 'eye_offset_y': 0},
+        2: {'eye_height': 150, 'eye_offset_x': 50, 'eye_offset_y': 0},
+        3: {'eye_height': 150, 'eye_offset_x': -50, 'eye_offset_y': 0},
+        4: {'eye_height': 10, 'eye_offset_x': 0, 'eye_offset_y': 0},
+        5: {'eye_height': 10, 'eye_offset_x': 0, 'eye_offset_y': 0},
+        6: {'eye_height': 150, 'eye_offset_x': 0, 'eye_offset_y': 0},
+        7: {'eye_height': 10, 'eye_offset_x': 0, 'eye_offset_y': 0},
+    }
+
+    # LOCAL VARIABLE
+    index = 0
+    perubahanAnimasi = time.time()
     
-# --- Fungsi Utilitas ---
-def lerp(start, end, t):
-    """Interpolasi Linier untuk transisi halus."""
-    return start + (end - start) * t
+    # PERBAIKAN: Tambahkan variabel untuk melacak status mouse dan animasi
+    last_mouse_pos = pygame.mouse.get_pos()
+    last_mouse_move_time = time.time()
+    is_animation_active = False
 
-def ease_in_out(t):
-    """Fungsi easing (melambat) untuk membuat transisi lebih alami."""
-    return t * t * (3.0 - 2.0 * t)
+    # BOOLEAN
+    click = False
+    varGlobals.list = False
+    varGlobals.runMakeOrder = True
+    varGlobals.updateOrder = True
 
-# --- Properti Mata ---
-current_properties = {
-    'eye_open_y': 100,   # Tinggi mata saat terbuka
-}
+    buttons = {
+        "Back": moButton.BACK,
+        "Add Order": moButton.TAMBAH_PESANAN,
+        "List Order": moButton.LIST_PESANAN
+    }
+    
+    # Inisialisasi awal transisi
+    varGlobals.startTransisi = time.time()
+    varGlobals.startProperties = varGlobals.SET_AWAL.copy()
+    varGlobals.targetPropertis = varGlobals.SET_AWAL.copy()
 
-target_properties = current_properties.copy()
-start_properties = current_properties.copy()
+    while varGlobals.runMakeOrder:
+        # Pindahkan event loop ke atas
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                varGlobals.trueSound.play()
+                click = True
 
-transition_duration = 0.5
-transition_start_time = time.time()
-
-# --- Animasi (Menggantikan case Arduino) ---
-ANIMATIONS = {
-    0: {'eye_open_y': 100},  # wakeup / mata normal
-    1: {'eye_open_y': 100},  # center_eyes
-    2: {'eye_open_y': 100},  # move_right
-    3: {'eye_open_y': 100},  # move_left
-    4: {'eye_open_y': 0},    # blink
-    5: {'eye_open_y': 100},  # happy_eye
-    6: {'eye_open_y': 0}     # sleep
-}
-
-def set_animation(index):
-    global start_properties, target_properties, transition_start_time
-    start_properties = current_properties.copy()
-    target_properties = ANIMATIONS.get(index, ANIMATIONS[0]).copy()
-    transition_start_time = time.time()
-
-# --- Main Loop ---
-current_animation_index = 0
-last_animation_change_time = time.time()
-set_animation(current_animation_index)
-
-running = True
-while running:
-    # Event handling
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    # Ganti animasi setiap 2 detik (meniru for loop Arduino)
-    if time.time() - last_animation_change_time > 0.5:
-        current_animation_index = (current_animation_index + 1) % len(ANIMATIONS)
-        set_animation(current_animation_index)
-        last_animation_change_time = time.time()
+        # --- LOGIKA ANIMASI MATA ---
+        mx, my = pygame.mouse.get_pos()
         
-    # --- Transisi Properti ---
-    # BUG FIX: Perbaikan pada perhitungan waktu yang telah berlalu
-    elapsed = time.time() - transition_start_time
-    t = min(elapsed / transition_duration, 1.0)
-    
-    # Gunakan easing untuk transisi yang lebih halus
-    t_eased = ease_in_out(t)
-    
-    for key in target_properties:
-        current_properties[key] = lerp(start_properties.get(key, 0), target_properties[key], t_eased)
+        # Cek apakah mouse bergerak
+        if (mx, my) != last_mouse_pos:
+            last_mouse_move_time = time.time()
+            is_animation_active = False
+            last_mouse_pos = (mx, my)
+            
+            # Jika mouse bergerak, matikan animasi berjangka waktu
+            perubahanAnimasi = time.time()
 
-    # --- Menggambar di Layar ---
-    screen.fill(cc.GRAY)
+        # LOGIKA PERGERAKAN MOUSE
+        # Ini akan selalu berjalan, dan mengupdate target properti
+        # jika mode animasi tidak aktif
+        center_x = varGlobals.res[0] // 2
+        center_y = varGlobals.res[1] // 2
+        max_offset = 70 
 
-    # Posisi mata
-    eye_width = 200
-    eye_height = int(current_properties['eye_open_y'])
-    eye_left_x = 150
-    eye_right_x = 450
-    eye_y = SCREEN_HEIGHT // 2 - eye_height // 2
+        mouse_offset_x = max(-max_offset, min(max_offset, (mx - center_x) / 5))
+        mouse_offset_y = max(-max_offset, min(max_offset, (my - center_y) / 5))
+        
+        if not is_animation_active:
+            varGlobals.targetPropertis['eye_offset_x'] = mouse_offset_x
+            varGlobals.targetPropertis['eye_offset_y'] = mouse_offset_y
 
-    # Gambar mata kiri dan kanan
-    eye_rect_left = pygame.Rect(eye_left_x, eye_y, eye_width, eye_height)
-    eye_rect_right = pygame.Rect(eye_right_x, eye_y, eye_width, eye_height)
-    
-    pygame.draw.rect(screen, cc.WHITE, eye_rect_left)
-    pygame.draw.rect(screen, cc.WHITE, eye_rect_right)
-    pygame.draw.rect(screen, cc.BLACK, eye_rect_left, 5)
-    pygame.draw.rect(screen, cc.BLACK, eye_rect_right, 5)
+        # LOGIKA ANIMASI BERJANGKA WAKTU
+        # Ini akan berjalan hanya jika mouse diam lebih dari 1 detik
+        if time.time() - last_mouse_move_time > 1 and not is_animation_active:
+            is_animation_active = True
+            
+            # Pemicu animasi berjangka waktu pertama
+            index = (index + 1) % len(varGlobals.ANIMATIONS)
+            setAnimation(index, varGlobals.ANIMATIONS, varGlobals.SET_AWAL)
+            perubahanAnimasi = time.time()
+            
+        # Pemicu animasi berjangka waktu selanjutnya
+        if is_animation_active and time.time() - perubahanAnimasi > 1:
+            index = (index + 1) % len(varGlobals.ANIMATIONS)
+            setAnimation(index, varGlobals.ANIMATIONS, varGlobals.SET_AWAL)
+            perubahanAnimasi = time.time()
+            
+            # Jika semua animasi sudah selesai, nonaktifkan flag
+            if index == len(varGlobals.ANIMATIONS) - 1:
+                is_animation_active = False
 
-    # Tampilkan teks animasi saat ini
-    font = pygame.font.SysFont(None, 30)
-    text = font.render(f"Animation Index: {current_animation_index}", True, cc.BLACK)
-    screen.blit(text, (10, 10))
-    
-    pygame.display.flip()
-    clock.tick(60)
+        # --- LERP & MENGGAMBAR ---
+        elapsed = time.time() - varGlobals.startTransisi
+        t = min(elapsed / varGlobals.durasiTransisi, 1.0)
+        tEased = easeInOut(t)
 
-pygame.quit()
+        for key in varGlobals.targetPropertis:
+            varGlobals.SET_AWAL[key] = lerp(
+                varGlobals.startProperties.get(key, 0),
+                varGlobals.targetPropertis[key],
+                tEased
+            )
+        
+        varGlobals.screen.blit(varGlobals.bgMakeOrder, (0, 0))
+
+        tinggiMata = int(varGlobals.SET_AWAL['eye_height'])
+        eyeOffsetX_val = varGlobals.SET_AWAL['eye_offset_x']
+        eyeOffsetY_val = varGlobals.SET_AWAL['eye_offset_y']
+        
+        eyeLeftX = varGlobals.eyeLeftX + eyeOffsetX_val
+        eyeRightX = varGlobals.eyeRightX + eyeOffsetX_val
+        eyePosY = varGlobals.eyePosY + eyeOffsetY_val
+
+        eyeLeft = pygame.Rect(eyeLeftX, eyePosY, varGlobals.lebarMata, tinggiMata)
+        eyeRight = pygame.Rect(eyeRightX, eyePosY, varGlobals.lebarMata, tinggiMata)
+
+        pygame.draw.rect(varGlobals.screen, cc.BLACK, eyeLeft, border_radius=50)
+        pygame.draw.rect(varGlobals.screen, cc.BLACK, eyeRight, border_radius=50)
+
+        # LOGIKA TOMBOL & POP-UP
+        # ... (tetap sama seperti sebelumnya)
+
+        click = False
+        varGlobals.clock.tick(60)
+        pygame.display.flip()
