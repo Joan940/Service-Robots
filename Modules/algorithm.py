@@ -32,7 +32,7 @@ def drawNumberPad(screen, popup_x, popup_y):
         y = start_y + (i // 3) * (button_size + gap)
         rect = pygame.Rect(x, y, button_size, button_size)
         pygame.draw.rect(screen, cc.WHITE, rect, border_radius=8)
-        pygame.draw.rect(screen, cc.BLACK, rect, 3, border_radius=8)
+        pygame.draw.rect(screen, cc.BLACK, rect, 2, border_radius=8)
         
         # MENAMPILKAN ANGKA
         number = str(i + 1)
@@ -43,7 +43,7 @@ def drawNumberPad(screen, popup_x, popup_y):
     # UNTUK KOTAK 0
     box_0 = pygame.Rect(start_x + (button_size + gap), start_y + (button_size + gap) * 3, button_size, button_size)
     pygame.draw.rect(screen, cc.WHITE, box_0, border_radius=8)
-    pygame.draw.rect(screen, cc.BLACK, box_0, 3, border_radius=8)
+    pygame.draw.rect(screen, cc.BLACK, box_0, 2, border_radius=8)
     text_0 = varGlobals.font.render("0", True, cc.BLACK)
     text_0_rect = text_0.get_rect(center=box_0.center)
     screen.blit(text_0, text_0_rect)
@@ -51,7 +51,7 @@ def drawNumberPad(screen, popup_x, popup_y):
     # UNTUK KOTAK DELETE
     box_del = pygame.Rect(start_x + 0, start_y + (button_size + gap) * 3, button_size, button_size)
     pygame.draw.rect(screen, cc.WHITE, box_del, border_radius=8)
-    pygame.draw.rect(screen, cc.BLACK, box_del, 3, border_radius=8)
+    pygame.draw.rect(screen, cc.BLACK, box_del, 2, border_radius=8)
     text_del = varGlobals.font.render("Del", True, cc.BLACK)
     text_del_rect = text_del.get_rect(center=box_del.center)
     screen.blit(text_del, text_del_rect)
@@ -59,7 +59,7 @@ def drawNumberPad(screen, popup_x, popup_y):
     # UNTUK KOTAK CLEAR
     box_clear = pygame.Rect(start_x + (button_size + gap) * 2, start_y + (button_size + gap) * 3, button_size, button_size)
     pygame.draw.rect(screen, cc.WHITE, box_clear, border_radius=8)
-    pygame.draw.rect(screen, cc.BLACK, box_clear, 3, border_radius=8)
+    pygame.draw.rect(screen, cc.BLACK, box_clear, 2, border_radius=8)
     text_clear = varGlobals.font.render("Clear", True, cc.BLACK)
     text_clear_rect = text_clear.get_rect(center=box_clear.center)
     screen.blit(text_clear, text_clear_rect)
@@ -147,3 +147,41 @@ def setAnimation(index, animations, deklarasi):
     varGlobals.startProperties = deklarasi.copy()
     varGlobals.targetPropertis = animations.get(index, animations.get(0)).copy()
     varGlobals.startTransisi = time.time()
+
+
+###################################################################################################
+#                                         SLIDE TRANSITION                                        #
+###################################################################################################
+
+def transition(surfaceOld, surfaceNew, direction="right", speed=20):
+    WIDTH, HEIGHT = surfaceOld.get_size()
+
+    offset = 0
+    if direction == "right":
+        while offset < WIDTH:
+            varGlobals.screen.blit(surfaceOld, (offset, 0))
+            varGlobals.screen.blit(surfaceNew, (offset - WIDTH, 0))
+            pygame.display.flip()
+            varGlobals.clock.tick(60)
+            offset += speed
+    elif direction == "left":
+        while offset > -WIDTH:
+            varGlobals.screen.blit(surfaceOld, (offset, 0))
+            varGlobals.screen.blit(surfaceNew, (offset + WIDTH, 0))
+            pygame.display.flip()
+            varGlobals.clock.tick(60)
+            offset -= speed
+    elif direction == "up":
+        while offset > -HEIGHT:
+            varGlobals.screen.blit(surfaceOld, (0, offset))
+            varGlobals.screen.blit(surfaceNew, (0, offset + HEIGHT))
+            pygame.display.flip()
+            varGlobals.clock.tick(60)
+            offset -= speed
+    elif direction == "down":
+        while offset < HEIGHT:
+            varGlobals.screen.blit(surfaceOld, (0, offset))
+            varGlobals.screen.blit(surfaceNew, (0, offset - HEIGHT))
+            pygame.display.flip()
+            varGlobals.clock.tick(60)
+            offset += speed
