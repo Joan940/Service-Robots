@@ -77,6 +77,7 @@ def reset_database():
 ###################################################################################################
 #                                        MENAMBAH PESANAN                                         #
 ###################################################################################################
+        
 def addOrders(table_number, queue_number, item_name, quantity):
     db_connection = connect_to_db()
     cursor = db_connection.cursor()
@@ -97,7 +98,7 @@ def getOrders():
     db_connection = connect_to_db()
     cursor = db_connection.cursor()
 
-    query = "SELECT * FROM orders ORDER BY id DESC LIMIT 5"
+    query = "SELECT * FROM orders ORDER BY id DESC"
     cursor.execute(query)
 
     orders = cursor.fetchall()

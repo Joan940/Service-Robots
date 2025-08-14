@@ -17,20 +17,26 @@ class custom:
     COFFEE_BROWN = (111, 78, 55)
     COPPER_BROWN = (184, 115, 51)
     LIGHT_RED_BROWN = (193, 154, 107)
-    BRIGHT_YELLOW = (255, 255, 0)  # Kuning cerah
-    ORANGE = (255, 165, 0)        # Oranye
-    PURPLE = (128, 0, 128)        # Ungu
-    CYAN = (0, 255, 255)          # Cyan (Aqua)
-    MAGENTA = (255, 0, 255)       # Magenta (Fuchsia)
-    GREY = (192, 192, 192)        # Abu-abu
-    DARK_GREY = (64, 64, 64)      # Abu-abu gelap
-    LIGHT_BLUE = (173, 216, 230)  # Biru muda
-    GOLD = (255, 215, 0)          # Emas
-    SILVER = (192, 192, 192)      # Perak
+    BRIGHT_YELLOW = (255, 255, 0)
+    ORANGE = (255, 165, 0)
+    PURPLE = (128, 0, 128)
+    CYAN = (0, 255, 255)
+    MAGENTA = (255, 0, 255)
+    GREY = (192, 192, 192)
+    DARK_GREY = (64, 64, 64)
+    LIGHT_BLUE = (173, 216, 230)
+    GOLD = (255, 215, 0)
+    SILVER = (192, 192, 192)
     
 
 def tts(text, color, rect, surface, font_size):
     font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", font_size)
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect(center=rect.center)
+    surface.blit(text_surface, text_rect)
+
+def tts1(text, color, rect, surface, font_size):
+    font = pygame.font.Font("C:\BMP-Robotics\Assets\CreatoDisplay-Regular.otf", font_size)
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect(center=rect.center)
     surface.blit(text_surface, text_rect)

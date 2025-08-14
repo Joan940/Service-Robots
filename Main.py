@@ -15,7 +15,7 @@ from Skills.demoMode import (
 from Modules.algorithm import (
     rotatedImage,
     drawNumberPad,
-    tamilanOrder,
+    tampilanOrder,
     setAnimation,
     easeInOut,
     lerp,
@@ -29,6 +29,7 @@ from Modules.database import (
 from Modules.colors import (
     custom as cc,
     tts,
+    tts1,
     tts2
 )
 from Modules.varGlobals import (
@@ -61,18 +62,7 @@ def pencetButton(text):
     # PAKSA HURUF KECIL
     text = text.lower()
 
-    if text == "add order":
-        order()
-
-    elif text == "save":
-        print("save")
-        runCom()
-        mainMenu()
-
-    elif text == "back":
-        mainMenu()
-
-    elif text == "demo 1":
+    if text == "demo 1":
         demo1()
 
     elif text == "coba":
@@ -180,10 +170,19 @@ def configuration():
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 5, border_radius = 20)
                 tts(display_text, cc.RED_BROWN, rect, varGlobals.screen, 30)
                 if click:
+                    varGlobals.oldSurface = varGlobals.screen.copy()
+                    varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
                     if key in ["IP", "PORT"]:
                         fillText(key, inputUser)
                     elif key == "Save" and (varGlobals.IP and varGlobals.PORT):
                         pencetButton(key)
+                        
+                        varGlobals.newSurface.blit(varGlobals.bgMenu, (0, 0))
+                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="right", speed=20)
+                        
+                        print("save")
+                        runCom()
+                        mainMenu()
                     elif key == "Save" and not (varGlobals.IP and varGlobals.PORT):
                         varGlobals.falseSound.play()
             else:
@@ -201,6 +200,10 @@ def configuration():
 
 def order():
 
+    # RESET
+    varGlobals.oldSurface = None
+    varGlobals.newSurface = None
+
     # MENYIMPAN BUTTON TAB ANGKA
     number_pad_buttons = {}
 
@@ -214,7 +217,7 @@ def order():
     varGlobals.runMakeOrder = False
 
     buttons = {
-        "Exit": orderButton.EXIT
+        "Back": orderButton.EXIT
     }
 
     menu = {
@@ -225,6 +228,11 @@ def order():
         "Nasi Telur": orderButton.MENU_5
     }
 
+    varGlobals.previousScreen = varGlobals.currentScreen
+    varGlobals.currentScreen = "order"
+
+    font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 17)
+
     while varGlobals.runOrder:
 
         varGlobals.screen.blit(varGlobals.bgOrder, (0, 0))
@@ -233,7 +241,7 @@ def order():
         
         # DEKLARASI POP UP
         popupPesanan = pygame.Rect(varGlobals.popupX, varGlobals.popupY, varGlobals.lebarPopup + 20, varGlobals.tinggiPopup)
-        numPad = pygame.Rect(varGlobals.popupX + 265, varGlobals.popupY + 100, 170, 230)
+        numPad = pygame.Rect(popupPesanan.width + 10, varGlobals.popupY, 450, varGlobals.tinggiPopup)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -241,6 +249,7 @@ def order():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                click = True
                 varGlobals.trueSound.play()
                 
                 if varGlobals.pesanan:
@@ -302,8 +311,6 @@ def order():
                             varGlobals.input = "table"
                             varGlobals.nomorMeja = ""
                             varGlobals.jumlah = ""
-                            varGlobals.popupX = rect.right + 20
-                            varGlobals.popupY = rect.centery - (varGlobals.tinggiPopup // 2)
 
                     for button_name in buttons:
                         if buttons[button_name].collidepoint(mx, my):
@@ -346,6 +353,18 @@ def order():
             if rect.collidepoint(mx, my) and not varGlobals.pesanan:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 5, border_radius=20)
                 tts(button_name, cc.RED_BROWN, rect, varGlobals.screen, 30)
+
+                if click:
+                    pencetButton(button_name)
+                    
+                    # MEMBUAT TRANSISI WINDOW
+                    varGlobals.oldSurface = varGlobals.screen.copy()
+                    varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+
+                    if button_name == "Back":
+                        varGlobals.newSurface.blit(varGlobals.bgMakeOrder, (0, 0))
+                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="down", speed=20)
+                        makeOrder()
             else:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 3, border_radius=20)
                 tts(button_name, cc.RED_BROWN, rect, varGlobals.screen, 20)
@@ -361,9 +380,15 @@ def order():
         # JENDELA TAMBAHAN MUNCUL KETIKA MEMESAN
         if varGlobals.pesanan:
 
-            boxNomorMeja = pygame.Rect(varGlobals.popupX + 10, varGlobals.popupY + 45, varGlobals.lebarPopup - 2 * 18, 34)
-            boxJumlah = pygame.Rect(varGlobals.popupX + 10, varGlobals.popupY + 88, varGlobals.lebarPopup - 2 * 18, 34)
-            boxConfirm = pygame.Rect(varGlobals.popupX + 270, varGlobals.popupY + 10, varGlobals.lebarPopup - 295, 34)
+            boxNomorMeja = pygame.Rect(varGlobals.popupX + 10, varGlobals.popupY + 61, varGlobals.lebarPopup - 2 * 10, 50)
+            boxJumlah = pygame.Rect(varGlobals.popupX + 10, varGlobals.popupY + 116, varGlobals.lebarPopup - 2 * 10, 50)
+            boxConfirm = pygame.Rect(varGlobals.popupX + 10, varGlobals.popupY + 171, varGlobals.lebarPopup - 2 * 10, 50)
+            
+            boxPenghalang = pygame.Rect(0, 0, varGlobals.res[0], varGlobals.res[1])
+            overlay = pygame.Surface((boxPenghalang.width, boxPenghalang.height), pygame.SRCALPHA)
+
+            pygame.draw.rect(overlay, (0, 0, 0, 100), overlay.get_rect())
+            varGlobals.screen.blit(overlay, (0, 0))
 
             # MENGGAMBAR KOTAK POP UP BESAR
             kotakPopup = pygame.Rect(varGlobals.popupX, varGlobals.popupY, varGlobals.lebarPopup, varGlobals.tinggiPopup)
@@ -376,7 +401,12 @@ def order():
 
             # KOTAK KONFIRMASI
             pygame.draw.rect(varGlobals.screen, cc.WHITE, boxConfirm, border_radius=8)
-            pygame.draw.rect(varGlobals.screen, cc.BLACK, boxConfirm, 2, border_radius=8)
+            if boxConfirm.collidepoint(mx, my):
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, boxConfirm, border_radius=25)
+                tts("Done", cc.WHITE, boxConfirm, varGlobals.screen, 17)
+            else:
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, boxConfirm, border_radius=8)
+                tts("Done", cc.WHITE, boxConfirm, varGlobals.screen, 17)
 
             # HIGHLIGHT BOX
             if varGlobals.input == "table":
@@ -392,21 +422,18 @@ def order():
             varGlobals.screen.blit(textJudul, textPos)
 
             # TEXT PADA INPUTAN DAN WARNANYA
-            textMeja = f"Meja     : {varGlobals.nomorMeja}"
-            textJumlah = f"Jumlah  : {varGlobals.jumlah}"
-            textConfirm = "Done"
-            ccMeja = varGlobals.font.render(textMeja, True, cc.BLACK)
-            ccJumlah = varGlobals.font.render(textJumlah, True, cc.BLACK)
-            ccConfirm = varGlobals.font.render(textConfirm, True, cc.BLACK)
+            textMeja = f"Meja     :   {varGlobals.nomorMeja}"
+            textJumlah = f"Jumlah  :   {varGlobals.jumlah}"
+            ccMeja = font.render(textMeja, True, cc.BLACK)
+            ccJumlah = font.render(textJumlah, True, cc.BLACK)
 
-            varGlobals.screen.blit(ccMeja, (boxNomorMeja.x + 10, boxNomorMeja.y + 6))
-            varGlobals.screen.blit(ccJumlah, (boxJumlah.x + 10, boxJumlah.y + 6))
-            varGlobals.screen.blit(ccConfirm, (boxConfirm.x + 9, boxConfirm.y + 6))
+            varGlobals.screen.blit(ccMeja, (boxNomorMeja.x + 10, boxNomorMeja.y + 13))
+            varGlobals.screen.blit(ccJumlah, (boxJumlah.x + 10, boxJumlah.y + 13))
 
-            number_pad_buttons = drawNumberPad(varGlobals.screen, varGlobals.popupX, varGlobals.popupY)
+            number_pad_buttons = drawNumberPad(varGlobals.screen, varGlobals.popupX, varGlobals.popupY, 2)
 
         click = False
-        varGlobals.clock.tick(30)
+        varGlobals.clock.tick(120)
         pygame.display.flip()
 
 
@@ -416,14 +443,20 @@ def order():
 
 def eyeUI():
 
+    # RESET
+    varGlobals.oldSurface = None
+    varGlobals.newSurface = None
+
     # LOCAL VARIABLE
     lastBlinkTime = time.time()
     blink_interval = random.uniform(3, 6)
     blinkStartTime = 0.0
     blinkDuration = 0.5
+    startPos = None
+    threshold = 10
 
     # BOOLEAN
-    click = False
+    dragging = False
     varGlobals.list = False
     varGlobals.runEye = True
     varGlobals.runSim = False
@@ -439,19 +472,43 @@ def eyeUI():
     varGlobals.startProperties = varGlobals.SET_AWAL.copy()
     varGlobals.targetPropertis = varGlobals.SET_AWAL.copy()
 
+    varGlobals.previousScreen = varGlobals.currentScreen
+    varGlobals.currentScreen = "eye ui"
+
     while varGlobals.runEye:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 varGlobals.runMenu = False
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                varGlobals.trueSound.play()
-                varGlobals.oldSurface = varGlobals.screen.copy()
-                varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
-                varGlobals.newSurface.blit(varGlobals.bgMakeOrder, (0, 0))
-                transition(varGlobals.oldSurface, varGlobals.newSurface, direction="up", speed=20)
-                makeOrder()
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                dragging = True
+                startPos = event.pos
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                if dragging:
+                    endPos = event.pos
+
+                    dx = endPos[0] - startPos[0]
+                    dy = endPos[1] - startPos[1]
+                    
+                    # MENGHITUNG JARAK TOTAL
+                    distance = (dx ** 2 + dy ** 2) ** 0.5
+                    
+                    if distance <= threshold or dy < (-20):
+
+                        # DIANGGAP CLICK
+                        print("Klik terdeteksi")
+                        varGlobals.trueSound.play()
+                        varGlobals.oldSurface = varGlobals.screen.copy()
+                        varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+                        varGlobals.newSurface.blit(varGlobals.bgMakeOrder, (0, 0))
+                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="up", speed=20)
+                        makeOrder()
+                    else:
+                        pass
+                
+                dragging = False
 
         # UPDATE ANIMASI KEDIP DENGAN MENGAMBIL PROPERTI ANIMATIONS KE 5 (MENUTUP MATA)
         if time.time() - lastBlinkTime > blink_interval and not varGlobals.isBlinking:
@@ -535,6 +592,17 @@ def eyeUI():
 
 def makeOrder():
 
+    # RESET
+    varGlobals.oldSurface = None
+    varGlobals.newSurface = None
+
+    # VARIABLE LOCAL
+    contentY = 0
+    duration = 10
+    scroll = False
+    scrollPos = None
+    lastAction = time.time()
+
     # BOOLEAN
     click = False
     varGlobals.list = False
@@ -543,9 +611,7 @@ def makeOrder():
     varGlobals.runMenu = False
     varGlobals.runOrder = False
     varGlobals.runConfig = False
-    varGlobals.isBlinking = False
     varGlobals.updateOrder = True
-    varGlobals.mouseActive = False
     varGlobals.runMakeOrder = True
 
     buttons = {
@@ -554,6 +620,9 @@ def makeOrder():
         "List Order": moButton.LIST_PESANAN
     }
 
+    varGlobals.previousScreen = varGlobals.currentScreen
+    varGlobals.currentScreen = "make order"
+
     while varGlobals.runMakeOrder:
 
         for event in pygame.event.get():
@@ -561,13 +630,30 @@ def makeOrder():
                 varGlobals.runMenu = False
                 pygame.quit()
                 sys.exit()
+
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 varGlobals.trueSound.play()
                 click = True
+                lastAction = time.time()
+                
+            # LOGIKA SCROLLING MENGGUNAKAN RODA MOUSE
+            # Button 4 = Roda mouse ke atas, Button 5 = Roda mouse ke bawah
+            if varGlobals.list and event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:  
+                    contentY += 30
+                    lastAction = time.time()
+                elif event.button == 5: 
+                    contentY -= 30
+                    lastAction = time.time()
+
+        # CEK TIMEOUT
+        if time.time() - lastAction >= duration:
+            eyeUI() 
+            lastAction = time.time()
 
         if varGlobals.updateOrder:
             listOrder = getOrders()
-            varGlobals.allOrders = tamilanOrder(listOrder)
+            varGlobals.allOrders = tampilanOrder(listOrder)
             varGlobals.updateOrder = False
 
         varGlobals.screen.blit(varGlobals.bgMakeOrder, (0, 0))
@@ -580,8 +666,23 @@ def makeOrder():
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 30)
                 if click:
                     pencetButton(button)
+
+                    # MEMBUAT TRANSISI WINDOW
+                    varGlobals.oldSurface = varGlobals.screen.copy()
+                    varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+                
                     if button == "List Order":
                         varGlobals.list = not varGlobals.list
+                        varGlobals.updateOrder = True
+
+                    elif button == "Add Order":
+                        varGlobals.newSurface.blit(varGlobals.bgOrder, (0, 0))
+                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="up", speed=20)
+                        order()
+                    elif button == "Back":
+                        varGlobals.newSurface.blit(varGlobals.bgEyes, (0, 0))
+                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="down", speed=20)
+                        eyeUI()
             else:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 3, border_radius=20)
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 20)
@@ -589,23 +690,49 @@ def makeOrder():
                     varGlobals.list = False
 
         if varGlobals.list:
-
-            # MENGGAMBAR JENDELA POP UP
-            pygame.draw.rect(varGlobals.screen, cc.WHITE, (1300, 440, 400, 300), border_radius=20)
-            pygame.draw.rect(varGlobals.screen, cc.BLACK, (1300, 440, 400, 300), 3, border_radius=20)
             
+            # MENGGAMBAR JENDELA POP UP
+            popupRect = pygame.Rect(65, 110, 400, 460)
+            pygame.draw.rect(varGlobals.screen, cc.WHITE, popupRect, border_radius=20)
+            pygame.draw.rect(varGlobals.screen, cc.BLACK, popupRect, 3, border_radius=20)
+
+            # MENGHITUNG TINGGI CONTENT
+            total_content_height = sum(group['height'] + 30 for group in varGlobals.allOrders)
+            
+            # BATAS SCROLLING
+            maxScroll = max(0, total_content_height - popupRect.height)
+            contentY = max(-maxScroll, min(10, contentY))
+
+            # Buat area gambar yang dipotong agar konten hanya terlihat di dalam pop-up
+            clipping_rect = pygame.Rect(popupRect.x, popupRect.y + 10, popupRect.width, popupRect.height - 20)
+            varGlobals.screen.set_clip(clipping_rect)
+            
+            # Menggambar semua orderan dengan offset Y
+            currentY = 0
             for group in varGlobals.allOrders:
-                meja_line = group['lines'][0]
-                x_pos = meja_line['rect'].x - 40
-                y_pos = meja_line['rect'].y - 10
+                # OFFSET SCROLLING PADA POSISI Y
+                yPosOffset = currentY + contentY + popupRect.y
+
+                # Mendapatkan posisi x dari elemen pertama
+                mejaLine = group['lines'][0]
+                xPos = mejaLine['rect'].x - 45
+
+                tinggiDinamis = group['height'] - 30
                 
-                tinggi_dinamis = group['height'] + 20
-                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (x_pos, y_pos, 380, tinggi_dinamis), border_radius=20)
-                pygame.draw.rect(varGlobals.screen, cc.WHITE, (x_pos, y_pos, 100, tinggi_dinamis), border_radius=20)
-                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (x_pos, y_pos, 100, tinggi_dinamis), 3, border_radius=20)
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (xPos, yPosOffset, 380, tinggiDinamis), 3, border_radius=20)
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (xPos, yPosOffset, 100, tinggiDinamis), border_radius=20)
 
                 for line in group['lines']:
-                    varGlobals.screen.blit(line['surface'], line['rect'])
+                    # RESET POSISI Y
+                    line_rect = line['rect'].copy()
+                    line_rect.y += contentY
+                    varGlobals.screen.blit(line['surface'], line_rect)
+
+                # BATAS ANTARA GROUP
+                currentY += tinggiDinamis + 10
+            
+            # HAPUS CLIPPING
+            varGlobals.screen.set_clip(None)
 
         click = False
         varGlobals.clock.tick(60)
@@ -617,6 +744,10 @@ def makeOrder():
 ###################################################################################################
 
 def mainMenu():
+
+    # RESET
+    varGlobals.oldSurface = None
+    varGlobals.newSurface = None
 
     # BOOLEAN
     click = False
@@ -640,6 +771,8 @@ def mainMenu():
         varGlobals.conServiceBot : mmButton.STATUS
     }
 
+    varGlobals.currentScreen = "main menu"
+
     while varGlobals.runMenu:
 
         varGlobals.screen.blit(varGlobals.bgMenu, (0, 0))
@@ -661,6 +794,8 @@ def mainMenu():
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 30)
                 if click:
                     pencetButton(button)
+
+                    # MEMBUAT TRANSISI WINDOW
                     varGlobals.oldSurface = varGlobals.screen.copy()
                     varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
                     if button == "Run":
@@ -702,10 +837,6 @@ def mainMenu():
 
 def simulation():
 
-    # RESET
-    varGlobals.oldSurface = None
-    varGlobals.newSurface = None
-
     # BOOLEAN
     click = False
     varGlobals.runSim = True
@@ -723,9 +854,9 @@ def simulation():
     while varGlobals.runSim:
 
         infoRobot = [
-            ("Compass   : " + str(dataRobot.kompas), (220, 30)),
-            ("X     : " + str(dataRobot.xpos), (120, 990)),
-            ("Y     : " + str(dataRobot.ypos), (320, 990))
+            ("Compass   :   " + str(dataRobot.kompas), (530, 220)),
+            ("X               :   " + str(dataRobot.ypos), (530, 240)),
+            ("Y               :   " + str(dataRobot.xpos), (530, 260))
         ]
 
         for event in pygame.event.get():
@@ -736,6 +867,20 @@ def simulation():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 varGlobals.trueSound.play()
                 click = True
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    dataRobot.ypos += 200
+                elif event.key == pygame.K_LEFT:
+                    dataRobot.ypos -= 200
+                elif event.key == pygame.K_UP:
+                    dataRobot.xpos -= 200
+                elif event.key == pygame.K_DOWN:
+                    dataRobot.xpos += 200
+                elif event.key == pygame.K_LSHIFT:
+                    dataRobot.kompas += 20
+                elif event.key == pygame.K_LCTRL:
+                    dataRobot.kompas -= 20
             
             # PENANGANAN BOOLEAN (PRESS BUTTON)
             if event.type == pygame.KEYDOWN:
@@ -775,6 +920,9 @@ def simulation():
 
         varGlobals.screen.blit(varGlobals.bgSim, (0, 0))
 
+        # pygame.draw.aaline(varGlobals.screen, cc.RED, (0 + varGlobals.offsetX, 0), (0 + varGlobals.offsetX, 600))
+        # pygame.draw.aaline(varGlobals.screen, cc.RED, (0, 0 + varGlobals.offsetY), (1024, 0 + varGlobals.offsetY))
+
         # LOGIKA TOMBOL
         mx, my = pygame.mouse.get_pos()
         for button in buttons:
@@ -783,22 +931,28 @@ def simulation():
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 20)
                 if click:
                     pencetButton(button)
+                    varGlobals.oldSurface = varGlobals.screen.copy()
+                    varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+                    if button == "Back":
+                        varGlobals.newSurface.blit(varGlobals.bgMenu, (0, 0))
+                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="right", speed=20)
+                        mainMenu()
             else:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 2, border_radius = 20)
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 15)
                 
         for text_line, pos in infoRobot:
-            tts(text_line, cc.RED_BROWN, pygame.Rect(pos[0], pos[1], 10, 10), varGlobals.screen, 20)
+            tts(text_line, cc.BLACK, pygame.Rect(pos[0], pos[1], 10, 10), varGlobals.screen, 15)
         
         # ROTASI IMAGE
         Xbot = varGlobals.offsetX + (dataRobot.ypos * varGlobals.skala)
         Ybot = varGlobals.offsetY + (dataRobot.xpos * varGlobals.skala)
         rotatedImage(varGlobals.bot, Xbot, Ybot, dataRobot.kompas)
-        rotatedImage(varGlobals.arrow, 873, 463, dataRobot.kompas)
+        rotatedImage(varGlobals.arrow, 446, 250, dataRobot.kompas)
 
         click = False
         pygame.display.flip()
         varGlobals.clock.tick(30)
 
-reset_database()
+# reset_database()
 mainMenu()

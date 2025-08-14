@@ -40,6 +40,8 @@ pesanan = None
 temporary = None
 oldSurface = None
 newSurface = None
+currentScreen = None
+previousScreen = None
 
 # BOOLEAN
 notAutonomus = bool
@@ -63,8 +65,8 @@ startProperties = {}
 targetPropertis = {}
 
 # RESOLUSI WINDOW
-offsetX = res[0] / 14.53
-offsetY = res[1] / 2.68
+offsetX = res[0] / 13.1
+offsetY = res[1] / 2.76
 skala = res[1] / 1200
 
 # UKURAN BUTTON
@@ -97,15 +99,15 @@ ANIMATIONS = {
 }
 
 # NUMERIK
-popupX = 0
-popupY = 0
+popupX = res[0] // 2 - 220
+popupY = res[1] // 2 - 113
 antrian = 1
 eyeLeftX = 370
 lebarMata = 100
 eyeRightX = 570
-lebarPopup = 250
+lebarPopup = 300
 startTransisi = 0
-tinggiPopup = 140
+tinggiPopup = 230
 durasiTransisi = 0.5
 eyePosY = 170
 
@@ -123,7 +125,7 @@ keys_pressed = {
 conServiceBot = 'Disconnected' 
 
 # FONT
-font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 15)
+font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 25)
 
 # SOUND EFFECT
 trueSound = pygame.mixer.Sound(r"C:\BMP-Robotics\Assets\true.wav")
@@ -146,7 +148,7 @@ bot = pygame.image.load(r"C:\BMP-Robotics\Assets\bot.png").convert_alpha()
 bot = pygame.transform.scale(bot, (40, 40))
 
 arrow = pygame.image.load(r"C:\BMP-Robotics\Assets\arrow.png").convert_alpha()
-arrow = pygame.transform.scale(arrow, (70, 70))
+arrow = pygame.transform.scale(arrow, (40, 40))
 
 
 ###################################################################################################
@@ -233,10 +235,10 @@ class simulasi:
         LEBAR_BUTTON * 1.2
     )
     DEMO_1 = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-0.27)),
-        window_rect.centery - (LEBAR_BUTTON * 3.5),
+        window_rect.centerx - (PANJANG_BUTTON * (-1)),
+        window_rect.centery - (LEBAR_BUTTON * 0),
         PANJANG_BUTTON,
-        LEBAR_BUTTON * 0.8
+        LEBAR_BUTTON * 6.7
     )
 
 class config:
