@@ -605,15 +605,21 @@ def eyeUI():
 
     # LOCAL VARIABLE
     blink_interval = random.uniform(3, 6)
-    
     blinkDuration = 0.5
     blinkStartTime = 0
+
+    varGlobals.isLookingRight = False
+    varGlobals.isLookingLeft = False
+    lastLookTime = time.time()
+    lookDuration = 1
+    lookInterval = random.uniform(3, 6)
+
     newExpressTime = 0
     threshold = 10
     distance = 0
     duration = 5
 
-
+    keKanan = time.time()
     lastBlinkTime = time.time()
     new_expression = varGlobals.ANIMATIONS['buka'].copy()
 
@@ -623,6 +629,7 @@ def eyeUI():
     varGlobals.list = False
     varGlobals.runEye = True
     varGlobals.runSim = False
+    varGlobals.isRight = False
     varGlobals.runMenu = False
     varGlobals.runOrder = False
     varGlobals.runConfig = False
@@ -783,7 +790,7 @@ def eyeUI():
                 end_angle = 0
             else:
                 start_angle = 0
-                end_angle = math.piw
+                end_angle = math.pi
                 
             pygame.draw.arc(varGlobals.screen, cc.BLACK, mouth_rect, start_angle, end_angle, 10)
 

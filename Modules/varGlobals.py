@@ -33,30 +33,43 @@ jumlah = ''
 nomorMeja = ''
 
 # NONE
+# -- List Pesanan
 meja = None
+
+# -- Transisi Surface
+oldSurface = None
+newSurface = None
+
+# -- Lainnya
 input = None
 warna = None
 pesanan = None
 temporary = None
-oldSurface = None
-newSurface = None
 
 # BOOLEAN
-newExpression = bool
-notAutonomus = bool
+# -- Surface
 runMakeOrder = bool
-serviceBot = False
-updateOrder = True
-mouseActive = bool
-isBlinking = bool
 runConfig = bool
 runOrder = bool
 runMenu = bool
 runSim = bool
 runEye = bool
-hapus = bool
-list = bool
+updateOrder = True
+
+# -- Animasi Mata
+isLookingRight = bool
+isLookingLeft = bool
+newExpression = bool
+isBlinking = bool
+mouseActive = bool
+
+# -- Komunikasi
+notAutonomus = bool
 udp = bool
+serviceBot = False
+
+# -- List Pesanan
+list = bool
 
 # STACK
 allOrders = []
@@ -102,6 +115,8 @@ SET_AWAL = {
 ANIMATIONS = {
     'buka': {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
     'kedip': {'eyeHeight': 10, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': -0.1, 'eyebrowAngle_right': 0.1, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
+    'kanan': {'eyeHeight': 150, 'eyeOffsetX': 100, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
+    'kiri': {'eyeHeight': 150, 'eyeOffsetX': -100, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
     
     # EKSPRESI
     'marah': {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 5, 'eyebrowOffset_rightY': 5, 'eyebrowAngle_left': -10, 'eyebrowAngle_right': 10, 'mouthY': 100, 'mouthWidth': 120, 'mouthHeight': 50, 'mouthAngle': 180},
@@ -111,16 +126,21 @@ ANIMATIONS = {
 }
 
 # NUMERIK
+# -- Orderan
 popupX = res[0] // 2 - 220
 popupY = res[1] // 2 - 113
-antrian = 1
-eyeLeftX = 365
-lebarMata = 100
-eyeRightX = 565
 lebarPopup = 300
-startTransisi = 0
 tinggiPopup = 230
+startTransisi = 0
 durasiTransisi = 0.5
+
+# -- List Pesanan
+antrian = 1
+
+# -- Animasi Mata
+eyeRightX = 565
+lebarMata = 100
+eyeLeftX = 365
 eyePosY = 170
 
 # KEYBOARD
