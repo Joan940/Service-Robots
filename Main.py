@@ -1,5 +1,6 @@
 import sys
 import time
+import math
 import random
 import pygame
 import Modules.dataRobot as dataRobot
@@ -19,7 +20,8 @@ from Modules.algorithm import (
     setAnimation,
     easeInOut,
     lerp,
-    transition
+    transition,
+    rotatePoint
 )
 from Modules.database import (
     addOrders,
@@ -227,9 +229,6 @@ def order():
         "Spageti": orderButton.MENU_4,
         "Nasi Telur": orderButton.MENU_5
     }
-
-    varGlobals.previousScreen = varGlobals.currentScreen
-    varGlobals.currentScreen = "order"
 
     font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 17)
 
@@ -441,21 +440,185 @@ def order():
 #                                           MAKE AN EYES                                          #
 ###################################################################################################
 
+# def eyeUI():
+
+#     # RESET
+#     varGlobals.oldSurface = None
+#     varGlobals.newSurface = None
+
+#     # LOCAL VARIABLE
+#     lastBlinkTime = time.time()
+#     blink_interval = random.uniform(3, 6)
+#     blinkStartTime = 0.0
+#     blinkDuration = 0.5
+#     startPos = None
+#     threshold = 10
+
+#     # BOOLEAN
+#     dragging = False
+#     varGlobals.runEye = True
+#     varGlobals.isBlinking = False
+
+#     varGlobals.startTransisi = time.time()
+#     varGlobals.startProperties = varGlobals.SET_AWAL.copy()
+#     varGlobals.targetPropertis = varGlobals.SET_AWAL.copy()
+    
+#     current_expression = varGlobals.ANIMATIONS[0].copy()
+
+#     while varGlobals.runEye:
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 varGlobals.runEye = False
+#                 pygame.quit()
+#                 sys.exit()
+
+#             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+#                 dragging = True
+#                 startPos = event.pos
+#             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+#                 if dragging:
+#                     endPos = event.pos
+#                     dx = endPos[0] - startPos[0]
+#                     dy = endPos[1] - startPos[1]
+#                     distance = (dx ** 2 + dy ** 2) ** 0.5
+                    
+#                     if distance <= threshold or dy < (-20):
+#                         print("Klik terdeteksi")
+#                         varGlobals.trueSound.play()
+#                         varGlobals.oldSurface = varGlobals.screen.copy()
+#                         varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+#                         varGlobals.newSurface.blit(varGlobals.bgOrder, (0, 0))
+#                         transition(varGlobals.oldSurface, varGlobals.newSurface, direction="up", speed=20)
+#                         order()
+#                     else:
+#                         pass
+                
+#                 dragging = False
+                
+#         mx, my = pygame.mouse.get_pos()
+#         center_x = varGlobals.res[0] // 2
+#         center_y = varGlobals.res[1] // 2
+#         distance_from_center = ((mx - center_x) ** 2 + (my - center_y) ** 2) ** 0.5
+
+#         if distance_from_center < 80:
+#             new_expression = varGlobals.ANIMATIONS['marah'].copy()
+#         elif my < varGlobals.res[1] // 4:
+#             new_expression = varGlobals.ANIMATIONS['terkejut'].copy()
+#         elif mx < varGlobals.res[0] // 4 or mx > varGlobals.res[0] * 3 // 4:
+#             new_expression = varGlobals.ANIMATIONS['sedih'].copy()
+#         else:
+#             new_expression = varGlobals.ANIMATIONS[0].copy()
+
+#         # 2. Gabungkan pergerakan mata dengan ekspresi yang dipilih
+#         max_offset = 70
+#         mouse_offset_x = max(-max_offset, min(max_offset, (mx - center_x) / 5))
+#         mouse_offset_y = max(-max_offset, min(max_offset, (my - center_y) / 5))
+        
+#         # Tambahkan offset mouse ke properti ekspresi
+#         new_expression['eyeOffsetX'] += mouse_offset_x
+#         new_expression['eyeOffsetY'] += mouse_offset_y
+
+#         # 3. Mulai transisi ke ekspresi baru jika diperlukan
+#         if not varGlobals.isBlinking and new_expression != varGlobals.targetPropertis:
+#             varGlobals.startProperties = varGlobals.SET_AWAL.copy()
+#             varGlobals.targetPropertis = new_expression.copy()
+#             varGlobals.startTransisi = time.time()
+#             current_expression = new_expression.copy()
+
+#         # 4. Tangani animasi kedipan
+#         if time.time() - lastBlinkTime > blink_interval and not varGlobals.isBlinking:
+#             varGlobals.isBlinking = True
+#             blinkStartTime = time.time()
+            
+#             varGlobals.startProperties = varGlobals.SET_AWAL.copy()
+#             varGlobals.targetPropertis = varGlobals.ANIMATIONS[5].copy()
+#             varGlobals.startTransisi = time.time()
+            
+#             lastBlinkTime = time.time()
+#             blink_interval = random.uniform(3, 6)
+
+#         # 5. Kembali ke ekspresi terakhir setelah kedipan selesai
+#         if varGlobals.isBlinking and time.time() - blinkStartTime > blinkDuration:
+#             varGlobals.isBlinking = False
+            
+#             varGlobals.startProperties = varGlobals.SET_AWAL.copy()
+#             varGlobals.targetPropertis = current_expression.copy()
+#             varGlobals.startTransisi = time.time()
+
+#         # MENGGUNAKAN RUMUS AGAR LEBIH HALUS
+#         elapsed = time.time() - varGlobals.startTransisi
+#         t = min(elapsed / varGlobals.durasiTransisi, 1.0)
+#         tEased = easeInOut(t)
+
+#         for key in varGlobals.targetPropertis:
+#             varGlobals.SET_AWAL[key] = lerp(
+#                 varGlobals.startProperties.get(key, 0),
+#                 varGlobals.targetPropertis[key],
+#                 tEased
+#             )
+            
+#         varGlobals.screen.blit(varGlobals.bgEyes, (0, 0))
+
+#         # UPDATE PROPERTI VISUAL
+#         tinggiMata = int(varGlobals.SET_AWAL['eyeHeight'])
+#         eyeOffsetX_val = varGlobals.SET_AWAL['eyeOffsetX']
+#         eyeOffsetY_val = varGlobals.SET_AWAL['eyeOffsetY']
+        
+#         eyeLeftX = varGlobals.eyeLeftX + eyeOffsetX_val
+#         eyeRightX = varGlobals.eyeRightX + eyeOffsetX_val
+#         eyePosY = varGlobals.eyePosY + eyeOffsetY_val
+
+#         eyeLeft = pygame.Rect(eyeLeftX, eyePosY, varGlobals.lebarMata, tinggiMata)
+#         eyeRight = pygame.Rect(eyeRightX, eyePosY, varGlobals.lebarMata, tinggiMata)
+
+#         pygame.draw.rect(varGlobals.screen, (0,0,0), eyeLeft, border_radius=60)
+#         pygame.draw.rect(varGlobals.screen, (0,0,0), eyeRight, border_radius=60)
+
+#         # Menggambar Alis
+#         eyebrowOffset_leftY = varGlobals.SET_AWAL['eyebrowOffset_leftY']
+#         eyebrowOffset_rightY = varGlobals.SET_AWAL['eyebrowOffset_rightY']
+#         eyebrowAngle_left = varGlobals.SET_AWAL['eyebrowAngle_right']
+#         eyebrowAngle_right = varGlobals.SET_AWAL['eyebrowAngle_left']
+        
+#         eyebrow_start_left = (varGlobals.eyeLeftX - 10, varGlobals.eyePosY - 40 + eyebrowOffset_leftY)
+#         eyebrow_end_left = (varGlobals.eyeLeftX + varGlobals.lebarMata + 10, varGlobals.eyePosY - 40 + eyebrowOffset_leftY)
+#         eyebrow_start_right = (varGlobals.eyeRightX - 10, varGlobals.eyePosY - 40 + eyebrowOffset_rightY)
+#         eyebrow_end_right = (varGlobals.eyeRightX + varGlobals.lebarMata + 10, varGlobals.eyePosY - 40 + eyebrowOffset_rightY)
+
+#         rotated_start_left = rotatePoint(eyebrow_start_left, eyeLeft.center, eyebrowAngle_left)
+#         rotated_end_left = rotatePoint(eyebrow_end_left, eyeLeft.center, eyebrowAngle_left)
+#         pygame.draw.line(varGlobals.screen, (0,0,0), rotated_start_left, rotated_end_left, 10)
+
+#         rotated_start_right = rotatePoint(eyebrow_start_right, eyeRight.center, eyebrowAngle_right)
+#         rotated_end_right = rotatePoint(eyebrow_end_right, eyeRight.center, eyebrowAngle_right)
+#         pygame.draw.line(varGlobals.screen, (0,0,0), rotated_start_right, rotated_end_right, 10)
+
+#         varGlobals.clock.tick(60)
+#         pygame.display.flip()
+
 def eyeUI():
 
     # RESET
+    startPos = None
     varGlobals.oldSurface = None
     varGlobals.newSurface = None
 
     # LOCAL VARIABLE
-    lastBlinkTime = time.time()
     blink_interval = random.uniform(3, 6)
-    blinkStartTime = 0.0
+    
     blinkDuration = 0.5
-    startPos = None
+    blinkStartTime = 0
+    newExpressTime = 0
     threshold = 10
+    distance = 0
+    duration = 5
+
+
+    lastBlinkTime = time.time()
+    new_expression = varGlobals.ANIMATIONS['buka'].copy()
 
     # BOOLEAN
+    yes = True
     dragging = False
     varGlobals.list = False
     varGlobals.runEye = True
@@ -467,13 +630,11 @@ def eyeUI():
     varGlobals.updateOrder = True
     varGlobals.mouseActive = False
     varGlobals.runMakeOrder = False
+    varGlobals.newExpression = False
 
     varGlobals.startTransisi = time.time()
     varGlobals.startProperties = varGlobals.SET_AWAL.copy()
     varGlobals.targetPropertis = varGlobals.SET_AWAL.copy()
-
-    varGlobals.previousScreen = varGlobals.currentScreen
-    varGlobals.currentScreen = "eye ui"
 
     while varGlobals.runEye:
         for event in pygame.event.get():
@@ -497,60 +658,83 @@ def eyeUI():
                     
                     if distance <= threshold or dy < (-20):
 
-                        # DIANGGAP CLICK
+                        # DIANGGAP KLIK
                         print("Klik terdeteksi")
                         varGlobals.trueSound.play()
                         varGlobals.oldSurface = varGlobals.screen.copy()
                         varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
                         varGlobals.newSurface.blit(varGlobals.bgMakeOrder, (0, 0))
                         transition(varGlobals.oldSurface, varGlobals.newSurface, direction="up", speed=20)
-                        makeOrder()
+                        order()
+                    
                     else:
                         pass
                 
                 dragging = False
 
-        # UPDATE ANIMASI KEDIP DENGAN MENGAMBIL PROPERTI ANIMATIONS KE 5 (MENUTUP MATA)
-        if time.time() - lastBlinkTime > blink_interval and not varGlobals.isBlinking:
-            varGlobals.isBlinking = True
-            blinkStartTime = time.time()
-
-            varGlobals.startProperties = varGlobals.SET_AWAL.copy()
-            varGlobals.targetPropertis = varGlobals.ANIMATIONS[5].copy()
-            varGlobals.startTransisi = time.time()
-            
-            lastBlinkTime = time.time()
-            blink_interval = random.uniform(3, 6)
-
-        # UPDATE ANIMASI KEDIP DENGAN MENGAMBIL PROPERTI ANIMATIONS KE 0 (MEMBUKA MATA)
-        if varGlobals.isBlinking and time.time() - blinkStartTime > blinkDuration:
-            varGlobals.isBlinking = False
-            
-            varGlobals.startProperties = varGlobals.SET_AWAL.copy()
-            varGlobals.targetPropertis = varGlobals.ANIMATIONS[0].copy()
-            varGlobals.startTransisi = time.time()
-            
-            mx, my = pygame.mouse.get_pos()
-            center_x = varGlobals.res[0] // 2
-            center_y = varGlobals.res[1] // 2
-            max_offset = 70
-            mouse_offset_x = max(-max_offset, min(max_offset, (mx - center_x) / 5))
-            mouse_offset_y = max(-max_offset, min(max_offset, (my - center_y) / 5))
-            
-            varGlobals.targetPropertis['eyeOffsetX'] = mouse_offset_x
-            varGlobals.targetPropertis['eyeOffsetY'] = mouse_offset_y
-
         # UPDATE POSISI MENGIKUTI MOUSE
         mx, my = pygame.mouse.get_pos()
         center_x = varGlobals.res[0] // 2
         center_y = varGlobals.res[1] // 2
-        max_offset = 70
+        max_offset = 30
 
         mouse_offset_x = max(-max_offset, min(max_offset, (mx - center_x) / 5))
         mouse_offset_y = max(-max_offset, min(max_offset, (my - center_y) / 5))
 
+        new_expression['eyeOffsetX'] = mouse_offset_x
+        new_expression['eyeOffsetY'] = mouse_offset_y
+
         varGlobals.targetPropertis['eyeOffsetX'] = mouse_offset_x
         varGlobals.targetPropertis['eyeOffsetY'] = mouse_offset_y
+
+        if distance >= 100:
+            yes = False
+
+        if yes and distance == 0:
+            # UPDATE ANIMASI KEDIP DENGAN MENGAMBIL PROPERTI ANIMATIONS KE 5 (MENUTUP MATA)
+            if time.time() - lastBlinkTime > blink_interval and not varGlobals.isBlinking:
+                varGlobals.isBlinking = True
+                blinkStartTime = time.time()
+                new_expression = varGlobals.ANIMATIONS['kedip'].copy()
+                
+                lastBlinkTime = time.time()
+                blink_interval = random.uniform(3, 6)
+
+            # UPDATE ANIMASI KEDIP DENGAN MENGAMBIL PROPERTI ANIMATIONS KE 0 (MEMBUKA MATA)
+            if varGlobals.isBlinking and time.time() - blinkStartTime > blinkDuration:
+                varGlobals.isBlinking = False
+                new_expression = varGlobals.ANIMATIONS['buka'].copy()
+
+        elif not yes and distance >= 100:
+            if distance >= 100 and distance < 200:
+                if not varGlobals.newExpression:
+                    varGlobals.newExpression = True
+                    new_expression = varGlobals.ANIMATIONS['terkejut'].copy()
+                    newExpressTime = time.time()
+
+            elif distance >= 200 and distance < 300:
+                if not varGlobals.newExpression:
+                    varGlobals.newExpression = True
+                    new_expression = varGlobals.ANIMATIONS['sedih'].copy()
+                    newExpressTime = time.time()
+
+            elif distance >= 400:
+                if not varGlobals.newExpression:
+                    varGlobals.newExpression = True
+                    new_expression = varGlobals.ANIMATIONS['marah'].copy()
+                    newExpressTime = time.time()
+
+            # KEMBALI KE NORMAL SETELAH DURASI YANG DITENTUKAN
+            if varGlobals.newExpression and time.time() - newExpressTime > duration:
+                varGlobals.newExpression = False
+                distance = 0
+                yes = True
+
+        # UPDATE KE EKSPRESI BARU
+        if new_expression != varGlobals.targetPropertis:
+            varGlobals.startProperties = varGlobals.SET_AWAL.copy()
+            varGlobals.targetPropertis = new_expression.copy()
+            varGlobals.startTransisi = time.time()
 
         # MENGGUNAKAN RUMUS AGAR LEBIH HALUS
         elapsed = time.time() - varGlobals.startTransisi
@@ -581,10 +765,51 @@ def eyeUI():
         pygame.draw.rect(varGlobals.screen, cc.BLACK, eyeLeft, border_radius=60)
         pygame.draw.rect(varGlobals.screen, cc.BLACK, eyeRight, border_radius=60)
 
-        click = False
+        mouthY_val = varGlobals.SET_AWAL.get('mouthY', 0)
+        mouthWidth_val = varGlobals.SET_AWAL.get('mouthWidth', 0)
+        mouthHeight_val = varGlobals.SET_AWAL.get('mouthHeight', 0)
+        mouthAngle_val = varGlobals.SET_AWAL.get('mouthAngle', 0)
+
+        # Gambar mulut jika propertinya tidak nol
+        if mouthWidth_val > 0 and mouthHeight_val > 0:
+            mouth_pos_y = varGlobals.res[1] // 2 + mouthY_val
+            mouth_rect = pygame.Rect(varGlobals.res[0] // 2 - (mouthWidth_val // 2), mouth_pos_y, mouthWidth_val, mouthHeight_val)
+            
+            if mouthAngle_val == 0:
+                start_angle = 3.14 * 0.01
+                end_angle = 0
+            elif mouthAngle_val == 1:
+                start_angle = 3.14
+                end_angle = 0
+            else:
+                start_angle = 0
+                end_angle = math.piw
+                
+            pygame.draw.arc(varGlobals.screen, cc.BLACK, mouth_rect, start_angle, end_angle, 10)
+
+        # pygame.draw.aaline(varGlobals.screen, cc.RED, (varGlobals.res[0] // 2, 0), (varGlobals.res[0] // 2, varGlobals.res[1]), 2)
+
+        # MENGGAMBAR ALIS
+        eyebrowOffset_leftY = varGlobals.SET_AWAL['eyebrowOffset_leftY']
+        eyebrowOffset_rightY = varGlobals.SET_AWAL['eyebrowOffset_rightY']
+        eyebrowAngle_left = varGlobals.SET_AWAL['eyebrowAngle_right']
+        eyebrowAngle_right = varGlobals.SET_AWAL['eyebrowAngle_left']
+        
+        eyebrow_start_left = (varGlobals.eyeLeftX - 20, varGlobals.eyePosY - 40 + eyebrowOffset_leftY)
+        eyebrow_end_left = (varGlobals.eyeLeftX + varGlobals.lebarMata + 15, varGlobals.eyePosY - 40 + eyebrowOffset_leftY)
+        eyebrow_start_right = (varGlobals.eyeRightX - 20, varGlobals.eyePosY - 40 + eyebrowOffset_rightY)
+        eyebrow_end_right = (varGlobals.eyeRightX + varGlobals.lebarMata + 15, varGlobals.eyePosY - 40 + eyebrowOffset_rightY)
+
+        rotated_start_left = rotatePoint(eyebrow_start_left, eyeLeft.center, eyebrowAngle_left)
+        rotated_end_left = rotatePoint(eyebrow_end_left, eyeLeft.center, eyebrowAngle_left)
+        pygame.draw.line(varGlobals.screen, cc.BLACK, rotated_start_left, rotated_end_left, 10)
+
+        rotated_start_right = rotatePoint(eyebrow_start_right, eyeRight.center, eyebrowAngle_right)
+        rotated_end_right = rotatePoint(eyebrow_end_right, eyeRight.center, eyebrowAngle_right)
+        pygame.draw.line(varGlobals.screen, cc.BLACK, rotated_start_right, rotated_end_right, 10)
+
         varGlobals.clock.tick(60)
         pygame.display.flip()
-
 
 ###################################################################################################
 #                                            MAKE ORDER                                           #
@@ -616,12 +841,8 @@ def makeOrder():
 
     buttons = {
         "Back": moButton.BACK,
-        "Add Order": moButton.TAMBAH_PESANAN,
         "List Order": moButton.LIST_PESANAN
     }
-
-    varGlobals.previousScreen = varGlobals.currentScreen
-    varGlobals.currentScreen = "make order"
 
     while varGlobals.runMakeOrder:
 
@@ -770,8 +991,6 @@ def mainMenu():
     status = {
         varGlobals.conServiceBot : mmButton.STATUS
     }
-
-    varGlobals.currentScreen = "main menu"
 
     while varGlobals.runMenu:
 
@@ -952,7 +1171,7 @@ def simulation():
 
         click = False
         pygame.display.flip()
-        varGlobals.clock.tick(30)
+        varGlobals.clock.tick(60)
 
-# reset_database()
+reset_database()
 mainMenu()

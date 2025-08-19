@@ -40,10 +40,9 @@ pesanan = None
 temporary = None
 oldSurface = None
 newSurface = None
-currentScreen = None
-previousScreen = None
 
 # BOOLEAN
+newExpression = bool
 notAutonomus = bool
 runMakeOrder = bool
 serviceBot = False
@@ -79,32 +78,45 @@ LEBAR_SAVE_BUTTON = res[1] * 0.06
 PANJANG_INP_BUTTON = res[0] * 0.1
 LEBAR_INP_BUTTON = res[1] * 0.06
 
-# DEKALRASI AWAL MATA
+# DEKLARASI AWAL MATA
 SET_AWAL = {
+    # MATA
     'eyeHeight': 150,
     'eyeOffsetX': 0,
-    'eyeOffsetY': 0
+    'eyeOffsetY': 0,
+    
+    # ALIS
+    'eyebrowOffset_leftY': 0,
+    'eyebrowOffset_rightY': 0,
+    'eyebrowAngle_left': 0,
+    'eyebrowAngle_right': 0,
+
+    # MULUT
+    'mouthY': 0,
+    'mouthWidth': 0,
+    'mouthHeight': 0,
+    'mouthAngle': 0,
 }
 
 # ANIMASI MATA
 ANIMATIONS = {
-    0: {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
-    1: {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
-    2: {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
-    3: {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
-    4: {'eyeHeight': 10, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
-    5: {'eyeHeight': 10, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
-    6: {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
-    7: {'eyeHeight': 10, 'eyeOffsetX': 0, 'eyeOffsetY': 0},
+    'buka': {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
+    'kedip': {'eyeHeight': 10, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': -0.1, 'eyebrowAngle_right': 0.1, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
+    
+    # EKSPRESI
+    'marah': {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 5, 'eyebrowOffset_rightY': 5, 'eyebrowAngle_left': -10, 'eyebrowAngle_right': 10, 'mouthY': 100, 'mouthWidth': 120, 'mouthHeight': 50, 'mouthAngle': 180},
+    'sedih': {'eyeHeight': 130, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': -10, 'eyebrowOffset_rightY': -10, 'eyebrowAngle_left': 10, 'eyebrowAngle_right': -10, 'mouthY': 100, 'mouthWidth': 80, 'mouthHeight': 10, 'mouthAngle': 0},
+    'terkejut': {'eyeHeight': 180, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': -40, 'eyebrowOffset_rightY': -40, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 50, 'mouthAngle': 0},
+    'senyum': {'eyeHeight': 80, 'eyeOffsetX': 0, 'eyeOffsetY': 10, 'eyebrowOffset_leftY': 5, 'eyebrowOffset_rightY': 5, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 120, 'mouthWidth': 120, 'mouthHeight': 40, 'mouthAngle': 0}
 }
 
 # NUMERIK
 popupX = res[0] // 2 - 220
 popupY = res[1] // 2 - 113
 antrian = 1
-eyeLeftX = 370
+eyeLeftX = 365
 lebarMata = 100
-eyeRightX = 570
+eyeRightX = 565
 lebarPopup = 300
 startTransisi = 0
 tinggiPopup = 230
@@ -270,15 +282,9 @@ class make_order:
         PANJANG_BUTTON,
         LEBAR_BUTTON * 1.2
     )
-    TAMBAH_PESANAN = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
-        window_rect.centery - LEBAR_BUTTON * (5.85),
-        PANJANG_BUTTON * 3,
-        LEBAR_BUTTON * 1.7
-    )
     LIST_PESANAN = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
-        window_rect.centery - LEBAR_BUTTON * (3.85),
+        window_rect.centery - LEBAR_BUTTON * (5.85),
         PANJANG_BUTTON * 3,
         LEBAR_BUTTON * 1.7
     )

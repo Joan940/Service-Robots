@@ -102,56 +102,63 @@ def drawNumberPad(screen, popup_x, popup_y, outline):
 
 def tampilanOrder(orders_list):
     orderStack = []
-    
-    # CEK APAKAH MEJA SUDAH ADA DALAM ARRAY, JIKA BELUM MEJA AKAN DIMASUKKAN
+    ySpacing = 10
+    box_lebar_kiri = 80  # lebar kotak meja
+    padding_text = 120     # jarak teks dari pinggir kotak
+
+    # Grouping berdasarkan nomor meja
     grouped_orders = {}
     for pesanan_data in orders_list:
         meja = pesanan_data[1]
         namaPesanan = pesanan_data[3]
         jumlahPesanan = pesanan_data[4]
-        
+
         if meja not in grouped_orders:
             grouped_orders[meja] = []
         grouped_orders[meja].append({'nama': namaPesanan, 'jumlah': jumlahPesanan})
 
+    # Hitung tinggi total (untuk scrolling atau posisi awal)
     total_height = 0
-    ySpacing = 10
-    
     for meja, items in grouped_orders.items():
-        group_height = 0
-        text_surf_meja, text_rect_meja = tts2(f"{meja}", cc.WHITE, 40, (0, 0))
-        group_height += text_rect_meja.height
-        
-        for item in items:
-            text_surf_pesanan, text_rect_pesanan = tts2(f"- {item['nama']} ({item['jumlah']})", cc.BLACK, 18, (0, 0))
-            group_height += text_rect_pesanan.height + ySpacing
-        
-        # MENAMBAHKAN SPASI TIAP PESANAN BERDASARKAN NOMOR MEJA
+        group_height = 100  # tinggi awal untuk nomor meja
+        group_height += sum([18 + ySpacing for _ in items])  # tinggi tiap pesanan
         total_height += group_height + (ySpacing * 3)
-    
-    # Menghitung posisi Y awal agar tampilan berada di tengah
+
+    # Posisi awal Y
     popup_y = 110
-    yStart = popup_y + (group_height - total_height // 2)
-    
-    # INI DIGUNAKAN UNTUK MENGEMBALIKAN VALUE
+    yStart = popup_y + 28
+
+    # Buat data untuk menggambar
     for meja, items in grouped_orders.items():
         group_height = 0
         group_lines = []
 
-        text_surf_meja, text_rect_meja = tts2(f"{meja}", cc.WHITE, 40, (120, yStart))
-        # print(f"yStart : {yStart}")
-
+        # Nomor meja (di kotak kiri)
+        text_surf_meja, text_rect_meja = tts2(
+            f"{meja}",
+            cc.WHITE,
+            40,
+            (padding_text, yStart)
+        )
         group_lines.append({'type': 'meja', 'surface': text_surf_meja, 'rect': text_rect_meja})
-        group_height += text_rect_meja.height
-        
+
+        # Daftar pesanan (di kotak kanan)
+        pesanan_x = box_lebar_kiri + padding_text
         for item in items:
-            text_surf_pesanan, text_rect_pesanan = tts2(f"- {item['nama']} ({item['jumlah']})", cc.BLACK, 18, (200, (yStart + group_height)))
+            text_surf_pesanan, text_rect_pesanan = tts2(
+                f"- {item['nama']} ({item['jumlah']})",
+                cc.BLACK,
+                18,
+                (pesanan_x, yStart + group_height)
+            )
             group_lines.append({'type': 'pesanan', 'surface': text_surf_pesanan, 'rect': text_rect_pesanan})
-            group_height += text_rect_pesanan.height + ySpacing
-        
+            group_height += text_rect_pesanan.height + ySpacing 
+
+        group_height += text_rect_meja.height
+
         orderStack.append({'meja': meja, 'height': group_height, 'lines': group_lines})
-        yStart += group_height + (ySpacing * 3) - 70
-            
+        yStart += group_height + (ySpacing - 30)
+
     return orderStack
 
 
@@ -179,6 +186,23 @@ def setAnimation(index, animations, deklarasi):
     varGlobals.startProperties = deklarasi.copy()
     varGlobals.targetPropertis = animations.get(index, animations.get(0)).copy()
     varGlobals.startTransisi = time.time()
+
+
+###################################################################################################
+#                                            SET AWAL                                             #
+###################################################################################################
+
+def rotatePoint(p, origin, angle):
+    angle_rad = math.radians(angle)
+    
+    ox, oy = origin
+    px, py = p
+    
+    # Menggunakan rumus rotasi
+    qx = ox + (px - ox) * math.cos(angle_rad) - (py - oy) * math.sin(angle_rad)
+    qy = oy + (px - ox) * math.sin(angle_rad) + (py - oy) * math.cos(angle_rad)
+    
+    return int(qx), int(qy)
 
 
 ###################################################################################################
