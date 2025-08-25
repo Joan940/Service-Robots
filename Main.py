@@ -14,14 +14,16 @@ from Skills.demoMode import (
     demo1
 )
 from Modules.algorithm import (
-    rotatedImage,
     drawNumberPad,
     tampilanOrder,
+    rotatedImage,
     setAnimation,
-    easeInOut,
-    lerp,
+    rotatePoint,
+    numpadStaff,
     transition,
-    rotatePoint
+    easeInOut,
+    getMeja,
+    lerp
 )
 from Modules.database import (
     addOrders,
@@ -39,7 +41,8 @@ from Modules.varGlobals import (
     main_menu as mmButton,
     simulasi as simButton,
     config as confButton,
-    make_order as moButton
+    make_order as moButton,
+    staffConfig as scButton
 )
 
 
@@ -67,9 +70,6 @@ def pencetButton(text):
     if text == "demo 1":
         demo1()
 
-    elif text == "coba":
-        makeOrder()
-
     elif text == "exit":
         sys.exit(0)
 
@@ -78,14 +78,15 @@ def pencetButton(text):
 #                                        TEXT ACTION MENU                                         #
 ###################################################################################################
 
-def fillText(inp_key, inputUser_rects):
+def fillText(inp_key, inputUser_rects, done_rect):
 
     while True:
         
-        varGlobals.screen.blit(varGlobals.bgConfig, (0, 0))
+        varGlobals.screen.blit(varGlobals.bgSocketConfig, (0, 0))
 
-        pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, inputUser_rects['Save'], 3, border_radius=20)
-        tts("Save", cc.RED_BROWN, inputUser_rects['Save'], varGlobals.screen, 20)
+        for itemKu, rect in done_rect.items():
+            pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, border_radius=20)
+            tts(itemKu, cc.WHITE, rect, varGlobals.screen, 20)
        
         for key, rect in inputUser_rects.items():
             if key in ["IP", "PORT"]:
@@ -141,14 +142,19 @@ def configuration():
     varGlobals.runConfig = True
     varGlobals.runMakeOrder = False
 
-    inputUser = {
+    buttons = {
         "Save" : confButton.SAVE_RECT,
+        "Back" : confButton.EXIT_RECT
+    }
+    
+    inputUser = {
         "IP" : confButton.INP_IP_RECT,
         "PORT" : confButton.INP_PORT_RECT
     }
 
     while varGlobals.runConfig:
-        varGlobals.screen.blit(varGlobals.bgConfig, (0, 0))
+
+        varGlobals.screen.blit(varGlobals.bgSocketConfig, (0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -161,6 +167,34 @@ def configuration():
 
         mx, my = pygame.mouse.get_pos()
 
+        for button, rect in buttons.items():
+            if rect.collidepoint(mx, my):
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, border_radius = 20)
+                tts(button, cc.WHITE, rect, varGlobals.screen, 30)
+                if click:
+                    varGlobals.oldSurface = varGlobals.screen.copy()
+                    varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+
+                    if button == "Save" and (varGlobals.IP and varGlobals.PORT):
+                        print("save")
+                        runCom()
+                    elif button == "Save" and not (varGlobals.IP and varGlobals.PORT):
+                        varGlobals.falseSound.play()
+                    elif button == "Back" and (varGlobals.IP and varGlobals.PORT):
+                        varGlobals.newSurface.blit(varGlobals.bgMenu, (0, 0))
+                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="right", speed=20)
+                        mainMenu()
+                    elif button == "Back" and not (varGlobals.IP and varGlobals.PORT):
+                        varGlobals.IP = '127.0.0.1'
+                        varGlobals.PORT = '8081'
+                        
+                        varGlobals.newSurface.blit(varGlobals.bgMenu, (0, 0))
+                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="right", speed=20)
+                        mainMenu()
+            else:
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, border_radius = 20)
+                tts(button, cc.WHITE, rect, varGlobals.screen, 20)
+
         for key, rect in inputUser.items():
             display_text = key
             if key == "IP":
@@ -172,21 +206,8 @@ def configuration():
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 5, border_radius = 20)
                 tts(display_text, cc.RED_BROWN, rect, varGlobals.screen, 30)
                 if click:
-                    varGlobals.oldSurface = varGlobals.screen.copy()
-                    varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
                     if key in ["IP", "PORT"]:
-                        fillText(key, inputUser)
-                    elif key == "Save" and (varGlobals.IP and varGlobals.PORT):
-                        pencetButton(key)
-                        
-                        varGlobals.newSurface.blit(varGlobals.bgMenu, (0, 0))
-                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="right", speed=20)
-                        
-                        print("save")
-                        runCom()
-                        mainMenu()
-                    elif key == "Save" and not (varGlobals.IP and varGlobals.PORT):
-                        varGlobals.falseSound.play()
+                        fillText(key, inputUser, buttons)
             else:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 3, border_radius = 20)
                 tts(display_text, cc.RED_BROWN, rect, varGlobals.screen, 20)
@@ -371,10 +392,10 @@ def order():
         for menu_item, rect in menu.items():
             if rect.collidepoint(mx, my) and not varGlobals.pesanan:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, border_radius=20)
-                tts(menu_item, cc.WHITE, rect, varGlobals.screen, 20)
+                tts(menu_item, cc.WHITE, rect, varGlobals.screen, 30)
             else:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, border_radius=20)
-                tts(menu_item, cc.WHITE, rect, varGlobals.screen, 15)
+                tts(menu_item, cc.WHITE, rect, varGlobals.screen, 25)
 
         # JENDELA TAMBAHAN MUNCUL KETIKA MEMESAN
         if varGlobals.pesanan:
@@ -440,165 +461,11 @@ def order():
 #                                           MAKE AN EYES                                          #
 ###################################################################################################
 
-# def eyeUI():
-
-#     # RESET
-#     varGlobals.oldSurface = None
-#     varGlobals.newSurface = None
-
-#     # LOCAL VARIABLE
-#     lastBlinkTime = time.time()
-#     blink_interval = random.uniform(3, 6)
-#     blinkStartTime = 0.0
-#     blinkDuration = 0.5
-#     startPos = None
-#     threshold = 10
-
-#     # BOOLEAN
-#     dragging = False
-#     varGlobals.runEye = True
-#     varGlobals.isBlinking = False
-
-#     varGlobals.startTransisi = time.time()
-#     varGlobals.startProperties = varGlobals.SET_AWAL.copy()
-#     varGlobals.targetPropertis = varGlobals.SET_AWAL.copy()
-    
-#     current_expression = varGlobals.ANIMATIONS[0].copy()
-
-#     while varGlobals.runEye:
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 varGlobals.runEye = False
-#                 pygame.quit()
-#                 sys.exit()
-
-#             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-#                 dragging = True
-#                 startPos = event.pos
-#             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-#                 if dragging:
-#                     endPos = event.pos
-#                     dx = endPos[0] - startPos[0]
-#                     dy = endPos[1] - startPos[1]
-#                     distance = (dx ** 2 + dy ** 2) ** 0.5
-                    
-#                     if distance <= threshold or dy < (-20):
-#                         print("Klik terdeteksi")
-#                         varGlobals.trueSound.play()
-#                         varGlobals.oldSurface = varGlobals.screen.copy()
-#                         varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
-#                         varGlobals.newSurface.blit(varGlobals.bgOrder, (0, 0))
-#                         transition(varGlobals.oldSurface, varGlobals.newSurface, direction="up", speed=20)
-#                         order()
-#                     else:
-#                         pass
-                
-#                 dragging = False
-                
-#         mx, my = pygame.mouse.get_pos()
-#         center_x = varGlobals.res[0] // 2
-#         center_y = varGlobals.res[1] // 2
-#         distance_from_center = ((mx - center_x) ** 2 + (my - center_y) ** 2) ** 0.5
-
-#         if distance_from_center < 80:
-#             new_expression = varGlobals.ANIMATIONS['marah'].copy()
-#         elif my < varGlobals.res[1] // 4:
-#             new_expression = varGlobals.ANIMATIONS['terkejut'].copy()
-#         elif mx < varGlobals.res[0] // 4 or mx > varGlobals.res[0] * 3 // 4:
-#             new_expression = varGlobals.ANIMATIONS['sedih'].copy()
-#         else:
-#             new_expression = varGlobals.ANIMATIONS[0].copy()
-
-#         # 2. Gabungkan pergerakan mata dengan ekspresi yang dipilih
-#         max_offset = 70
-#         mouse_offset_x = max(-max_offset, min(max_offset, (mx - center_x) / 5))
-#         mouse_offset_y = max(-max_offset, min(max_offset, (my - center_y) / 5))
-        
-#         # Tambahkan offset mouse ke properti ekspresi
-#         new_expression['eyeOffsetX'] += mouse_offset_x
-#         new_expression['eyeOffsetY'] += mouse_offset_y
-
-#         # 3. Mulai transisi ke ekspresi baru jika diperlukan
-#         if not varGlobals.isBlinking and new_expression != varGlobals.targetPropertis:
-#             varGlobals.startProperties = varGlobals.SET_AWAL.copy()
-#             varGlobals.targetPropertis = new_expression.copy()
-#             varGlobals.startTransisi = time.time()
-#             current_expression = new_expression.copy()
-
-#         # 4. Tangani animasi kedipan
-#         if time.time() - lastBlinkTime > blink_interval and not varGlobals.isBlinking:
-#             varGlobals.isBlinking = True
-#             blinkStartTime = time.time()
-            
-#             varGlobals.startProperties = varGlobals.SET_AWAL.copy()
-#             varGlobals.targetPropertis = varGlobals.ANIMATIONS[5].copy()
-#             varGlobals.startTransisi = time.time()
-            
-#             lastBlinkTime = time.time()
-#             blink_interval = random.uniform(3, 6)
-
-#         # 5. Kembali ke ekspresi terakhir setelah kedipan selesai
-#         if varGlobals.isBlinking and time.time() - blinkStartTime > blinkDuration:
-#             varGlobals.isBlinking = False
-            
-#             varGlobals.startProperties = varGlobals.SET_AWAL.copy()
-#             varGlobals.targetPropertis = current_expression.copy()
-#             varGlobals.startTransisi = time.time()
-
-#         # MENGGUNAKAN RUMUS AGAR LEBIH HALUS
-#         elapsed = time.time() - varGlobals.startTransisi
-#         t = min(elapsed / varGlobals.durasiTransisi, 1.0)
-#         tEased = easeInOut(t)
-
-#         for key in varGlobals.targetPropertis:
-#             varGlobals.SET_AWAL[key] = lerp(
-#                 varGlobals.startProperties.get(key, 0),
-#                 varGlobals.targetPropertis[key],
-#                 tEased
-#             )
-            
-#         varGlobals.screen.blit(varGlobals.bgEyes, (0, 0))
-
-#         # UPDATE PROPERTI VISUAL
-#         tinggiMata = int(varGlobals.SET_AWAL['eyeHeight'])
-#         eyeOffsetX_val = varGlobals.SET_AWAL['eyeOffsetX']
-#         eyeOffsetY_val = varGlobals.SET_AWAL['eyeOffsetY']
-        
-#         eyeLeftX = varGlobals.eyeLeftX + eyeOffsetX_val
-#         eyeRightX = varGlobals.eyeRightX + eyeOffsetX_val
-#         eyePosY = varGlobals.eyePosY + eyeOffsetY_val
-
-#         eyeLeft = pygame.Rect(eyeLeftX, eyePosY, varGlobals.lebarMata, tinggiMata)
-#         eyeRight = pygame.Rect(eyeRightX, eyePosY, varGlobals.lebarMata, tinggiMata)
-
-#         pygame.draw.rect(varGlobals.screen, (0,0,0), eyeLeft, border_radius=60)
-#         pygame.draw.rect(varGlobals.screen, (0,0,0), eyeRight, border_radius=60)
-
-#         # Menggambar Alis
-#         eyebrowOffset_leftY = varGlobals.SET_AWAL['eyebrowOffset_leftY']
-#         eyebrowOffset_rightY = varGlobals.SET_AWAL['eyebrowOffset_rightY']
-#         eyebrowAngle_left = varGlobals.SET_AWAL['eyebrowAngle_right']
-#         eyebrowAngle_right = varGlobals.SET_AWAL['eyebrowAngle_left']
-        
-#         eyebrow_start_left = (varGlobals.eyeLeftX - 10, varGlobals.eyePosY - 40 + eyebrowOffset_leftY)
-#         eyebrow_end_left = (varGlobals.eyeLeftX + varGlobals.lebarMata + 10, varGlobals.eyePosY - 40 + eyebrowOffset_leftY)
-#         eyebrow_start_right = (varGlobals.eyeRightX - 10, varGlobals.eyePosY - 40 + eyebrowOffset_rightY)
-#         eyebrow_end_right = (varGlobals.eyeRightX + varGlobals.lebarMata + 10, varGlobals.eyePosY - 40 + eyebrowOffset_rightY)
-
-#         rotated_start_left = rotatePoint(eyebrow_start_left, eyeLeft.center, eyebrowAngle_left)
-#         rotated_end_left = rotatePoint(eyebrow_end_left, eyeLeft.center, eyebrowAngle_left)
-#         pygame.draw.line(varGlobals.screen, (0,0,0), rotated_start_left, rotated_end_left, 10)
-
-#         rotated_start_right = rotatePoint(eyebrow_start_right, eyeRight.center, eyebrowAngle_right)
-#         rotated_end_right = rotatePoint(eyebrow_end_right, eyeRight.center, eyebrowAngle_right)
-#         pygame.draw.line(varGlobals.screen, (0,0,0), rotated_start_right, rotated_end_right, 10)
-
-#         varGlobals.clock.tick(60)
-#         pygame.display.flip()
-
 def eyeUI():
 
     # RESET
+    wait = None
+    endPos = None
     startPos = None
     varGlobals.oldSurface = None
     varGlobals.newSurface = None
@@ -608,28 +475,26 @@ def eyeUI():
     blinkDuration = 0.5
     blinkStartTime = 0
 
+    # VARIABEL BARU UNTUK RANDOM EKSPRESI
+    lastExpressionTime = time.time()
+    expressionInterval = random.uniform(5, 10)
+
     varGlobals.isLookingRight = False
     varGlobals.isLookingLeft = False
-    lastLookTime = time.time()
-    lookDuration = 1
-    lookInterval = random.uniform(3, 6)
 
     newExpressTime = 0
     threshold = 10
     distance = 0
     duration = 5
 
-    keKanan = time.time()
     lastBlinkTime = time.time()
     new_expression = varGlobals.ANIMATIONS['buka'].copy()
 
     # BOOLEAN
-    yes = True
     dragging = False
     varGlobals.list = False
     varGlobals.runEye = True
     varGlobals.runSim = False
-    varGlobals.isRight = False
     varGlobals.runMenu = False
     varGlobals.runOrder = False
     varGlobals.runConfig = False
@@ -646,37 +511,37 @@ def eyeUI():
     while varGlobals.runEye:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                varGlobals.runMenu = False
+                varGlobals.runEye = False
                 pygame.quit()
                 sys.exit()
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 dragging = True
+                wait = time.time()
                 startPos = event.pos
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                if dragging:
-                    endPos = event.pos
+                distance = 0
 
-                    dx = endPos[0] - startPos[0]
-                    dy = endPos[1] - startPos[1]
-                    
-                    # MENGHITUNG JARAK TOTAL
-                    distance = (dx ** 2 + dy ** 2) ** 0.5
-                    
-                    if distance <= threshold or dy < (-20):
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                adminSense = time.time() - wait
 
-                        # DIANGGAP KLIK
-                        print("Klik terdeteksi")
+                endPos = event.pos
+                dx = endPos[0] - startPos[0]
+                dy = endPos[1] - startPos[1]
+                distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                if adminSense > 5 and distance < 5:
+                    staffConfiguration()
+
+                elif dragging:
+                    print(distance)
+                    if distance <= threshold or dy < -20:
                         varGlobals.trueSound.play()
                         varGlobals.oldSurface = varGlobals.screen.copy()
                         varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
                         varGlobals.newSurface.blit(varGlobals.bgMakeOrder, (0, 0))
                         transition(varGlobals.oldSurface, varGlobals.newSurface, direction="up", speed=20)
                         order()
-                    
-                    else:
-                        pass
-                
+
                 dragging = False
 
         # UPDATE POSISI MENGIKUTI MOUSE
@@ -694,48 +559,31 @@ def eyeUI():
         varGlobals.targetPropertis['eyeOffsetX'] = mouse_offset_x
         varGlobals.targetPropertis['eyeOffsetY'] = mouse_offset_y
 
-        if distance >= 100:
-            yes = False
+        # RANDOM BLINK
+        if time.time() - lastBlinkTime > blink_interval and not varGlobals.isBlinking:
+            varGlobals.isBlinking = True
+            blinkStartTime = time.time()
+            new_expression = varGlobals.ANIMATIONS['kedip'].copy()
+            
+            lastBlinkTime = time.time()
+            blink_interval = random.uniform(3, 6)
 
-        if yes and distance == 0:
-            # UPDATE ANIMASI KEDIP DENGAN MENGAMBIL PROPERTI ANIMATIONS KE 5 (MENUTUP MATA)
-            if time.time() - lastBlinkTime > blink_interval and not varGlobals.isBlinking:
-                varGlobals.isBlinking = True
-                blinkStartTime = time.time()
-                new_expression = varGlobals.ANIMATIONS['kedip'].copy()
-                
-                lastBlinkTime = time.time()
-                blink_interval = random.uniform(3, 6)
+        if varGlobals.isBlinking and time.time() - blinkStartTime > blinkDuration:
+            varGlobals.isBlinking = False
+            new_expression = varGlobals.ANIMATIONS['buka'].copy()
 
-            # UPDATE ANIMASI KEDIP DENGAN MENGAMBIL PROPERTI ANIMATIONS KE 0 (MEMBUKA MATA)
-            if varGlobals.isBlinking and time.time() - blinkStartTime > blinkDuration:
-                varGlobals.isBlinking = False
-                new_expression = varGlobals.ANIMATIONS['buka'].copy()
+        # RANDOM EKSPRESI SETIAP BEBERAPA DETIK
+        if time.time() - lastExpressionTime > expressionInterval:
+            pilihan = random.choice(['terkejut', 'sedih', 'marah'])
+            new_expression = varGlobals.ANIMATIONS[pilihan].copy()
 
-        elif not yes and distance >= 100:
-            if distance >= 100 and distance < 200:
-                if not varGlobals.newExpression:
-                    varGlobals.newExpression = True
-                    new_expression = varGlobals.ANIMATIONS['terkejut'].copy()
-                    newExpressTime = time.time()
+            lastExpressionTime = time.time()
+            expressionInterval = random.uniform(5, 10)
 
-            elif distance >= 200 and distance < 300:
-                if not varGlobals.newExpression:
-                    varGlobals.newExpression = True
-                    new_expression = varGlobals.ANIMATIONS['sedih'].copy()
-                    newExpressTime = time.time()
-
-            elif distance >= 400:
-                if not varGlobals.newExpression:
-                    varGlobals.newExpression = True
-                    new_expression = varGlobals.ANIMATIONS['marah'].copy()
-                    newExpressTime = time.time()
-
-            # KEMBALI KE NORMAL SETELAH DURASI YANG DITENTUKAN
-            if varGlobals.newExpression and time.time() - newExpressTime > duration:
-                varGlobals.newExpression = False
-                distance = 0
-                yes = True
+        # RESET KE NORMAL SETELAH DURASI
+        if varGlobals.newExpression and time.time() - newExpressTime > duration:
+            varGlobals.newExpression = False
+            new_expression = varGlobals.ANIMATIONS['buka'].copy()
 
         # UPDATE KE EKSPRESI BARU
         if new_expression != varGlobals.targetPropertis:
@@ -818,6 +666,149 @@ def eyeUI():
         varGlobals.clock.tick(60)
         pygame.display.flip()
 
+
+###################################################################################################
+#                                       STAFF CONFIGURATION                                       #
+###################################################################################################
+
+def staffConfiguration():
+
+    # RESET
+    input = time.time()
+    contentY = 0
+    numpad = {}
+    meja = 0
+    
+    # BOOLEAN
+    click = False
+    trayMeja = False
+    pesananMeja = False
+    varGlobals.runSim = False
+    varGlobals.runEye = False
+    varGlobals.runStaff = True
+    varGlobals.runMenu = False
+    varGlobals.runOrder = False
+    varGlobals.runConfig = False
+    varGlobals.runMakeOrder = False
+
+    buttons = {
+        "Tray 1" : scButton.TRAY_1,
+        "Tray 2" : scButton.TRAY_2
+    }
+
+    while varGlobals.runStaff:
+
+        varGlobals.screen.blit(varGlobals.bgStaff, (0,0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                varGlobals.runStaff = False
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                click = True
+
+                x = varGlobals.window_rect.centerx
+                y = varGlobals.window_rect.centery
+
+                boxSetup = pygame.Rect(x - 250, y - 200, 500, 400)
+                if not boxSetup.collidepoint(mx, my):
+                    trayMeja = False
+
+                # LOGIKA NUMPAD
+                if numpad:
+                    for number, rect in numpad.items():
+                        if rect.collidepoint(mx, my):
+                            if number.isdigit():
+                                pesananMeja = True
+                                meja = number
+
+            if trayMeja and event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:  
+                    contentY += 30
+                    input = time.time()
+                elif event.button == 5: 
+                    contentY -= 30
+                    input = time.time()
+
+        # if time.time() - input >= 10:
+        #     eyeUI()
+        #     input = time.time()
+
+        # if varGlobals.updateOrder:
+        listOrder = getOrders()
+        varGlobals.allOrders = getMeja(listOrder)
+        varGlobals.updateOrder = False
+
+        # print(varGlobals.allOrders)
+
+
+        mx, my = pygame.mouse.get_pos()
+        for button, rect in buttons.items():
+            if rect.collidepoint(mx, my):
+                pygame.draw.rect(varGlobals.screen, cc.WHITE, rect, border_radius=20)
+                pygame.draw.rect(varGlobals.screen, cc.BLACK, rect, 5, border_radius=20)
+                tts(button, cc.BLACK, rect, varGlobals.screen, 35)
+                if click:
+                    trayMeja = True
+            else:
+                pygame.draw.rect(varGlobals.screen, cc.WHITE, rect, border_radius=20)
+                pygame.draw.rect(varGlobals.screen, cc.BLACK, rect, 3, border_radius=20)
+                tts(button, cc.BLACK, rect, varGlobals.screen, 30)
+
+        if trayMeja:
+            boxPenghalang = pygame.Rect(0, 0, varGlobals.res[0], varGlobals.res[1])
+            overlay = pygame.Surface((boxPenghalang.width, boxPenghalang.height), pygame.SRCALPHA)
+
+            pygame.draw.rect(overlay, (0, 0, 0, 100), overlay.get_rect())
+            varGlobals.screen.blit(overlay, (0, 0))
+
+            # BATAS SCROLLING
+            maxScroll = max(0, 500 - boxSetup.height)
+            contentY = max(-maxScroll, min(10, contentY))
+
+            pygame.draw.rect(varGlobals.screen, cc.WHITE, boxSetup, border_radius=20)
+            pygame.draw.rect(varGlobals.screen, cc.BLACK, boxSetup, 3, border_radius=20)
+
+            # Buat area gambar yang dipotong agar konten hanya terlihat di dalam pop-up
+            clipping_rect = pygame.Rect(boxSetup.x, boxSetup.y + 10, boxSetup.width, boxSetup.height - 20)
+            varGlobals.screen.set_clip(clipping_rect)
+
+            currentY = 0
+            for group in varGlobals.allOrders:
+                # OFFSET SCROLLING PADA POSISI Y
+                yPosOffset = currentY + contentY + boxSetup.y
+
+                # Mendapatkan posisi x dari elemen pertama
+                mejaLine = group['lines'][0]
+                xPos = mejaLine['rect'].x - 38
+
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (xPos, yPosOffset, 100, 100), border_radius=20)
+
+                for line in group['lines']:
+                    # RESET POSISI Y
+                    line_rect = line['rect'].copy()
+                    line_rect.y += contentY
+                    varGlobals.screen.blit(line['surface'], line_rect)
+
+                # BATAS ANTARA GROUP
+                currentY += 100 + 10
+            
+            # HAPUS CLIPPING
+            varGlobals.screen.set_clip(None)
+
+            numpad = numpadStaff(varGlobals.screen, varGlobals.popupX, varGlobals.popupY, 2)
+            noMeja = str(varGlobals.allOrders[0]['meja'])
+
+            if pesananMeja and str(meja) == noMeja:
+                print("biasa aja dong")
+
+        click = False
+        pygame.display.flip()
+        varGlobals.clock.tick(60)
+
+
 ###################################################################################################
 #                                            MAKE ORDER                                           #
 ###################################################################################################
@@ -831,8 +822,6 @@ def makeOrder():
     # VARIABLE LOCAL
     contentY = 0
     duration = 10
-    scroll = False
-    scrollPos = None
     lastAction = time.time()
 
     # BOOLEAN
@@ -977,6 +966,9 @@ def mainMenu():
     varGlobals.oldSurface = None
     varGlobals.newSurface = None
 
+    # LOCAL VARIABLE
+    popUp = False
+
     # BOOLEAN
     click = False
     varGlobals.runEye = False
@@ -994,6 +986,11 @@ def mainMenu():
         "Exit" : mmButton.EXIT,
     }
 
+    pilihan = {
+        "Socket Configuration" : mmButton.SOCKET,
+        "PID Configuration" : mmButton.PID
+    }
+
     # STATUS
     status = {
         varGlobals.conServiceBot : mmButton.STATUS
@@ -1002,6 +999,8 @@ def mainMenu():
     while varGlobals.runMenu:
 
         varGlobals.screen.blit(varGlobals.bgMenu, (0, 0))
+
+        boxPopUp = pygame.Rect(433, 340, 217, 138)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1012,45 +1011,66 @@ def mainMenu():
                 varGlobals.trueSound.play()
                 click = True
 
-        # LOGIKA TOMBOL
+                if not boxPopUp.collidepoint(mx, my):
+                    popUp = False
+
         mx, my = pygame.mouse.get_pos()
         for button in buttons:
             if buttons[button].collidepoint(mx, my):
-                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 4, border_radius = 20)
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 4, border_radius=20)
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 30)
-                if click:
-                    pencetButton(button)
+            else:
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 2, border_radius=20)
+                tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 20)
 
-                    # MEMBUAT TRANSISI WINDOW
+        # === INTERAKSI TOMBOL UTAMA (hanya saat popup tidak aktif) ===
+        if not popUp and click:
+            for button in buttons:
+                if buttons[button].collidepoint(mx, my):
                     varGlobals.oldSurface = varGlobals.screen.copy()
                     varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+
                     if button == "Run":
                         varGlobals.newSurface.blit(varGlobals.bgEyes, (0, 0))
                         transition(varGlobals.oldSurface, varGlobals.newSurface, direction="left", speed=20)
                         runCom()
                         eyeUI()
+
                     elif button == "Simulation":
                         varGlobals.newSurface.blit(varGlobals.bgSim, (0, 0))
                         transition(varGlobals.oldSurface, varGlobals.newSurface, direction="left", speed=20)
                         runCom()
                         simulation()
-                    elif button == "Configuration":
-                        varGlobals.newSurface.blit(varGlobals.bgConfig, (0, 0))
-                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="left", speed=20)
-                        configuration()
-            else:
-                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 2, border_radius = 20)
-                tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 20)
 
-        for myStatus in status:
-            if varGlobals.serviceBot:
-                varGlobals.conServiceBot = "Connected"
-                pygame.draw.rect(varGlobals.screen, cc.GREEN, status[myStatus], border_radius = 20)
-                tts(varGlobals.conServiceBot, cc.WHITE, status[myStatus], varGlobals.screen, 15)
-            else:
-                varGlobals.conServiceBot = "Disconnected"
-                pygame.draw.rect(varGlobals.screen, cc.RED, status[myStatus], border_radius = 20)
-                tts(varGlobals.conServiceBot, cc.WHITE, status[myStatus], varGlobals.screen, 15)
+                    elif button == "Configuration":
+                        popUp = True
+
+                    elif button == "Exit":
+                        pygame.quit()
+                        sys.exit()
+
+        # === POPUP (jika aktif, hanya popup yang interaktif) ===
+        if popUp:
+            boxChoice = pygame.Rect(433, 340, 217, 138)
+            pygame.draw.rect(varGlobals.screen, cc.WHITE, boxChoice, border_radius=20)
+            pygame.draw.rect(varGlobals.screen, cc.BLACK, boxChoice, 2, border_radius=20)
+
+            for pilih, rect in pilihan.items():
+                if rect.collidepoint(mx, my):
+                    pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, border_radius=15)
+                    tts(pilih, cc.WHITE, rect, varGlobals.screen, 25)
+
+                    if click:
+                        if pilih == "Socket Configuration":
+                            varGlobals.newSurface.blit(varGlobals.bgSocketConfig, (0, 0))
+                            transition(varGlobals.oldSurface, varGlobals.newSurface, direction="left", speed=20)
+                            configuration()
+
+                        elif pilih == "Close":
+                            popUp = False
+                else:
+                    pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, border_radius=15)
+                    tts(pilih, cc.WHITE, rect, varGlobals.screen, 20)
 
         click = False
         varGlobals.clock.tick(30)
@@ -1180,5 +1200,5 @@ def simulation():
         pygame.display.flip()
         varGlobals.clock.tick(60)
 
-reset_database()
-mainMenu()
+# reset_database()
+staffConfiguration()

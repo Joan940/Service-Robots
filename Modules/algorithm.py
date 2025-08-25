@@ -125,7 +125,7 @@ def tampilanOrder(orders_list):
         total_height += group_height + (ySpacing * 3)
 
     # Posisi awal Y
-    popup_y = 110
+    popup_y = 120
     yStart = popup_y + 28
 
     # Buat data untuk menggambar
@@ -241,3 +241,99 @@ def transition(surfaceOld, surfaceNew, direction="right", speed=20):
             pygame.display.flip()
             varGlobals.clock.tick(60)
             offset += speed
+
+
+###################################################################################################
+#                                     MENDAPATKAN NOMOR MEJA                                      #
+###################################################################################################
+
+def getMeja(orders_list):
+    orderStack = []
+    ySpacing = 20
+    padding_text = 310  # posisi teks
+
+    # Grouping berdasarkan nomor meja
+    grouped_orders = {}
+    for pesanan_data in orders_list:
+        meja = pesanan_data[1]
+        if meja not in grouped_orders:
+            grouped_orders[meja] = []  # tidak perlu simpan detail pesanan lagi
+
+    # Posisi awal Y
+    popup_y = 115
+    yStart = popup_y + 28
+
+    for meja in grouped_orders.keys():
+        group_height = 60  # cukup tinggi untuk satu nomor meja
+        group_lines = []
+
+        # Nomor meja
+        text_surf_meja, text_rect_meja = tts2(
+            f"{meja}",
+            cc.WHITE,
+            40,
+            (padding_text, yStart)
+        )
+        group_lines.append({'type': 'meja', 'surface': text_surf_meja, 'rect': text_rect_meja})
+
+        orderStack.append({'meja': meja, 'height': group_height, 'lines': group_lines})
+        yStart += group_height + ySpacing
+
+    return orderStack
+
+
+###################################################################################################
+#                                         NUMPAD FOR STAFF                                        #
+###################################################################################################
+
+def numpadStaff(screen, popup_x, popup_y, outline):
+    button_size = 50
+    gap = 10
+    start_x = popup_x + varGlobals.lebarPopup + 20
+    start_y = popup_y
+
+    font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 17)
+    mx, my = pygame.mouse.get_pos()
+
+    # UNTUK KOTAK DARI 1 - 9
+    for i in range(9):
+        x = start_x + (i % 3) * (button_size + gap)
+        y = start_y + (i // 3) * (button_size + gap)
+        rect = pygame.Rect(x, y, button_size, button_size)
+        pygame.draw.rect(screen, cc.WHITE, rect, border_radius=8)
+        if rect.collidepoint(mx, my):
+            pygame.draw.rect(screen, cc.BLACK, rect, outline + 1, border_radius=8)
+        else:
+            pygame.draw.rect(screen, cc.BLACK, rect, outline, border_radius=8)
+        
+        # MENAMPILKAN ANGKA
+        number = str(i + 1)
+        text_surf = font.render(number, True, cc.BLACK)
+        text_rect = text_surf.get_rect(center=rect.center)
+        screen.blit(text_surf, text_rect)
+
+    # UNTUK KOTAK 0
+    box_0 = pygame.Rect(start_x + (button_size + gap), start_y + (button_size + gap) * 3, button_size, button_size)
+    pygame.draw.rect(screen, cc.WHITE, box_0, border_radius=8)
+    if box_0.collidepoint(mx, my):
+        pygame.draw.rect(screen, cc.BLACK, box_0, outline + 1, border_radius=8)
+    else:
+        pygame.draw.rect(screen, cc.BLACK, box_0, outline, border_radius=8)
+    text_0 = font.render("0", True, cc.BLACK)
+    text_0_rect = text_0.get_rect(center=box_0.center)
+    screen.blit(text_0, text_0_rect)
+    
+    # MENGEMBALIKAN SEMUA VALUE RECTANGLE
+    return {
+        "1": pygame.Rect(start_x + (0 % 3) * (button_size + gap), start_y + (0 // 3) * (button_size + gap), button_size, button_size),
+        "2": pygame.Rect(start_x + (1 % 3) * (button_size + gap), start_y + (1 // 3) * (button_size + gap), button_size, button_size),
+        "3": pygame.Rect(start_x + (2 % 3) * (button_size + gap), start_y + (2 // 3) * (button_size + gap), button_size, button_size),
+        "4": pygame.Rect(start_x + (3 % 3) * (button_size + gap), start_y + (3 // 3) * (button_size + gap), button_size, button_size),
+        "5": pygame.Rect(start_x + (4 % 3) * (button_size + gap), start_y + (4 // 3) * (button_size + gap), button_size, button_size),
+        "6": pygame.Rect(start_x + (5 % 3) * (button_size + gap), start_y + (5 // 3) * (button_size + gap), button_size, button_size),
+        "7": pygame.Rect(start_x + (6 % 3) * (button_size + gap), start_y + (6 // 3) * (button_size + gap), button_size, button_size),
+        "8": pygame.Rect(start_x + (7 % 3) * (button_size + gap), start_y + (7 // 3) * (button_size + gap), button_size, button_size),
+        "9": pygame.Rect(start_x + (8 % 3) * (button_size + gap), start_y + (8 // 3) * (button_size + gap), button_size, button_size),
+        "0": box_0
+    }
+
