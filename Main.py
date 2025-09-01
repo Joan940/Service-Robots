@@ -14,21 +14,23 @@ from Skills.demoMode import (
     demo1
 )
 from Modules.algorithm import (
+    getPesananByMeja,
     drawNumberPad,
     tampilanOrder,
     rotatedImage,
-    setAnimation,
     rotatePoint,
     numpadStaff,
     transition,
     easeInOut,
+    CheckBox,
     getMeja,
-    lerp
+    lerp,
 )
 from Modules.database import (
-    addOrders,
+    reset_database,
+    delete_orders,
     getOrders,
-    reset_database
+    addOrders
 )
 from Modules.colors import (
     custom as cc,
@@ -240,10 +242,10 @@ def order():
     varGlobals.runMakeOrder = False
 
     buttons = {
-        "Back": orderButton.EXIT
     }
 
     menu = {
+        "Back": orderButton.EXIT,
         "Pizza": orderButton.MENU_1,
         "Burger": orderButton.MENU_2,
         "Tahu Gimbal": orderButton.MENU_3,
@@ -256,7 +258,6 @@ def order():
     while varGlobals.runOrder:
 
         varGlobals.screen.blit(varGlobals.bgOrder, (0, 0))
-
         mx, my = pygame.mouse.get_pos()
         
         # DEKLARASI POP UP
@@ -327,10 +328,18 @@ def order():
                 else:
                     for menu_item, rect in menu.items():
                         if rect.collidepoint(mx, my):
-                            varGlobals.pesanan = menu_item
-                            varGlobals.input = "table"
-                            varGlobals.nomorMeja = ""
-                            varGlobals.jumlah = ""
+                            varGlobals.oldSurface = varGlobals.screen.copy()
+                            varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+
+                            if menu_item == "Back":
+                                varGlobals.newSurface.blit(varGlobals.bgMakeOrder, (0, 0))
+                                transition(varGlobals.oldSurface, varGlobals.newSurface, direction="down", speed=20)
+                                makeOrder()
+                            else:
+                                varGlobals.pesanan = menu_item
+                                varGlobals.input = "table"
+                                varGlobals.nomorMeja = ""
+                                varGlobals.jumlah = ""
 
                     for button_name in buttons:
                         if buttons[button_name].collidepoint(mx, my):
@@ -368,26 +377,26 @@ def order():
                             print("Nomor meja dan jumlah harus diisi!")
                             varGlobals.falseSound.play()
 
-        # LOGIKA TOMBOL
-        for button_name, rect in buttons.items():
-            if rect.collidepoint(mx, my) and not varGlobals.pesanan:
-                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 5, border_radius=20)
-                tts(button_name, cc.RED_BROWN, rect, varGlobals.screen, 30)
+        # # LOGIKA TOMBOL
+        # for button_name, rect in buttons.items():
+        #     if rect.collidepoint(mx, my) and not varGlobals.pesanan:
+        #         pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 5, border_radius=20)
+        #         tts(button_name, cc.RED_BROWN, rect, varGlobals.screen, 30)
 
-                if click:
-                    pencetButton(button_name)
+        #         # if click:
+        #         #     pencetButton(button_name)
                     
-                    # MEMBUAT TRANSISI WINDOW
-                    varGlobals.oldSurface = varGlobals.screen.copy()
-                    varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+        #         #     # MEMBUAT TRANSISI WINDOW
+        #         #     varGlobals.oldSurface = varGlobals.screen.copy()
+        #         #     varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
 
-                    if button_name == "Back":
-                        varGlobals.newSurface.blit(varGlobals.bgMakeOrder, (0, 0))
-                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="down", speed=20)
-                        makeOrder()
-            else:
-                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 3, border_radius=20)
-                tts(button_name, cc.RED_BROWN, rect, varGlobals.screen, 20)
+        #         #     if button_name == "Back":
+        #         #         varGlobals.newSurface.blit(varGlobals.bgMakeOrder, (0, 0))
+        #         #         transition(varGlobals.oldSurface, varGlobals.newSurface, direction="down", speed=20)
+        #         #         makeOrder()
+        #     else:
+        #         pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 3, border_radius=20)
+        #         tts(button_name, cc.RED_BROWN, rect, varGlobals.screen, 20)
         
         for menu_item, rect in menu.items():
             if rect.collidepoint(mx, my) and not varGlobals.pesanan:
@@ -551,13 +560,13 @@ def eyeUI():
         max_offset = 30
 
         mouse_offset_x = max(-max_offset, min(max_offset, (mx - center_x) / 5))
-        mouse_offset_y = max(-max_offset, min(max_offset, (my - center_y) / 5))
+        mouse_offsetY = max(-max_offset, min(max_offset, (my - center_y) / 5))
 
         new_expression['eyeOffsetX'] = mouse_offset_x
-        new_expression['eyeOffsetY'] = mouse_offset_y
+        new_expression['eyeOffsetY'] = mouse_offsetY
 
         varGlobals.targetPropertis['eyeOffsetX'] = mouse_offset_x
-        varGlobals.targetPropertis['eyeOffsetY'] = mouse_offset_y
+        varGlobals.targetPropertis['eyeOffsetY'] = mouse_offsetY
 
         # RANDOM BLINK
         if time.time() - lastBlinkTime > blink_interval and not varGlobals.isBlinking:
@@ -674,15 +683,13 @@ def eyeUI():
 def staffConfiguration():
 
     # RESET
-    input = time.time()
-    contentY = 0
+    goBack = time.time()
     numpad = {}
-    meja = 0
+    selectedMeja = None
     
     # BOOLEAN
-    click = False
     trayMeja = False
-    pesananMeja = False
+    trayPesanan = False
     varGlobals.runSim = False
     varGlobals.runEye = False
     varGlobals.runStaff = True
@@ -692,119 +699,185 @@ def staffConfiguration():
     varGlobals.runMakeOrder = False
 
     buttons = {
-        "Tray 1" : scButton.TRAY_1,
-        "Tray 2" : scButton.TRAY_2
+        "Tray 1": scButton.TRAY_1,
+        "Tray 2": scButton.TRAY_2
     }
 
+    box = {
+        "Back": scButton.BACK,
+        "Confirm": scButton.BOX_KONFIRMASI
+    }
+    
     while varGlobals.runStaff:
 
-        varGlobals.screen.blit(varGlobals.bgStaff, (0,0))
+        varGlobals.screen.blit(varGlobals.bgStaff, (0, 0))
 
+        mx, my = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 varGlobals.runStaff = False
                 pygame.quit()
                 sys.exit()
 
+            for cb in varGlobals.checkboxes:
+                cb.handleEvent(event)
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    eyeUI()
+
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                click = True
 
-                x = varGlobals.window_rect.centerx
-                y = varGlobals.window_rect.centery
+                # NUMPAD DALAM MEMILIH MEJA
+                if trayMeja:
+                    if numpad:
+                        for number, rect in numpad.items():
+                            if rect.collidepoint(mx, my):
+                                if number.isdigit():
+                                    selectedMeja = int(number)  # simpan nomor meja
+                                    if any(str(m['meja']) == str(selectedMeja) for m in varGlobals.allMeja):
+                                        trayPesanan = True
+                                        trayMeja = False
+                                elif number == "Back":
+                                    trayMeja = False
 
-                boxSetup = pygame.Rect(x - 250, y - 200, 500, 400)
-                if not boxSetup.collidepoint(mx, my):
-                    trayMeja = False
+                # PENANGANAN POPUP PESANAN BERDASARKAN MEJA
+                elif trayPesanan:
+                    if scButton.BACK.collidepoint(mx, my) and trayPesanan and not trayMeja:
+                        trayPesanan = False
+                        trayMeja = True
 
-                # LOGIKA NUMPAD
-                if numpad:
-                    for number, rect in numpad.items():
+                    # PENANGANAN TOMBOL KONFIRMASI
+                    elif scButton.BOX_KONFIRMASI.collidepoint(mx, my):
+                        selected_ids = [cb.data_id for cb in varGlobals.checkboxes if cb.checked]
+
+                        if selected_ids:
+                            delete_orders(selected_ids)   # hapus di DB
+                            print("Terhapus:", selected_ids)
+
+                            # Refresh data
+                            varGlobals.allOrders = getOrders()
+                            varGlobals.orderStack = tampilanOrder(varGlobals.allOrders)
+                            varGlobals.checkboxes = []
+
+                # PENANGANAN TOMBOL TRAY
+                else:
+                    for button, rect in buttons.items():
                         if rect.collidepoint(mx, my):
-                            if number.isdigit():
-                                pesananMeja = True
-                                meja = number
+                            if button == "Tray 1" or button == "Tray 2":
+                                trayMeja = True
 
-            if trayMeja and event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 4:  
-                    contentY += 30
-                    input = time.time()
-                elif event.button == 5: 
-                    contentY -= 30
-                    input = time.time()
+            # # Logika scrolling (kalau dipakai di trayMeja)
+            # if trayMeja and event.type == pygame.MOUSEBUTTONDOWN:
+            #     if event.button == 4:
+            #         contentY += 30
+            #         input = time.time()
+            #     elif event.button == 5:
+            #         contentY -= 30
+            #         input = time.time()
 
-        # if time.time() - input >= 10:
-        #     eyeUI()
-        #     input = time.time()
-
-        # if varGlobals.updateOrder:
+        # MENGAMBIL DATA PESANAN (MEJA)
         listOrder = getOrders()
-        varGlobals.allOrders = getMeja(listOrder)
+        varGlobals.allMeja = getMeja(listOrder)
         varGlobals.updateOrder = False
 
-        # print(varGlobals.allOrders)
-
-
-        mx, my = pygame.mouse.get_pos()
+        # MENGGAMBAR OPSI TRAY (1 ATAU 2)
         for button, rect in buttons.items():
             if rect.collidepoint(mx, my):
                 pygame.draw.rect(varGlobals.screen, cc.WHITE, rect, border_radius=20)
                 pygame.draw.rect(varGlobals.screen, cc.BLACK, rect, 5, border_radius=20)
                 tts(button, cc.BLACK, rect, varGlobals.screen, 35)
-                if click:
-                    trayMeja = True
             else:
                 pygame.draw.rect(varGlobals.screen, cc.WHITE, rect, border_radius=20)
                 pygame.draw.rect(varGlobals.screen, cc.BLACK, rect, 3, border_radius=20)
                 tts(button, cc.BLACK, rect, varGlobals.screen, 30)
 
+        # MENGGAMBAR NUMPAD UNTUK MEMILIH MEJA
         if trayMeja:
             boxPenghalang = pygame.Rect(0, 0, varGlobals.res[0], varGlobals.res[1])
             overlay = pygame.Surface((boxPenghalang.width, boxPenghalang.height), pygame.SRCALPHA)
-
             pygame.draw.rect(overlay, (0, 0, 0, 100), overlay.get_rect())
             varGlobals.screen.blit(overlay, (0, 0))
 
-            # BATAS SCROLLING
-            maxScroll = max(0, 500 - boxSetup.height)
-            contentY = max(-maxScroll, min(10, contentY))
+            pygame.draw.rect(varGlobals.screen, cc.WHITE, scButton.BOX_SETUP, border_radius=20)
+            pygame.draw.rect(varGlobals.screen, cc.BLACK, scButton.BOX_SETUP, 3, border_radius=20)
 
-            pygame.draw.rect(varGlobals.screen, cc.WHITE, boxSetup, border_radius=20)
-            pygame.draw.rect(varGlobals.screen, cc.BLACK, boxSetup, 3, border_radius=20)
+            numpad = numpadStaff(varGlobals.screen, varGlobals.popupX, varGlobals.popupY, 3)
 
-            # Buat area gambar yang dipotong agar konten hanya terlihat di dalam pop-up
-            clipping_rect = pygame.Rect(boxSetup.x, boxSetup.y + 10, boxSetup.width, boxSetup.height - 20)
-            varGlobals.screen.set_clip(clipping_rect)
+            varGlobals.checkboxes = []
 
-            currentY = 0
-            for group in varGlobals.allOrders:
-                # OFFSET SCROLLING PADA POSISI Y
-                yPosOffset = currentY + contentY + boxSetup.y
+        # MENAMPILKAN PESANAN BERDASARKAN MEJA
+        if trayPesanan:
 
-                # Mendapatkan posisi x dari elemen pertama
-                mejaLine = group['lines'][0]
-                xPos = mejaLine['rect'].x - 38
+            if not varGlobals.checkboxes:   # hanya buat sekali
+                pesanan_lines = getPesananByMeja(varGlobals.allOrders, selectedMeja)
 
-                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (xPos, yPosOffset, 100, 100), border_radius=20)
+                varGlobals.checkboxes = []
+                start_x = scButton.BOX_SETUP.x + 30
+                start_y = scButton.BOX_SETUP.y + 40
+                offset_y = 35
 
-                for line in group['lines']:
-                    # RESET POSISI Y
-                    line_rect = line['rect'].copy()
-                    line_rect.y += contentY
-                    varGlobals.screen.blit(line['surface'], line_rect)
+                pesanan_idx = 0
+                for line in pesanan_lines:
+                    if line['type'] == 'meja':
+                        continue
 
-                # BATAS ANTARA GROUP
-                currentY += 100 + 10
-            
-            # HAPUS CLIPPING
-            varGlobals.screen.set_clip(None)
+                    rect_custom = line['rect'].copy()
+                    rect_custom.topleft = (start_x + 40, start_y + (pesanan_idx + 1) * offset_y)
 
-            numpad = numpadStaff(varGlobals.screen, varGlobals.popupX, varGlobals.popupY, 2)
-            noMeja = str(varGlobals.allOrders[0]['meja'])
+                    cb = CheckBox(start_x, rect_custom.y + 2, 20, False, None, varGlobals.font)
+                    cb.data_id = line['id']     # simpan id pesanan
+                    cb.label = getattr(line, 'menu', str(line.get('id')))  # fallback jika tidak ada menu
+                    varGlobals.checkboxes.append(cb)
 
-            if pesananMeja and str(meja) == noMeja:
-                print("biasa aja dong")
+                    pesanan_idx += 1
 
-        click = False
+            # MENGGAMBAR OVERLAY (OPACITY)
+            overlay = pygame.Surface((varGlobals.res[0], varGlobals.res[1]), pygame.SRCALPHA)
+            pygame.draw.rect(overlay, (0, 0, 0, 100), overlay.get_rect())
+            varGlobals.screen.blit(overlay, (0, 0))
+
+            pygame.draw.rect(varGlobals.screen, cc.WHITE, scButton.BOX_SETUP, border_radius=20)
+            pygame.draw.rect(varGlobals.screen, cc.BLACK, scButton.BOX_SETUP, 3, border_radius=20)
+
+            for boxes, rect in box.items():
+                if rect.collidepoint(mx, my):
+                    pygame.draw.rect(varGlobals.screen, cc.WHITE, rect, border_radius=20)
+                    pygame.draw.rect(varGlobals.screen, cc.BLACK, rect, 4, border_radius=20)
+                    tts(boxes, cc.BLACK, rect, varGlobals.screen, 30)
+                else:
+                    pygame.draw.rect(varGlobals.screen, cc.WHITE, rect, border_radius=20)
+                    pygame.draw.rect(varGlobals.screen, cc.BLACK, rect, 3, border_radius=20)
+                    tts(boxes, cc.BLACK, rect, varGlobals.screen, 25)
+
+            # MENEMPATKAN TEXT PADA SAMPING CHECKBOXS
+            mejaList = [m for m in varGlobals.allMeja if m['meja'] == selectedMeja]
+            startX = scButton.BOX_SETUP.x + 30
+            startY = scButton.BOX_SETUP.y + 40
+            offsetY = 35
+            offsetMeja = 50
+
+            for mejaData in mejaList:
+                nomor_meja = mejaData['meja']
+                pesanan_lines = getPesananByMeja(varGlobals.allOrders, nomor_meja)
+
+                title_surface = varGlobals.font.render(f"Meja {nomor_meja}", True, cc.BLACK)
+                varGlobals.screen.blit(title_surface, (startX, startY - 20))
+
+                pesanan_idx = 0
+                for line, cb in zip([l for l in pesanan_lines if l['type'] != 'meja'], varGlobals.checkboxes):
+                    rect_custom = line['rect'].copy()
+                    rect_custom.topleft = (startX + 40, startY + (pesanan_idx + 1) * offsetY)
+
+                    # gambar teks
+                    varGlobals.screen.blit(line['surface'], rect_custom)
+
+                    # gambar checkbox
+                    cb.draw(varGlobals.screen)
+                    pesanan_idx += 1
+
+                startY += (pesanan_idx + 1) * offsetY + offsetMeja
+
         pygame.display.flip()
         varGlobals.clock.tick(60)
 
@@ -1201,4 +1274,4 @@ def simulation():
         varGlobals.clock.tick(60)
 
 # reset_database()
-staffConfiguration()
+makeOrder()

@@ -41,18 +41,14 @@ def reset_database():
     cursor = db_connection.cursor()
 
     try:
-        # Perintah untuk menghapus database jika ada
         cursor.execute("DROP DATABASE IF EXISTS campberingin")
         print("Database campberingin berhasil dihapus (jika ada).")
-        
-        # Perintah untuk membuat database baru
+
         cursor.execute("CREATE DATABASE campberingin")
         print("Database campberingin berhasil dibuat.")
         
-        # Ganti ke database yang baru dibuat
         cursor.execute("USE campberingin")
 
-        # Perintah untuk membuat tabel orders
         create_table_query = """
         CREATE TABLE orders (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -107,3 +103,20 @@ def getOrders():
     db_connection.close()
 
     return orders
+
+
+###################################################################################################
+#                                      MENGHAPUS DATA PESANAN                                     #
+###################################################################################################
+
+def delete_orders(order_ids):
+    db_connection = connect_to_db()
+    cursor = db_connection.cursor()
+
+    format_strings = ','.join(['%s'] * len(order_ids))
+    query = f"DELETE FROM orders WHERE id IN ({format_strings})"
+    cursor.execute(query, tuple(order_ids))
+
+    db_connection.commit()
+    cursor.close()
+    db_connection.close()

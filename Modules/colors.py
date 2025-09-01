@@ -3,7 +3,7 @@ import Modules.varGlobals as varGlobals
 
 class custom:
     RED = (255, 0, 0)
-    GREEN = (70, 205, 0)
+    GREEN = (0, 200, 0)
     BLUE = (0, 0, 255)
     BLACK = (0, 0, 0)
     WHITE = (245, 245, 245)

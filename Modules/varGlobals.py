@@ -1,4 +1,3 @@
-import time
 import pygame
 import os, sys
 
@@ -35,6 +34,7 @@ nomorMeja = ''
 # NONE
 # -- List Pesanan
 meja = None
+checkboxes = []
 
 # -- Transisi Surface
 oldSurface = None
@@ -73,6 +73,7 @@ serviceBot = False
 list = bool
 
 # STACK
+allMeja = []
 allOrders = []
 startProperties = {}
 targetPropertis = {}
@@ -332,10 +333,10 @@ class make_order:
 
 class staffConfig:
     BACK = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-3.75)),
-        window_rect.centery - LEBAR_BUTTON * 7.8,
+        window_rect.centerx - (PANJANG_BUTTON * (-1.4)),
+        window_rect.centery - (LEBAR_BUTTON * (-3.2)),
         PANJANG_BUTTON,
-        LEBAR_BUTTON * 1.2
+        LEBAR_BUTTON * 2
     )
     TRAY_1 = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * 3.4),
@@ -348,4 +349,16 @@ class staffConfig:
         window_rect.centery - LEBAR_BUTTON * (-1),
         PANJANG_BUTTON * 3,
         LEBAR_BUTTON * 3.5
+    )
+    BOX_SETUP = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 2.4),
+        window_rect.centery - LEBAR_BUTTON * 5,
+        PANJANG_BUTTON * 4.8,
+        LEBAR_BUTTON * 10.2
+    )
+    BOX_KONFIRMASI = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 2.4),
+        window_rect.centery - (LEBAR_BUTTON * (-3.2)),
+        PANJANG_BUTTON,
+        LEBAR_BUTTON * 2
     )

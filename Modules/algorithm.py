@@ -58,14 +58,14 @@ def drawNumberPad(screen, popup_x, popup_y, outline):
     screen.blit(text_0, text_0_rect)
 
     # UNTUK KOTAK DELETE
-    box_del = pygame.Rect(start_x + 0, start_y + (button_size + gap) * 3, button_size, button_size)
-    pygame.draw.rect(screen, cc.WHITE, box_del, border_radius=8)
-    if box_del.collidepoint(mx, my):
-        pygame.draw.rect(screen, cc.BLACK, box_del, outline + 1, border_radius=8)
+    box_back = pygame.Rect(start_x + 0, start_y + (button_size + gap) * 3, button_size, button_size)
+    pygame.draw.rect(screen, cc.WHITE, box_back, border_radius=8)
+    if box_back.collidepoint(mx, my):
+        pygame.draw.rect(screen, cc.BLACK, box_back, outline + 1, border_radius=8)
     else:
-        pygame.draw.rect(screen, cc.BLACK, box_del, outline, border_radius=8)
+        pygame.draw.rect(screen, cc.BLACK, box_back, outline, border_radius=8)
     text_del = font.render("Del", True, cc.BLACK)
-    text_del_rect = text_del.get_rect(center=box_del.center)
+    text_del_rect = text_del.get_rect(center=box_back.center)
     screen.blit(text_del, text_del_rect)
 
     # UNTUK KOTAK CLEAR
@@ -91,7 +91,7 @@ def drawNumberPad(screen, popup_x, popup_y, outline):
         "8": pygame.Rect(start_x + (7 % 3) * (button_size + gap), start_y + (7 // 3) * (button_size + gap), button_size, button_size),
         "9": pygame.Rect(start_x + (8 % 3) * (button_size + gap), start_y + (8 // 3) * (button_size + gap), button_size, button_size),
         "0": box_0,
-        "Del": box_del,
+        "Del": box_back,
         "Clear": box_clear
     }
 
@@ -103,61 +103,64 @@ def drawNumberPad(screen, popup_x, popup_y, outline):
 def tampilanOrder(orders_list):
     orderStack = []
     ySpacing = 10
-    box_lebar_kiri = 80  # lebar kotak meja
-    padding_text = 120     # jarak teks dari pinggir kotak
+    box_lebar_kiri = 80
+    padding_text = 120
 
-    # Grouping berdasarkan nomor meja
     grouped_orders = {}
     for pesanan_data in orders_list:
+        pesanan_id = pesanan_data[0]
         meja = pesanan_data[1]
         namaPesanan = pesanan_data[3]
         jumlahPesanan = pesanan_data[4]
 
         if meja not in grouped_orders:
             grouped_orders[meja] = []
-        grouped_orders[meja].append({'nama': namaPesanan, 'jumlah': jumlahPesanan})
+        grouped_orders[meja].append({
+            'id': pesanan_id,
+            'nama': namaPesanan,
+            'jumlah': jumlahPesanan
+        })
 
-    # Hitung tinggi total (untuk scrolling atau posisi awal)
-    total_height = 0
+    yStart = 80
+
     for meja, items in grouped_orders.items():
-        group_height = 100  # tinggi awal untuk nomor meja
-        group_height += sum([18 + ySpacing for _ in items])  # tinggi tiap pesanan
-        total_height += group_height + (ySpacing * 3)
-
-    # Posisi awal Y
-    popup_y = 120
-    yStart = popup_y + 28
-
-    # Buat data untuk menggambar
-    for meja, items in grouped_orders.items():
-        group_height = 0
         group_lines = []
+        group_height = 0
 
-        # Nomor meja (di kotak kiri)
+        # Tampilkan nomor meja
         text_surf_meja, text_rect_meja = tts2(
-            f"{meja}",
-            cc.WHITE,
-            40,
-            (padding_text, yStart)
+            f"{meja}", cc.WHITE, 40, (padding_text, yStart + 60)
         )
-        group_lines.append({'type': 'meja', 'surface': text_surf_meja, 'rect': text_rect_meja})
+        group_lines.append({
+            'type': 'meja',
+            'surface': text_surf_meja,
+            'rect': text_rect_meja
+        })
+        group_height += text_rect_meja.height + ySpacing
 
-        # Daftar pesanan (di kotak kanan)
+        # Tampilkan daftar pesanan
         pesanan_x = box_lebar_kiri + padding_text
         for item in items:
             text_surf_pesanan, text_rect_pesanan = tts2(
-                f"- {item['nama']} ({item['jumlah']})",
-                cc.BLACK,
-                18,
-                (pesanan_x, yStart + group_height)
+                f"{item['nama']} ({item['jumlah']})",
+                cc.BLACK, 18, (pesanan_x, yStart + group_height)
             )
-            group_lines.append({'type': 'pesanan', 'surface': text_surf_pesanan, 'rect': text_rect_pesanan})
-            group_height += text_rect_pesanan.height + ySpacing 
+            group_lines.append({
+                'type': 'pesanan',
+                'id': item['id'],
+                'surface': text_surf_pesanan,
+                'rect': text_rect_pesanan
+            })
+            group_height += text_rect_pesanan.height + ySpacing
 
-        group_height += text_rect_meja.height
+        orderStack.append({
+            'meja': meja,
+            'height': group_height,
+            'lines': group_lines
+        })
 
-        orderStack.append({'meja': meja, 'height': group_height, 'lines': group_lines})
-        yStart += group_height + (ySpacing - 30)
+        # Pindahkan ke bawah untuk meja berikutnya
+        yStart += group_height - 20
 
     return orderStack
 
@@ -248,37 +251,18 @@ def transition(surfaceOld, surfaceNew, direction="right", speed=20):
 ###################################################################################################
 
 def getMeja(orders_list):
-    orderStack = []
-    ySpacing = 20
-    padding_text = 310  # posisi teks
-
-    # Grouping berdasarkan nomor meja
-    grouped_orders = {}
+    unique_meja_numbers = set()
     for pesanan_data in orders_list:
         meja = pesanan_data[1]
-        if meja not in grouped_orders:
-            grouped_orders[meja] = []  # tidak perlu simpan detail pesanan lagi
-
-    # Posisi awal Y
-    popup_y = 115
-    yStart = popup_y + 28
-
-    for meja in grouped_orders.keys():
-        group_height = 60  # cukup tinggi untuk satu nomor meja
-        group_lines = []
-
-        # Nomor meja
-        text_surf_meja, text_rect_meja = tts2(
-            f"{meja}",
-            cc.WHITE,
-            40,
-            (padding_text, yStart)
-        )
-        group_lines.append({'type': 'meja', 'surface': text_surf_meja, 'rect': text_rect_meja})
-
-        orderStack.append({'meja': meja, 'height': group_height, 'lines': group_lines})
-        yStart += group_height + ySpacing
-
+        unique_meja_numbers.add(meja)
+    
+    # Mengonversi set unik menjadi daftar kamus sesuai format yang dibutuhkan
+    orderStack = []
+    for meja in unique_meja_numbers:
+        # Membuat kamus baru dengan hanya kunci 'meja'
+        order_dict = {'meja': meja}
+        orderStack.append(order_dict)
+    
     return orderStack
 
 
@@ -286,13 +270,25 @@ def getMeja(orders_list):
 #                                         NUMPAD FOR STAFF                                        #
 ###################################################################################################
 
-def numpadStaff(screen, popup_x, popup_y, outline):
-    button_size = 50
-    gap = 10
-    start_x = popup_x + varGlobals.lebarPopup + 20
-    start_y = popup_y
+def getPesananByMeja(orders_list, nomor_meja):
+    for pesanan_data in orders_list:
+        if isinstance(pesanan_data, dict) and pesanan_data.get('meja') == nomor_meja:
+            return pesanan_data['lines']
+    
+    return []
 
-    font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 17)
+
+###################################################################################################
+#                                         NUMPAD FOR STAFF                                        #
+###################################################################################################
+
+def numpadStaff(screen, popup_x, popup_y, outline):
+    button_size = 100
+    gap = 10
+    start_x = popup_x + 5
+    start_y = popup_y - 45
+
+    font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 25)
     mx, my = pygame.mouse.get_pos()
 
     # UNTUK KOTAK DARI 1 - 9
@@ -300,7 +296,6 @@ def numpadStaff(screen, popup_x, popup_y, outline):
         x = start_x + (i % 3) * (button_size + gap)
         y = start_y + (i // 3) * (button_size + gap)
         rect = pygame.Rect(x, y, button_size, button_size)
-        pygame.draw.rect(screen, cc.WHITE, rect, border_radius=8)
         if rect.collidepoint(mx, my):
             pygame.draw.rect(screen, cc.BLACK, rect, outline + 1, border_radius=8)
         else:
@@ -313,8 +308,7 @@ def numpadStaff(screen, popup_x, popup_y, outline):
         screen.blit(text_surf, text_rect)
 
     # UNTUK KOTAK 0
-    box_0 = pygame.Rect(start_x + (button_size + gap), start_y + (button_size + gap) * 3, button_size, button_size)
-    pygame.draw.rect(screen, cc.WHITE, box_0, border_radius=8)
+    box_0 = pygame.Rect(start_x + (button_size + gap) * 3, start_y + (button_size + gap) * 2, button_size, button_size)
     if box_0.collidepoint(mx, my):
         pygame.draw.rect(screen, cc.BLACK, box_0, outline + 1, border_radius=8)
     else:
@@ -322,6 +316,17 @@ def numpadStaff(screen, popup_x, popup_y, outline):
     text_0 = font.render("0", True, cc.BLACK)
     text_0_rect = text_0.get_rect(center=box_0.center)
     screen.blit(text_0, text_0_rect)
+
+    # UNTUK KOTAK BACK
+    box_back = pygame.Rect(start_x + (button_size + gap) * 3, start_y, button_size, button_size * 2 + gap)
+    if box_back.collidepoint(mx, my):
+        pygame.draw.rect(screen, cc.RED_BROWN, box_back, border_radius=8)
+        font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 30)
+    else:
+        pygame.draw.rect(screen, cc.RED_BROWN, box_back, border_radius=8)
+    text_del = font.render("Back", True, cc.WHITE)
+    text_del_rect = text_del.get_rect(center=box_back.center)
+    screen.blit(text_del, text_del_rect)
     
     # MENGEMBALIKAN SEMUA VALUE RECTANGLE
     return {
@@ -334,6 +339,41 @@ def numpadStaff(screen, popup_x, popup_y, outline):
         "7": pygame.Rect(start_x + (6 % 3) * (button_size + gap), start_y + (6 // 3) * (button_size + gap), button_size, button_size),
         "8": pygame.Rect(start_x + (7 % 3) * (button_size + gap), start_y + (7 // 3) * (button_size + gap), button_size, button_size),
         "9": pygame.Rect(start_x + (8 % 3) * (button_size + gap), start_y + (8 // 3) * (button_size + gap), button_size, button_size),
-        "0": box_0
+        "0": box_0,
+        "Back": box_back
     }
 
+
+###################################################################################################
+#                                          DRAW CHECKBOX                                          #
+###################################################################################################
+
+class CheckBox:
+    def __init__(self, x, y, size=50, checked=False, label=None, font=None, color_box=cc.WHITE, color_tick=cc.GREEN):
+        self.rect = pygame.Rect(x, y, size, size)
+        self.checked = checked
+        self.label = label
+        self.font = font
+        self.color_box = color_box
+        self.color_tick = color_tick
+
+    def draw(self, surface):
+        # kotak
+        pygame.draw.rect(surface, self.color_box, self.rect, border_radius=5)
+        pygame.draw.rect(surface, cc.BLACK, self.rect, 2, border_radius=5)
+
+        # tanda centang
+        if self.checked:
+            pygame.draw.rect(surface, self.color_tick, self.rect.inflate(-6, -6), border_radius=5)
+
+        # label teks
+        if self.label and self.font:
+            text_surface = self.font.render(self.label, True, cc.WHITE)
+            surface.blit(text_surface, (self.rect.right+10, self.rect.y))
+
+    def handleEvent(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.rect.collidepoint(event.pos):
+                self.checked = not self.checked
+                return True
+        return False
