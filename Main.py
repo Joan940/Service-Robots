@@ -757,7 +757,7 @@ def staffConfiguration():
 
                             # Refresh data
                             varGlobals.allOrders = getOrders()
-                            varGlobals.orderStack = tampilanOrder(varGlobals.allOrders)
+                            varGlobals.allOrders = tampilanOrder(varGlobals.allOrders)
                             varGlobals.checkboxes = []
 
                 # PENANGANAN TOMBOL TRAY
@@ -1145,6 +1145,15 @@ def mainMenu():
                     pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, border_radius=15)
                     tts(pilih, cc.WHITE, rect, varGlobals.screen, 20)
 
+        # === STATUS (selalu ditampilkan non-interaktif) ===
+        for text, rect in status.items():
+            if varGlobals.conServiceBot == "Disconnected":
+                pygame.draw.rect(varGlobals.screen, cc.RED, rect, border_radius=20)
+                tts(text, cc.WHITE, rect, varGlobals.screen, 20)
+            elif varGlobals.conServiceBot == "Connected":
+                pygame.draw.rect(varGlobals.screen, cc.GREEN, rect, border_radius=20)
+                tts(text, cc.WHITE, rect, varGlobals.screen, 20)
+
         click = False
         varGlobals.clock.tick(30)
         pygame.display.flip()
@@ -1274,4 +1283,4 @@ def simulation():
         varGlobals.clock.tick(60)
 
 # reset_database()
-makeOrder()
+mainMenu()
