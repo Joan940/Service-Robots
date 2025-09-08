@@ -65,8 +65,10 @@ isBlinking = bool
 mouseActive = bool
 
 # -- Komunikasi
-notAutonomus = bool
+ser = None
 udp = bool
+uart = bool
+notAutonomus = bool
 serviceBot = False
 
 # -- List Pesanan
@@ -361,4 +363,22 @@ class staffConfig:
         window_rect.centery - (LEBAR_BUTTON * (-3.2)),
         PANJANG_BUTTON,
         LEBAR_BUTTON * 2
+    )
+    PLUS = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
+        window_rect.centery - (LEBAR_BUTTON),
+        PANJANG_BUTTON - 75,
+        LEBAR_BUTTON - 7
+    )
+    MIN = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-2)),
+        window_rect.centery - (LEBAR_BUTTON),
+        PANJANG_BUTTON - 75,
+        LEBAR_BUTTON - 7
+    )
+    TOTAL = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-1.65)),
+        window_rect.centery - (LEBAR_BUTTON),
+        PANJANG_BUTTON - 75,
+        LEBAR_BUTTON - 7
     )

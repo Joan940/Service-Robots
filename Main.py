@@ -686,6 +686,7 @@ def staffConfiguration():
     goBack = time.time()
     numpad = {}
     selectedMeja = None
+    antar = 0
     
     # BOOLEAN
     trayMeja = False
@@ -707,6 +708,13 @@ def staffConfiguration():
         "Back": scButton.BACK,
         "Confirm": scButton.BOX_KONFIRMASI
     }
+
+    adjust = {
+        " + ": scButton.PLUS,
+        " - ": scButton.MIN
+    }
+
+    # antar: scButton.TOTAL
     
     while varGlobals.runStaff:
 
@@ -759,6 +767,14 @@ def staffConfiguration():
                             varGlobals.allOrders = getOrders()
                             varGlobals.allOrders = tampilanOrder(varGlobals.allOrders)
                             varGlobals.checkboxes = []
+
+                    elif scButton.PLUS.collidepoint(mx, my):
+                        antar += 1
+                    elif scButton.MIN.collidepoint(mx, my):
+                            if antar > 0:
+                                antar -= 1
+                            else:
+                                pass
 
                 # PENANGANAN TOMBOL TRAY
                 else:
@@ -826,8 +842,8 @@ def staffConfiguration():
                     rect_custom.topleft = (start_x + 40, start_y + (pesanan_idx + 1) * offset_y)
 
                     cb = CheckBox(start_x, rect_custom.y + 2, 20, False, None, varGlobals.font)
-                    cb.data_id = line['id']     # simpan id pesanan
-                    cb.label = getattr(line, 'menu', str(line.get('id')))  # fallback jika tidak ada menu
+                    cb.data_id = line['id']
+                    cb.label = getattr(line, 'menu', str(line.get('id')))
                     varGlobals.checkboxes.append(cb)
 
                     pesanan_idx += 1
@@ -839,6 +855,16 @@ def staffConfiguration():
 
             pygame.draw.rect(varGlobals.screen, cc.WHITE, scButton.BOX_SETUP, border_radius=20)
             pygame.draw.rect(varGlobals.screen, cc.BLACK, scButton.BOX_SETUP, 3, border_radius=20)
+            
+            for penyesuaian, rect in adjust.items():
+                if rect.collidepoint(mx, my):
+                    pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 4, border_radius=20)
+                    tts(penyesuaian, cc.RED_BROWN, rect, varGlobals.screen, 35)
+                else:
+                    pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 3, border_radius=20)
+                    tts(penyesuaian, cc.RED_BROWN, rect, varGlobals.screen, 30)
+
+            tts(antar, cc.RED_BROWN, scButton.TOTAL, varGlobals.screen, 25)
 
             for boxes, rect in box.items():
                 if rect.collidepoint(mx, my):

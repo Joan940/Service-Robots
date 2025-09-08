@@ -349,7 +349,7 @@ def numpadStaff(screen, popup_x, popup_y, outline):
 ###################################################################################################
 
 class CheckBox:
-    def __init__(self, x, y, size=50, checked=False, label=None, font=None, color_box=cc.WHITE, color_tick=cc.GREEN):
+    def __init__(self, x, y, size=1000, checked=False, label=None, font=None, color_box=cc.WHITE, color_tick=cc.GREEN):
         self.rect = pygame.Rect(x, y, size, size)
         self.checked = checked
         self.label = label

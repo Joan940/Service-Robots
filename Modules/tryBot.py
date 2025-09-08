@@ -13,19 +13,22 @@ def demoMode():
     data[5] = 5
     data[6] = 0
     data[7] = 1
-    time.sleep(0.25)
+    # time.sleep(0.25)
     send(data)
 
 def send(data):
+    if varGlobals.ser is None or not varGlobals.ser.is_open:
+        print("UART tidak aktif / belum dibuka")
+        return
 
-    # MEMBUAT SOCKET
-    kirim = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    # kirim.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
-
-    if varGlobals.udp:
+    if varGlobals.uart:
         try:
-            kirim.sendto(data, (varGlobals.IP, int(varGlobals.PORT)))
+            if isinstance(data, (list, tuple)):
+                data = bytes(data)
+            elif isinstance(data, int):
+                data = data.to_bytes(2, "big")  # contoh: integer 16-bit
+
+            varGlobals.ser.write(data)
+            print("[UART] Data terkirim:", list(data))
         except Exception as e:
-            print("Pengiriman Gagal : ", e)
-    else:
-        kirim.close()
+            print("Pengiriman UART gagal:", e)
