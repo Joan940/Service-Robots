@@ -27,6 +27,25 @@ def connect_to_db():
     
 
 ###################################################################################################
+#                                        GET DATABASE LOG                                         #
+###################################################################################################
+
+def get_all_orders_log():
+    db_connection = connect_to_db()
+    if db_connection is None:
+        return []
+
+    cursor = db_connection.cursor(dictionary=True)
+    query = "SELECT id, table_number, queue_number, item_name, quantity, status, created_at FROM orders"
+    cursor.execute(query)
+
+    orders = cursor.fetchall()
+    cursor.close()
+    db_connection.close()
+    return orders
+
+
+###################################################################################################
 #                                          RESET DATABASE                                         #
 ###################################################################################################
 

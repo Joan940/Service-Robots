@@ -26,8 +26,11 @@ print(int(screen_width), int(screen_height))
 ###################################################################################################
 
 # KOSONGAN
-IP = ''
-PORT = ''
+# IP = ''
+# PORT = ''
+P = ''
+I = ''
+D = ''
 jumlah = ''
 nomorMeja = ''
 
@@ -53,6 +56,7 @@ runConfig = bool
 runStaff = bool
 runOrder = bool
 runMenu = bool
+runPID = bool
 runSim = bool
 runEye = bool
 updateOrder = True
@@ -183,7 +187,7 @@ bgMenu = pygame.image.load("C:\BMP-Robotics\Assets\menu.png").convert_alpha()
 bgEyes = pygame.image.load("C:\BMP-Robotics\Assets\eye.png").convert_alpha()
 
 bot = pygame.image.load(r"C:\BMP-Robotics\Assets\bot.png").convert_alpha()
-bot = pygame.transform.scale(bot, (20, 20))
+bot = pygame.transform.scale(bot, (25, 25))
 
 arrow = pygame.image.load(r"C:\BMP-Robotics\Assets\arrow.png").convert_alpha()
 arrow = pygame.transform.scale(arrow, (40, 40))
@@ -365,13 +369,13 @@ class staffConfig:
         LEBAR_BUTTON * 2
     )
     PLUS = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
+        window_rect.centerx - (PANJANG_BUTTON * (-2)),
         window_rect.centery - (LEBAR_BUTTON),
         PANJANG_BUTTON - 75,
         LEBAR_BUTTON - 7
     )
     MIN = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-2)),
+        window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
         window_rect.centery - (LEBAR_BUTTON),
         PANJANG_BUTTON - 75,
         LEBAR_BUTTON - 7
@@ -381,4 +385,36 @@ class staffConfig:
         window_rect.centery - (LEBAR_BUTTON),
         PANJANG_BUTTON - 75,
         LEBAR_BUTTON - 7
+    )
+
+class PID:
+    P = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 4),
+        window_rect.centery - (LEBAR_BUTTON),
+        PANJANG_BUTTON * 2,
+        LEBAR_BUTTON
+    )
+    I = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 1),
+        window_rect.centery - (LEBAR_BUTTON),
+        PANJANG_BUTTON * 2,
+        LEBAR_BUTTON
+    )
+    D = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-2)),
+        window_rect.centery - (LEBAR_BUTTON),
+        PANJANG_BUTTON * 2,
+        LEBAR_BUTTON
+    )
+    SAVE_RECT = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * 1.08),
+        window_rect.centery - LEBAR_SAVE_BUTTON * (-5.2),
+        PANJANG_SAVE_BUTTON * 1,
+        LEBAR_SAVE_BUTTON * 1.7
+    )
+    EXIT_RECT = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * (-0.07)),
+        window_rect.centery - LEBAR_SAVE_BUTTON * (-5.2),
+        PANJANG_SAVE_BUTTON * 1,
+        LEBAR_SAVE_BUTTON * 1.7
     )

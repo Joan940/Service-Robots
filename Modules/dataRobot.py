@@ -1,8 +1,8 @@
 # VARIABLE GLOBAL
 service_bot_ip = ''
 kompas = 0
-xpos = 0
-ypos = 0
+xpos = 25
+ypos = 25
 battery = 0
 connect = 0
 

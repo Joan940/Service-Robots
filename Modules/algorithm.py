@@ -1,6 +1,8 @@
 import time
 import math
+import heapq
 import pygame
+import numpy as np
 import Modules.varGlobals as varGlobals
 from Modules.colors import custom as cc, tts1, tts2
 
@@ -148,9 +150,12 @@ def tampilanOrder(orders_list):
             group_lines.append({
                 'type': 'pesanan',
                 'id': item['id'],
+                'nama': item['nama'],        # tambahin nama
+                'jumlah': item['jumlah'],    # tambahin jumlah
                 'surface': text_surf_pesanan,
                 'rect': text_rect_pesanan
             })
+
             group_height += text_rect_pesanan.height + ySpacing
 
         orderStack.append({
@@ -163,6 +168,14 @@ def tampilanOrder(orders_list):
         yStart += group_height - 20
 
     return orderStack
+
+
+###################################################################################################
+#                                            HEURISTIC                                            #
+###################################################################################################
+
+def heuristic(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
 ###################################################################################################
@@ -279,6 +292,23 @@ def getPesananByMeja(orders_list, nomor_meja):
 
 
 ###################################################################################################
+#                                    GET NAMA & JUMLAH PESANAN                                    #
+###################################################################################################
+
+def getNamaJumlahPesanan(orders_list):
+    nama_list = []
+    jumlah_list = []
+
+    for meja_data in orders_list:
+        for line in meja_data["lines"]:
+            if line["type"] == "pesanan":
+                nama_list.append(line["nama"])
+                jumlah_list.append(line["jumlah"])
+
+    return nama_list, jumlah_list
+
+
+###################################################################################################
 #                                         NUMPAD FOR STAFF                                        #
 ###################################################################################################
 
@@ -345,6 +375,45 @@ def numpadStaff(screen, popup_x, popup_y, outline):
 
 
 ###################################################################################################
+#                                            DRAW GRID                                            #
+###################################################################################################
+
+def drawGrid(grid_size):
+
+    ox = varGlobals.offsetX
+    oy = varGlobals.offsetY
+
+    # --- Area 1: Persegi panjang vertikal di KIRI ---
+    area1_x_start = int(ox)
+    area1_x_end = int(300 + ox)  # Batas kanan area kiri (~378)
+    area1_y_start = int(oy)      # Batas atas (~217)
+    area1_y_end = int(300 + oy)  # Batas bawah (~517)
+
+    # Menggambar garis vertikal di Area 1
+    for x in range(area1_x_start, area1_x_end + 1, grid_size):
+        pygame.draw.line(varGlobals.screen, cc.DARK_GREY, (x, area1_y_start), (x, area1_y_end))
+        
+    # Menggambar garis horizontal di Area 1
+    for y in range(area1_y_start, area1_y_end + 1, grid_size):
+        pygame.draw.line(varGlobals.screen, cc.DARK_GREY, (area1_x_start, y), (area1_x_end, y))
+
+    # --- Area 2: Persegi panjang horizontal di KANAN BAWAH ---
+    area2_x_start = int(300 + ox)   # Mulai dari tempat Area 1 berakhir
+    area2_x_end = int(500 + ox)     # Batas kanan map (~578)
+    area2_y_start = int(100 + oy)   # Batas atas area ini (~317)
+    area2_y_end = int(300 + oy)     # Batas bawah map (~517)
+    
+    # Menggambar garis vertikal di Area 2
+    for x in range(area2_x_start, area2_x_end + 1, grid_size):
+        pygame.draw.line(varGlobals.screen, cc.DARK_GREY, (x, area2_y_start), (x, area2_y_end))
+        
+    # Menggambar garis horizontal di Area 2
+    for y in range(area2_y_start, area2_y_end + 1, grid_size):
+        pygame.draw.line(varGlobals.screen, cc.DARK_GREY, (area1_x_start, y), (area2_x_end, y))
+
+
+
+###################################################################################################
 #                                          DRAW CHECKBOX                                          #
 ###################################################################################################
 
@@ -377,3 +446,61 @@ class CheckBox:
                 self.checked = not self.checked
                 return True
         return False
+    
+
+###################################################################################################
+#                                          A* ALGORITHM                                           #
+###################################################################################################
+
+def aStar(start, goal):
+
+    # DRAW MAP
+    map = np.array([
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ])
+
+    grid_rows, grid_cols = map.shape
+    open_set = []
+    heapq.heappush(open_set, (0, start))
+    came_from = {}
+    g_score = { (x, y): float('inf') for y in range(grid_rows) for x in range(grid_cols) }
+    g_score[start] = 0
+    f_score = { (x, y): float('inf') for y in range(grid_rows) for x in range(grid_cols) }
+    f_score[start] = heuristic(start, goal)
+
+    while open_set:
+        current_f, current = heapq.heappop(open_set)
+
+        if current == goal:
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            return path[::-1]
+
+        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            neighbor = (current[0] + dx, current[1] + dy)
+            
+            # Periksa apakah tetangga valid dan bisa dilewati (nilai 1)
+            if 0 <= neighbor[0] < grid_cols and 0 <= neighbor[1] < grid_rows and map[neighbor[1], neighbor[0]] == 1:
+                tentative_g_score = g_score[current] + 1
+
+                if tentative_g_score < g_score.get(neighbor, float('inf')):
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g_score
+                    f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
+                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
+    
+    return None # Tidak ada jalur yang ditemukan
