@@ -26,13 +26,15 @@ print(int(screen_width), int(screen_height))
 ###################################################################################################
 
 # KOSONGAN
-# IP = ''
-# PORT = ''
+IP = ''
+PORT = ''
 P = ''
 I = ''
 D = ''
 jumlah = ''
 nomorMeja = ''
+mejaPesanan1 = 'Meja 1'
+mejaPesanan2 = 'Meja 2'
 
 # NONE
 # -- List Pesanan
@@ -338,6 +340,12 @@ class make_order:
     )
 
 class staffConfig:
+    EXIT = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-3.75)),
+        window_rect.centery - LEBAR_BUTTON * 7.8,
+        PANJANG_BUTTON,
+        LEBAR_BUTTON * 1.2
+    )
     BACK = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * (-1.4)),
         window_rect.centery - (LEBAR_BUTTON * (-3.2)),
@@ -361,24 +369,6 @@ class staffConfig:
         window_rect.centery - LEBAR_BUTTON * 5,
         PANJANG_BUTTON * 4.8,
         LEBAR_BUTTON * 10.2
-    )
-    BOX_KONFIRMASI = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 2.4),
-        window_rect.centery - (LEBAR_BUTTON * (-3.2)),
-        PANJANG_BUTTON,
-        LEBAR_BUTTON * 2
-    )
-    PLUS = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-2)),
-        window_rect.centery - (LEBAR_BUTTON),
-        PANJANG_BUTTON - 75,
-        LEBAR_BUTTON - 7
-    )
-    MIN = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
-        window_rect.centery - (LEBAR_BUTTON),
-        PANJANG_BUTTON - 75,
-        LEBAR_BUTTON - 7
     )
     TOTAL = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * (-1.65)),

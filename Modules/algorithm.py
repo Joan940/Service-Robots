@@ -263,20 +263,46 @@ def transition(surfaceOld, surfaceNew, direction="right", speed=20):
 #                                     MENDAPATKAN NOMOR MEJA                                      #
 ###################################################################################################
 
+# def getMeja(orders_list):
+#     unique_meja_numbers = set()
+#     for pesanan_data in orders_list:
+#         meja = pesanan_data[1]
+#         unique_meja_numbers.add(meja)
+    
+#     # Mengonversi set unik menjadi daftar kamus sesuai format yang dibutuhkan
+#     orderStack = []
+#     for meja in unique_meja_numbers:
+#         # Membuat kamus baru dengan hanya kunci 'meja'
+#         order_dict = {'meja': meja}
+#         orderStack.append(order_dict)
+    
+#     return orderStack
+
 def getMeja(orders_list):
+
+    # Tambahkan ini di awal skrip Anda
+    table_positions = {
+        1: (4, 2),
+        2: (3, 3),
+        4: (6, 6),
+        5: (10, 7),
+        6: (12, 12)
+    }
+
+    # Menggunakan set untuk mendapatkan nomor meja yang unik secara efisien
     unique_meja_numbers = set()
     for pesanan_data in orders_list:
         meja = pesanan_data[1]
         unique_meja_numbers.add(meja)
     
-    # Mengonversi set unik menjadi daftar kamus sesuai format yang dibutuhkan
-    orderStack = []
+    # Membuat kamus baru sesuai format yang diinginkan
+    all_meja_with_positions = {}
     for meja in unique_meja_numbers:
-        # Membuat kamus baru dengan hanya kunci 'meja'
-        order_dict = {'meja': meja}
-        orderStack.append(order_dict)
+        # Periksa apakah nomor meja memiliki posisi yang telah ditentukan
+        if meja in table_positions:
+            all_meja_with_positions[meja] = table_positions[meja]
     
-    return orderStack
+    return all_meja_with_positions
 
 
 ###################################################################################################
@@ -410,7 +436,6 @@ def drawGrid(grid_size):
     # Menggambar garis horizontal di Area 2
     for y in range(area2_y_start, area2_y_end + 1, grid_size):
         pygame.draw.line(varGlobals.screen, cc.DARK_GREY, (area1_x_start, y), (area2_x_end, y))
-
 
 
 ###################################################################################################
