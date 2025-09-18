@@ -14,7 +14,7 @@ from Skills.demoMode import (
     demo1
 )
 from Modules.algorithm import (
-    getPesananByMeja,
+    # getPesananByMeja,
     drawNumberPad,
     tampilanOrder,
     rotatedImage,
@@ -25,7 +25,7 @@ from Modules.algorithm import (
     drawGrid,
     CheckBox,
     getMeja,
-    aStar,
+    # aStar,
     lerp,
 )
 from Modules.database import (
@@ -57,7 +57,7 @@ from Modules.varGlobals import (
 
 pygame.mixer.init()
 
-varGlobals.IP = '127.0.0.1'
+varGlobals.IP = '192.168.110.15'
 varGlobals.PORT = '8081'
 varGlobals.P = '0'
 varGlobals.I = '0'
@@ -70,7 +70,7 @@ varGlobals.D = '0'
 
 def pencetButton(text):
 
-    data = bytearray(3)
+    # data = bytearray(3)
 
     # PAKSA HURUF KECIL
     text = text.lower()
@@ -320,7 +320,7 @@ def configuration():
                 varGlobals.runConfig = False
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 varGlobals.trueSound.play()
                 click = True
 
@@ -352,7 +352,7 @@ def configuration():
                         mainMenu()
             else:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, border_radius = 20)
-                tts(button, cc.WHITE, rect, varGlobals.screen, 20)
+                tts(button, cc.WHITE, rect, varGlobals.screen, 25)
 
         for key, rect in inputUser.items():
             display_text = key
@@ -369,7 +369,7 @@ def configuration():
                         fillText(key, inputUser, buttons)
             else:
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 3, border_radius = 20)
-                tts(display_text, cc.RED_BROWN, rect, varGlobals.screen, 20)
+                tts(display_text, cc.RED_BROWN, rect, varGlobals.screen, 25)
 
         click = False
         varGlobals.clock.tick(120)
@@ -698,7 +698,7 @@ def eyeUI():
                 distance = (dx ** 2 + dy ** 2) ** 0.5
 
                 if adminSense > 5 and distance < 5:
-                    mainMenu()
+                    staffConfiguration()
 
                 elif dragging:
                     print(distance)
@@ -845,6 +845,8 @@ def staffConfiguration():
     goBack = time.time()
     numpad = {}
     selectedMeja = None
+    selectedMeja1 = None
+    selectedMeja2 = None
     
     # BOOLEAN
     tray1 = False
@@ -885,6 +887,8 @@ def staffConfiguration():
 
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
 
+                goBack = time.time()
+
                 # NUMPAD DALAM MEMILIH MEJA
                 if trayMeja:
                     if numpad:
@@ -892,17 +896,27 @@ def staffConfiguration():
                             if rect.collidepoint(mx, my):
                                 if number.isdigit():
                                     selectedMeja = int(number)
-                                    print(selectedMeja)
                                     
                                     # KODE YANG DIPINDAHKAN
                                     if tray1:
                                         varGlobals.mejaPesanan1 = f'Meja {selectedMeja}'
+                                        selectedMeja1 = selectedMeja
                                         tray1 = False
                                     elif tray2:
                                         varGlobals.mejaPesanan2 = f'Meja {selectedMeja}'
+                                        selectedMeja2 = selectedMeja
                                         tray2 = False
                                     
                                     trayMeja = False
+
+                                    if selectedMeja1 and selectedMeja2:
+                                        varGlobals.runEye = True
+
+                                        data = bytearray(3)
+                                        data[0] = 100
+                                        data[1] = int(selectedMeja1)
+                                        data[2] = int(selectedMeja2)
+                                        send(data)
                                     
                                 elif number == "Back":
                                     trayMeja = False
@@ -926,14 +940,8 @@ def staffConfiguration():
                                 transition(varGlobals.oldSurface, varGlobals.newSurface, direction="right", speed=20)
                                 mainMenu()
 
-            # # Logika scrolling (kalau dipakai di trayMeja)
-            # if trayMeja and event.type == pygame.MOUSEBUTTONDOWN:
-            #     if event.button == 4:
-            #         contentY += 30
-            #         input = time.time()
-            #     elif event.button == 5:
-            #         contentY -= 30
-            #         input = time.time()
+        # if time.time() - goBack > 10:
+        #     eyeUI()
 
         # MENGAMBIL DATA PESANAN (MEJA)
         listOrder = getOrders()
@@ -1052,11 +1060,6 @@ def makeOrder():
                     if button == "List Order":
                         varGlobals.list = not varGlobals.list
                         varGlobals.updateOrder = True
-
-                    elif button == "Add Order":
-                        varGlobals.newSurface.blit(varGlobals.bgOrder, (0, 0))
-                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="up", speed=20)
-                        order()
                     elif button == "Back":
                         varGlobals.newSurface.blit(varGlobals.bgEyes, (0, 0))
                         transition(varGlobals.oldSurface, varGlobals.newSurface, direction="down", speed=20)
@@ -1265,7 +1268,6 @@ def simulation():
     # MENGAMBIL DATA PESANAN (MEJA)
     listOrder = getOrders()
     varGlobals.allMeja = getMeja(listOrder)
-    # print(varGlobals.allMeja)
     varGlobals.updateOrder = False
 
     # BOOLEAN
@@ -1283,31 +1285,31 @@ def simulation():
         "Demo 1" : simButton.DEMO_1
     }
 
-    path = aStar((dataRobot.xpos // 25, dataRobot.ypos // 25), varGlobals.allMeja[1])
+    # path = aStar((dataRobot.xpos // 25, dataRobot.ypos // 25), varGlobals.allMeja[6])
 
-    if path:
-        print("Jalur ditemukan : ", path)
-    else:
-        print("Path tidak ditemukan")
+    # if path:
+    #     print("Jalur ditemukan : ", path)
+    # else:
+    #     print("Path tidak ditemukan")
     
     while varGlobals.runSim:
 
-        if path and path_index < len(path):
-            next_pos_grid = path[path_index]
+        # if path and path_index < len(path):
+        #     next_pos_grid = path[path_index]
 
-            dataRobot.xpos = (next_pos_grid[1] * 50) - 25
-            dataRobot.ypos = (next_pos_grid[0] * 50) - 25
+        #     dataRobot.xpos = (next_pos_grid[1] * 50) - 25
+        #     dataRobot.ypos = (next_pos_grid[0] * 50) - 25
 
-            path_index += 1
+        #     path_index += 1
 
-            pygame.time.wait(500)
+        #     pygame.time.wait(500)
 
         varGlobals.screen.blit(varGlobals.bgSim, (0, 0))
 
         infoRobot = [
-            ("Compass   :   " + str(dataRobot.kompas), (530, 220)),
-            ("X               :   " + str(dataRobot.ypos), (530, 240)),
-            ("Y               :   " + str(dataRobot.xpos), (530, 260))
+            ("Compass   :   " + str(dataRobot.kompas), (500, 220)),
+            ("X                :   " + str(dataRobot.ypos), (500, 240)),
+            ("Y                :   " + str(dataRobot.xpos), (500, 260))
         ]
 
         for event in pygame.event.get():
@@ -1410,7 +1412,7 @@ def simulation():
                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 15)
                 
         for text_line, pos in infoRobot:
-            tts(text_line, cc.BLACK, pygame.Rect(pos[0], pos[1], 10, 10), varGlobals.screen, 15)
+            tts1(text_line, cc.BLACK, pygame.Rect(pos[0], pos[1], 10, 10), varGlobals.screen, 15)
         
         # ROTASI IMAGE
         Xbot = varGlobals.offsetX + (dataRobot.ypos * varGlobals.skala) - 1

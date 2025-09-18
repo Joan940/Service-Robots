@@ -263,21 +263,6 @@ def transition(surfaceOld, surfaceNew, direction="right", speed=20):
 #                                     MENDAPATKAN NOMOR MEJA                                      #
 ###################################################################################################
 
-# def getMeja(orders_list):
-#     unique_meja_numbers = set()
-#     for pesanan_data in orders_list:
-#         meja = pesanan_data[1]
-#         unique_meja_numbers.add(meja)
-    
-#     # Mengonversi set unik menjadi daftar kamus sesuai format yang dibutuhkan
-#     orderStack = []
-#     for meja in unique_meja_numbers:
-#         # Membuat kamus baru dengan hanya kunci 'meja'
-#         order_dict = {'meja': meja}
-#         orderStack.append(order_dict)
-    
-#     return orderStack
-
 def getMeja(orders_list):
 
     # Tambahkan ini di awal skrip Anda
@@ -286,7 +271,7 @@ def getMeja(orders_list):
         2: (3, 3),
         4: (6, 6),
         5: (10, 7),
-        6: (12, 12)
+        6: (12, 1)
     }
 
     # Menggunakan set untuk mendapatkan nomor meja yang unik secara efisien
@@ -309,29 +294,29 @@ def getMeja(orders_list):
 #                                         NUMPAD FOR STAFF                                        #
 ###################################################################################################
 
-def getPesananByMeja(orders_list, nomor_meja):
-    for pesanan_data in orders_list:
-        if isinstance(pesanan_data, dict) and pesanan_data.get('meja') == nomor_meja:
-            return pesanan_data['lines']
+# def getPesananByMeja(orders_list, nomor_meja):
+#     for pesanan_data in orders_list:
+#         if isinstance(pesanan_data, dict) and pesanan_data.get('meja') == nomor_meja:
+#             return pesanan_data['lines']
     
-    return []
+#     return []
 
 
 ###################################################################################################
 #                                    GET NAMA & JUMLAH PESANAN                                    #
 ###################################################################################################
 
-def getNamaJumlahPesanan(orders_list):
-    nama_list = []
-    jumlah_list = []
+# def getNamaJumlahPesanan(orders_list):
+#     nama_list = []
+#     jumlah_list = []
 
-    for meja_data in orders_list:
-        for line in meja_data["lines"]:
-            if line["type"] == "pesanan":
-                nama_list.append(line["nama"])
-                jumlah_list.append(line["jumlah"])
+#     for meja_data in orders_list:
+#         for line in meja_data["lines"]:
+#             if line["type"] == "pesanan":
+#                 nama_list.append(line["nama"])
+#                 jumlah_list.append(line["jumlah"])
 
-    return nama_list, jumlah_list
+#     return nama_list, jumlah_list
 
 
 ###################################################################################################
@@ -477,55 +462,56 @@ class CheckBox:
 #                                          A* ALGORITHM                                           #
 ###################################################################################################
 
-def aStar(start, goal):
+# def aStar(start, goal):
 
-    # DRAW MAP
-    map = np.array([
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ])
+#     # DRAW MAP
+#     map = np.array([
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#     ])
 
-    grid_rows, grid_cols = map.shape
-    open_set = []
-    heapq.heappush(open_set, (0, start))
-    came_from = {}
-    g_score = { (x, y): float('inf') for y in range(grid_rows) for x in range(grid_cols) }
-    g_score[start] = 0
-    f_score = { (x, y): float('inf') for y in range(grid_rows) for x in range(grid_cols) }
-    f_score[start] = heuristic(start, goal)
+#     grid_rows, grid_cols = map.shape
+#     open_set = []
+#     heapq.heappush(open_set, (0, start))
+#     came_from = {}
+#     g_score = { (x, y): float('inf') for y in range(grid_rows) for x in range(grid_cols) }
+#     g_score[start] = 0
+#     f_score = { (x, y): float('inf') for y in range(grid_rows) for x in range(grid_cols) }
+#     f_score[start] = heuristic(start, goal)
 
-    while open_set:
-        current_f, current = heapq.heappop(open_set)
+#     while open_set:
+#         current_f, current = heapq.heappop(open_set)
 
-        if current == goal:
-            path = []
-            while current in came_from:
-                path.append(current)
-                current = came_from[current]
-            path.append(start)
-            return path[::-1]
+#         if current == goal:
+#             path = []
+#             while current in came_from:
+#                 path.append(current)
+#                 current = came_from[current]
+#             path.append(start)
+#             return path[::-1]
 
-        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-            neighbor = (current[0] + dx, current[1] + dy)
+#         for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+#             neighbor = (current[0] + dx, current[1] + dy)
             
-            # Periksa apakah tetangga valid dan bisa dilewati (nilai 1)
-            if 0 <= neighbor[0] < grid_cols and 0 <= neighbor[1] < grid_rows and map[neighbor[1], neighbor[0]] == 1:
-                tentative_g_score = g_score[current] + 1
+#             # Periksa apakah tetangga valid dan bisa dilewati (nilai 1)
+#             if 0 <= neighbor[0] < grid_cols and 0 <= neighbor[1] < grid_rows and map[neighbor[1], neighbor[0]] == 1:
+#                 tentative_g_score = g_score[current] + 1
 
-                if tentative_g_score < g_score.get(neighbor, float('inf')):
-                    came_from[neighbor] = current
-                    g_score[neighbor] = tentative_g_score
-                    f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
-                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
+#                 if tentative_g_score < g_score.get(neighbor, float('inf')):
+#                     came_from[neighbor] = current
+#                     g_score[neighbor] = tentative_g_score
+#                     f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
+#                     heapq.heappush(open_set, (f_score[neighbor], neighbor))
     
-    return None # Tidak ada jalur yang ditemukan
+#     return None # Tidak ada jalur yang ditemukan
