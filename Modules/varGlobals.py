@@ -50,6 +50,8 @@ input = None
 warna = None
 pesanan = None
 temporary = None
+selectedMeja1 = None
+selectedMeja2 = None
 
 # BOOLEAN
 # -- Surface
@@ -201,13 +203,14 @@ arrow = pygame.transform.scale(arrow, (40, 40))
 
 class orderan:
     EXIT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-1.2)),
-        window_rect.centery - (LEBAR_BUTTON * (-3.5)),
-        PANJANG_BUTTON * 3,
-        LEBAR_BUTTON * 1.7
+        window_rect.centerx - (PANJANG_BUTTON * (-3.2)),
+        window_rect.centery - (LEBAR_BUTTON * 7.5),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
     )
 
     # SETIAP TURUN DIKURANGI 1.8
+    # SETIAP KE KANAN DIKURANGI 1.6
     MENU_1 = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * 4.4),
         window_rect.centery - (LEBAR_BUTTON * 4),
@@ -235,6 +238,66 @@ class orderan:
     MENU_5 = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * 4.4),
         window_rect.centery - (LEBAR_BUTTON * (-3.2)),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    MENU_6 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 4.4),
+        window_rect.centery - (LEBAR_BUTTON * (-5)),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    MENU_7 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 2.8),
+        window_rect.centery - (LEBAR_BUTTON * (4)),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    MENU_8 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 2.8),
+        window_rect.centery - (LEBAR_BUTTON * (2.2)),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    MENU_9 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 2.8),
+        window_rect.centery - (LEBAR_BUTTON * (0.4)),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    MENU_10 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 2.8),
+        window_rect.centery - (LEBAR_BUTTON * (-1.4)),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    MENU_11 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 2.8),
+        window_rect.centery - (LEBAR_BUTTON * (-3.2)),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    MENU_12 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 2.8),
+        window_rect.centery - (LEBAR_BUTTON * (-5)),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    MENU_13 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 4.4),
+        window_rect.centery - (LEBAR_BUTTON * (-16.6)),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    MENU_14 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 4.4),
+        window_rect.centery - (LEBAR_BUTTON * (-18.4)),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    MENU_15 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 4.4),
+        window_rect.centery - (LEBAR_BUTTON * (-20.2)),
         PANJANG_BUTTON * 1.5,
         LEBAR_BUTTON * 1.5
     )
@@ -272,13 +335,19 @@ class main_menu:
     )
     SOCKET = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * 0.7),
-        window_rect.centery - (LEBAR_BUTTON * (-1.3)),
+        window_rect.centery - (LEBAR_BUTTON * (-0.4)),
         PANJANG_BUTTON * 2,
         LEBAR_BUTTON * 1.7
     )
     PID = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * 0.7),
-        window_rect.centery - (LEBAR_BUTTON * (-3.1)),
+        window_rect.centery - (LEBAR_BUTTON * (-2.2)),
+        PANJANG_BUTTON * 2,
+        LEBAR_BUTTON * 1.7
+    )
+    STAFF = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 0.7),
+        window_rect.centery - (LEBAR_BUTTON * (-4)),
         PANJANG_BUTTON * 2,
         LEBAR_BUTTON * 1.7
     )
@@ -299,13 +368,13 @@ class simulasi:
 
 class config:
     SAVE_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_SAVE_BUTTON * 1.08),
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * 1.87),
         window_rect.centery - LEBAR_SAVE_BUTTON * (-5.2),
         PANJANG_SAVE_BUTTON * 1,
         LEBAR_SAVE_BUTTON * 1.7
     )
     EXIT_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_SAVE_BUTTON * (-0.07)),
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * (3)),
         window_rect.centery - LEBAR_SAVE_BUTTON * (-5.2),
         PANJANG_SAVE_BUTTON * 1,
         LEBAR_SAVE_BUTTON * 1.7
@@ -313,13 +382,13 @@ class config:
 
     # POSISI INPUT USER
     INP_IP_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_INP_BUTTON),
+        window_rect.centerx - (PANJANG_INP_BUTTON * 2.8),
         window_rect.centery - (LEBAR_INP_BUTTON * 1.2),
         PANJANG_INP_BUTTON * 2,
         LEBAR_INP_BUTTON * 1.7
     )
     INP_PORT_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_INP_BUTTON),
+        window_rect.centerx - (PANJANG_INP_BUTTON * 2.8),
         window_rect.centery - LEBAR_INP_BUTTON * (-2.95),
         PANJANG_INP_BUTTON * 2,
         LEBAR_INP_BUTTON * 1.7
@@ -327,14 +396,14 @@ class config:
 
 class make_order:
     BACK = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-3.75)),
-        window_rect.centery - LEBAR_BUTTON * 7.8,
-        PANJANG_BUTTON,
-        LEBAR_BUTTON * 1.2
+        window_rect.centerx - (PANJANG_BUTTON * (-3.2)),
+        window_rect.centery - (LEBAR_BUTTON * 7.5),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
     )
     LIST_PESANAN = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-1.3)),
-        window_rect.centery - LEBAR_BUTTON * (5.85),
+        window_rect.centerx - (PANJANG_BUTTON * (-0.8)),
+        window_rect.centery - (LEBAR_BUTTON * 1),
         PANJANG_BUTTON * 3,
         LEBAR_BUTTON * 1.7
     )

@@ -6,11 +6,14 @@ import Modules.dataRobot as dataRobot
 import Modules.varGlobals as varGlobals
 
 def runCom():
+    before = varGlobals.udp
     varGlobals.udp = True
 
-    # runThread = threading.Thread(target=send, daemon=True)
-    # runThread.start()
-    print("Masuk thread komunikasi!")
+    if varGlobals.udp != before:
+        print("Masuk thread komunikasi!")
+    
+#     runThread = threading.Thread(target=getUDP, daemon=True)
+#     runThread.start()
 
 
 # ###################################################################################################
@@ -32,7 +35,7 @@ def runCom():
 #     while varGlobals.udp:
 #         try:
 #             data, address = get.recvfrom(1024)
-#             print("Data:", data)
+#             print("Data diterima :", data)
             
 #             if len(data) == 8:
 #                 if data[7] == 1:
@@ -65,7 +68,7 @@ def send(data):
 
     if varGlobals.udp:
         try:
-            kirim.sendto(data, (int(varGlobals.IP), int(varGlobals.PORT)))
+            kirim.sendto(data, (varGlobals.IP, int(varGlobals.PORT)))
             print(f"Data terkirim : {data}")
         except Exception as e:
             print("Pengiriman Gagal : ", e)
