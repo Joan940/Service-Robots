@@ -368,13 +368,13 @@ class simulasi:
 
 class config:
     SAVE_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_SAVE_BUTTON * 1.87),
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * (3)),
         window_rect.centery - LEBAR_SAVE_BUTTON * (-5.2),
         PANJANG_SAVE_BUTTON * 1,
         LEBAR_SAVE_BUTTON * 1.7
     )
     EXIT_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_SAVE_BUTTON * (3)),
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * 1.77),
         window_rect.centery - LEBAR_SAVE_BUTTON * (-5.2),
         PANJANG_SAVE_BUTTON * 1,
         LEBAR_SAVE_BUTTON * 1.7
@@ -388,8 +388,8 @@ class config:
         LEBAR_INP_BUTTON * 1.7
     )
     INP_PORT_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_INP_BUTTON * 2.8),
-        window_rect.centery - LEBAR_INP_BUTTON * (-2.95),
+        window_rect.centerx - (PANJANG_INP_BUTTON * 2.75),
+        window_rect.centery - LEBAR_INP_BUTTON * (-2.9),
         PANJANG_INP_BUTTON * 2,
         LEBAR_INP_BUTTON * 1.7
     )
@@ -448,31 +448,31 @@ class staffConfig:
 
 class PID:
     P = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 4),
+        window_rect.centerx - (PANJANG_BUTTON * 2.7),
         window_rect.centery - (LEBAR_BUTTON),
         PANJANG_BUTTON * 2,
-        LEBAR_BUTTON
+        LEBAR_BUTTON * 1.2
     )
     I = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 1),
-        window_rect.centery - (LEBAR_BUTTON),
+        window_rect.centerx - (PANJANG_BUTTON * 2.7),
+        window_rect.centery - (LEBAR_BUTTON * (-0.5)),
         PANJANG_BUTTON * 2,
-        LEBAR_BUTTON
+        LEBAR_BUTTON * 1.2
     )
     D = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * (-2)),
-        window_rect.centery - (LEBAR_BUTTON),
+        window_rect.centerx - (PANJANG_BUTTON * 2.7),
+        window_rect.centery - (LEBAR_BUTTON * (-2)),
         PANJANG_BUTTON * 2,
-        LEBAR_BUTTON
+        LEBAR_BUTTON * 1.2
     )
     SAVE_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_SAVE_BUTTON * 1.08),
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * 2.9),
         window_rect.centery - LEBAR_SAVE_BUTTON * (-5.2),
         PANJANG_SAVE_BUTTON * 1,
         LEBAR_SAVE_BUTTON * 1.7
     )
     EXIT_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_SAVE_BUTTON * (-0.07)),
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * (1.75)),
         window_rect.centery - LEBAR_SAVE_BUTTON * (-5.2),
         PANJANG_SAVE_BUTTON * 1,
         LEBAR_SAVE_BUTTON * 1.7

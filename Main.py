@@ -23,7 +23,6 @@ from Modules.algorithm import (
     transition,
     easeInOut,
     drawGrid,
-    CheckBox,
     getMeja,
     lerp,
 )
@@ -35,17 +34,17 @@ from Modules.database import (
 )
 from Modules.colors import (
     custom as cc,
-    tts,
     tts1,
-    tts2
+    tts2,
+    tts,
 )
 from Modules.varGlobals import (
+    staffConfig as scButton,
+    make_order as moButton,
     orderan as orderButton,
     main_menu as mmButton,
     simulasi as simButton,
     config as confButton,
-    make_order as moButton,
-    staffConfig as scButton,
     PID as pidButton
 )
 
@@ -56,11 +55,11 @@ from Modules.varGlobals import (
 
 pygame.mixer.init()
 
-varGlobals.IP = '192.168.110.15'
+varGlobals.IP   = '192.168.110.15'
 varGlobals.PORT = '8081'
-varGlobals.P = '0'
-varGlobals.I = '0'
-varGlobals.D = '0'
+varGlobals.P    = '0'
+varGlobals.I    = '0'
+varGlobals.D    = '0'
 
 
 ###################################################################################################
@@ -272,12 +271,12 @@ def pidConfig():
 
     # BOOLEAN
     click = False
-    varGlobals.runPID = True
-    varGlobals.runEye = False
-    varGlobals.runSim = False
-    varGlobals.runMenu = False
-    varGlobals.runOrder = False
-    varGlobals.runConfig = False
+    varGlobals.runPID       = True
+    varGlobals.runEye       = False
+    varGlobals.runSim       = False
+    varGlobals.runMenu      = False
+    varGlobals.runOrder     = False
+    varGlobals.runConfig    = False
     varGlobals.runMakeOrder = False
 
     buttons = {
@@ -363,11 +362,11 @@ def configuration():
 
     # BOOLEAN
     click = False
-    varGlobals.runEye = False
-    varGlobals.runSim = False
-    varGlobals.runMenu = False
-    varGlobals.runOrder = False
-    varGlobals.runConfig = True
+    varGlobals.runEye       = False
+    varGlobals.runSim       = False
+    varGlobals.runMenu      = False
+    varGlobals.runOrder     = False
+    varGlobals.runConfig    = True
     varGlobals.runMakeOrder = False
 
     buttons = {
@@ -376,7 +375,7 @@ def configuration():
     }
     
     inputUser = {
-        "IP" : confButton.INP_IP_RECT,
+        "IP"   : confButton.INP_IP_RECT,
         "PORT" : confButton.INP_PORT_RECT
     }
 
@@ -460,28 +459,28 @@ def order():
 
     # BOOLEAN
     click = False
-    varGlobals.runPID = False
-    varGlobals.runEye = False
-    varGlobals.runSim = False
-    varGlobals.runMenu = False
-    varGlobals.runOrder = True
-    varGlobals.runConfig = False
+    varGlobals.runPID       = False
+    varGlobals.runEye       = False
+    varGlobals.runSim       = False
+    varGlobals.runMenu      = False
+    varGlobals.runOrder     = True
+    varGlobals.runConfig    = False
     varGlobals.runMakeOrder = False
 
     buttons = {
-        "Back": orderButton.EXIT
+        "Back" : orderButton.EXIT
     }
 
     menu = {
-        "Menu 1": orderButton.MENU_1,
-        "Menu 2": orderButton.MENU_2,
-        "Menu 3": orderButton.MENU_3,
-        "Menu 4": orderButton.MENU_4,
-        "Menu 5": orderButton.MENU_5,
-        "Menu 6": orderButton.MENU_6,
-        "Menu 7": orderButton.MENU_7,
-        "Menu 8": orderButton.MENU_8,
-        "Menu 9": orderButton.MENU_9,
+        "Menu 1" : orderButton.MENU_1,
+        "Menu 2" : orderButton.MENU_2,
+        "Menu 3" : orderButton.MENU_3,
+        "Menu 4" : orderButton.MENU_4,
+        "Menu 5" : orderButton.MENU_5,
+        "Menu 6" : orderButton.MENU_6,
+        "Menu 7" : orderButton.MENU_7,
+        "Menu 8" : orderButton.MENU_8,
+        "Menu 9" : orderButton.MENU_9,
         "Menu 10": orderButton.MENU_10,
         "Menu 11": orderButton.MENU_11,
         "Menu 12": orderButton.MENU_12,
@@ -499,7 +498,7 @@ def order():
         
         # DEKLARASI POP UP
         popupPesanan = pygame.Rect(varGlobals.popupX, varGlobals.popupY, varGlobals.lebarPopup + 20, varGlobals.tinggiPopup)
-        numPad = pygame.Rect(popupPesanan.width + 10, varGlobals.popupY, 450, varGlobals.tinggiPopup)
+        numPad       = pygame.Rect(popupPesanan.width + 10, varGlobals.popupY, 450, varGlobals.tinggiPopup)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -514,10 +513,10 @@ def order():
 
                     # POP UP HILANG JIKA DIKLIK DI LUAR BUTTON
                     if not popupPesanan.collidepoint(mx, my) and not numPad.collidepoint(mx, my):
-                        varGlobals.pesanan = None
-                        varGlobals.input = None
+                        varGlobals.pesanan   = None
+                        varGlobals.input     = None
                         varGlobals.nomorMeja = ""
-                        varGlobals.jumlah = ""
+                        varGlobals.jumlah    = ""
                     else:
 
                         # LOGIKA POP UP
@@ -530,11 +529,11 @@ def order():
                                 addOrders(varGlobals.nomorMeja, varGlobals.antrian, varGlobals.pesanan, varGlobals.jumlah)
                                 
                                 # RESET
-                                varGlobals.pesanan = None
+                                varGlobals.pesanan   = None
                                 varGlobals.nomorMeja = ""
-                                varGlobals.jumlah = ""
-                                varGlobals.antrian += 1
-                                varGlobals.input = None
+                                varGlobals.jumlah    = ""
+                                varGlobals.antrian  += 1
+                                varGlobals.input     = None
 
                                 # RESET NUMPAD
                                 number_pad_buttons = {}
@@ -565,10 +564,10 @@ def order():
                 else:
                     for menu_item, rect in menu.items():
                         if rect.collidepoint(mx, my):
-                            varGlobals.pesanan = menu_item
-                            varGlobals.input = "table"
+                            varGlobals.pesanan   = menu_item
+                            varGlobals.input     = "table"
                             varGlobals.nomorMeja = ""
-                            varGlobals.jumlah = ""
+                            varGlobals.jumlah    = ""
 
                     for menu_item, rect in buttons.items():
                         if rect.collidepoint(mx, my):
@@ -607,11 +606,11 @@ def order():
                             addOrders(varGlobals.nomorMeja, varGlobals.antrian, varGlobals.pesanan, varGlobals.jumlah)
                             
                             # RESET
-                            varGlobals.pesanan = None
+                            varGlobals.pesanan   = None
                             varGlobals.nomorMeja = ""
-                            varGlobals.jumlah = ""
-                            varGlobals.antrian += 1
-                            varGlobals.input = None
+                            varGlobals.jumlah    = ""
+                            varGlobals.antrian  += 1
+                            varGlobals.input     = None
                         else:
                             print("Nomor meja dan jumlah harus diisi!")
                             varGlobals.falseSound.play()
@@ -639,11 +638,11 @@ def order():
         if varGlobals.pesanan:
 
             boxNomorMeja = pygame.Rect(varGlobals.popupX + 10, varGlobals.popupY + 61, varGlobals.lebarPopup - 2 * 10, 50)
-            boxJumlah = pygame.Rect(varGlobals.popupX + 10, varGlobals.popupY + 116, varGlobals.lebarPopup - 2 * 10, 50)
-            boxConfirm = pygame.Rect(varGlobals.popupX + 10, varGlobals.popupY + 171, varGlobals.lebarPopup - 2 * 10, 50)
+            boxJumlah    = pygame.Rect(varGlobals.popupX + 10, varGlobals.popupY + 116, varGlobals.lebarPopup - 2 * 10, 50)
+            boxConfirm   = pygame.Rect(varGlobals.popupX + 10, varGlobals.popupY + 171, varGlobals.lebarPopup - 2 * 10, 50)
             
             boxPenghalang = pygame.Rect(0, 0, varGlobals.res[0], varGlobals.res[1])
-            overlay = pygame.Surface((boxPenghalang.width, boxPenghalang.height), pygame.SRCALPHA)
+            overlay       = pygame.Surface((boxPenghalang.width, boxPenghalang.height), pygame.SRCALPHA)
 
             pygame.draw.rect(overlay, (0, 0, 0, 100), overlay.get_rect())
             varGlobals.screen.blit(overlay, (0, 0))
@@ -676,14 +675,14 @@ def order():
             
             # JUDUL UNTUK KOTAK POP UP BESAR
             textJudul = varGlobals.font.render(f"Order {varGlobals.pesanan}", True, cc.BLACK)
-            textPos = textJudul.get_rect(centerx = kotakPopup.centerx, top = varGlobals.popupY + 10)
+            textPos   = textJudul.get_rect(centerx = kotakPopup.centerx, top = varGlobals.popupY + 10)
             varGlobals.screen.blit(textJudul, textPos)
 
             # TEXT PADA INPUTAN DAN WARNANYA
-            textMeja = f"Meja     :   {varGlobals.nomorMeja}"
+            textMeja   = f"Meja     :   {varGlobals.nomorMeja}"
             textJumlah = f"Jumlah  :   {varGlobals.jumlah}"
-            ccMeja = font.render(textMeja, True, cc.BLACK)
-            ccJumlah = font.render(textJumlah, True, cc.BLACK)
+            ccMeja     = font.render(textMeja, True, cc.BLACK)
+            ccJumlah   = font.render(textJumlah, True, cc.BLACK)
 
             varGlobals.screen.blit(ccMeja, (boxNomorMeja.x + 10, boxNomorMeja.y + 13))
             varGlobals.screen.blit(ccJumlah, (boxJumlah.x + 10, boxJumlah.y + 13))
@@ -702,15 +701,15 @@ def order():
 def eyeUI():
 
     # RESET
-    wait = None
-    endPos = None
-    startPos = None
+    wait                  = None
+    endPos                = None
+    startPos              = None
     varGlobals.oldSurface = None
     varGlobals.newSurface = None
 
     # LOCAL VARIABLE
     blink_interval = random.uniform(3, 6)
-    blinkDuration = 0.5
+    blinkDuration  = 0.5
     blinkStartTime = 0
 
     # VARIABEL BARU UNTUK RANDOM EKSPRESI
@@ -718,32 +717,32 @@ def eyeUI():
     expressionInterval = random.uniform(5, 10)
 
     varGlobals.isLookingRight = False
-    varGlobals.isLookingLeft = False
+    varGlobals.isLookingLeft  = False
 
     newExpressTime = 0
-    threshold = 10
-    distance = 0
-    duration = 5
+    threshold      = 10
+    distance       = 0
+    duration       = 5
 
-    lastBlinkTime = time.time()
+    lastBlinkTime  = time.time()
     new_expression = varGlobals.ANIMATIONS['buka'].copy()
 
     # BOOLEAN
-    dragging = False
-    varGlobals.list = False
-    varGlobals.runEye = True
-    varGlobals.runPID = False
-    varGlobals.runSim = False
-    varGlobals.runMenu = False
-    varGlobals.runOrder = False
-    varGlobals.runConfig = False
-    varGlobals.isBlinking = False
-    varGlobals.updateOrder = True
-    varGlobals.mouseActive = False
-    varGlobals.runMakeOrder = False
+    dragging                 = False
+    varGlobals.list          = False
+    varGlobals.runEye        = True
+    varGlobals.runPID        = False
+    varGlobals.runSim        = False
+    varGlobals.runMenu       = False
+    varGlobals.runOrder      = False
+    varGlobals.runConfig     = False
+    varGlobals.isBlinking    = False
+    varGlobals.updateOrder   = True
+    varGlobals.mouseActive   = False
+    varGlobals.runMakeOrder  = False
     varGlobals.newExpression = False
 
-    varGlobals.startTransisi = time.time()
+    varGlobals.startTransisi   = time.time()
     varGlobals.startProperties = varGlobals.SET_AWAL.copy()
     varGlobals.targetPropertis = varGlobals.SET_AWAL.copy()
 
@@ -784,13 +783,13 @@ def eyeUI():
                 dragging = False
 
         # UPDATE POSISI MENGIKUTI MOUSE
-        mx, my = pygame.mouse.get_pos()
-        center_x = varGlobals.res[0] // 2
-        center_y = varGlobals.res[1] // 2
+        mx, my     = pygame.mouse.get_pos()
+        center_x   = varGlobals.res[0] // 2
+        center_y   = varGlobals.res[1] // 2
         max_offset = 30
 
         mouse_offset_x = max(-max_offset, min(max_offset, (mx - center_x) / 5))
-        mouse_offsetY = max(-max_offset, min(max_offset, (my - center_y) / 5))
+        mouse_offsetY  = max(-max_offset, min(max_offset, (my - center_y) / 5))
 
         new_expression['eyeOffsetX'] = mouse_offset_x
         new_expression['eyeOffsetY'] = mouse_offsetY
@@ -801,19 +800,19 @@ def eyeUI():
         # RANDOM BLINK
         if time.time() - lastBlinkTime > blink_interval and not varGlobals.isBlinking:
             varGlobals.isBlinking = True
-            blinkStartTime = time.time()
-            new_expression = varGlobals.ANIMATIONS['kedip'].copy()
+            blinkStartTime        = time.time()
+            new_expression        = varGlobals.ANIMATIONS['kedip'].copy()
             
-            lastBlinkTime = time.time()
+            lastBlinkTime  = time.time()
             blink_interval = random.uniform(3, 6)
 
         if varGlobals.isBlinking and time.time() - blinkStartTime > blinkDuration:
             varGlobals.isBlinking = False
-            new_expression = varGlobals.ANIMATIONS['buka'].copy()
+            new_expression        = varGlobals.ANIMATIONS['buka'].copy()
 
         # RANDOM EKSPRESI SETIAP BEBERAPA DETIK
         if time.time() - lastExpressionTime > expressionInterval:
-            pilihan = random.choice(['terkejut', 'sedih', 'marah'])
+            pilihan        = random.choice(['terkejut', 'sedih', 'marah'])
             new_expression = varGlobals.ANIMATIONS[pilihan].copy()
 
             lastExpressionTime = time.time()
@@ -822,18 +821,18 @@ def eyeUI():
         # RESET KE NORMAL SETELAH DURASI
         if varGlobals.newExpression and time.time() - newExpressTime > duration:
             varGlobals.newExpression = False
-            new_expression = varGlobals.ANIMATIONS['buka'].copy()
+            new_expression           = varGlobals.ANIMATIONS['buka'].copy()
 
         # UPDATE KE EKSPRESI BARU
         if new_expression != varGlobals.targetPropertis:
             varGlobals.startProperties = varGlobals.SET_AWAL.copy()
             varGlobals.targetPropertis = new_expression.copy()
-            varGlobals.startTransisi = time.time()
+            varGlobals.startTransisi   = time.time()
 
         # MENGGUNAKAN RUMUS AGAR LEBIH HALUS
         elapsed = time.time() - varGlobals.startTransisi
-        t = min(elapsed / varGlobals.durasiTransisi, 1.0)
-        tEased = easeInOut(t)
+        t       = min(elapsed / varGlobals.durasiTransisi, 1.0)
+        tEased  = easeInOut(t)
 
         for key in varGlobals.targetPropertis:
             varGlobals.SET_AWAL[key] = lerp(
@@ -845,61 +844,61 @@ def eyeUI():
         varGlobals.screen.blit(varGlobals.bgEyes, (0, 0))
 
         # UPDATE PROPERTI
-        tinggiMata = int(varGlobals.SET_AWAL['eyeHeight'])
+        tinggiMata     = int(varGlobals.SET_AWAL['eyeHeight'])
         eyeOffsetX_val = varGlobals.SET_AWAL['eyeOffsetX']
         eyeOffsetY_val = varGlobals.SET_AWAL['eyeOffsetY']
         
-        eyeLeftX = varGlobals.eyeLeftX + eyeOffsetX_val
+        eyeLeftX  = varGlobals.eyeLeftX + eyeOffsetX_val
         eyeRightX = varGlobals.eyeRightX + eyeOffsetX_val
-        eyePosY = varGlobals.eyePosY + eyeOffsetY_val
+        eyePosY   = varGlobals.eyePosY + eyeOffsetY_val
 
-        eyeLeft = pygame.Rect(eyeLeftX, eyePosY, varGlobals.lebarMata, tinggiMata)
+        eyeLeft  = pygame.Rect(eyeLeftX, eyePosY, varGlobals.lebarMata, tinggiMata)
         eyeRight = pygame.Rect(eyeRightX, eyePosY, varGlobals.lebarMata, tinggiMata)
 
         pygame.draw.rect(varGlobals.screen, cc.BLACK, eyeLeft, border_radius=60)
         pygame.draw.rect(varGlobals.screen, cc.BLACK, eyeRight, border_radius=60)
 
-        mouthY_val = varGlobals.SET_AWAL.get('mouthY', 0)
-        mouthWidth_val = varGlobals.SET_AWAL.get('mouthWidth', 0)
+        mouthY_val      = varGlobals.SET_AWAL.get('mouthY', 0)
+        mouthWidth_val  = varGlobals.SET_AWAL.get('mouthWidth', 0)
         mouthHeight_val = varGlobals.SET_AWAL.get('mouthHeight', 0)
-        mouthAngle_val = varGlobals.SET_AWAL.get('mouthAngle', 0)
+        mouthAngle_val  = varGlobals.SET_AWAL.get('mouthAngle', 0)
 
         # Gambar mulut jika propertinya tidak nol
         if mouthWidth_val > 0 and mouthHeight_val > 0:
             mouth_pos_y = varGlobals.res[1] // 2 + mouthY_val
-            mouth_rect = pygame.Rect(varGlobals.res[0] // 2 - (mouthWidth_val // 2), mouth_pos_y, mouthWidth_val, mouthHeight_val)
+            mouth_rect  = pygame.Rect(varGlobals.res[0] // 2 - (mouthWidth_val // 2), mouth_pos_y, mouthWidth_val, mouthHeight_val)
             
             if mouthAngle_val == 0:
                 start_angle = 3.14 * 0.01
-                end_angle = 0
+                end_angle   = 0
             elif mouthAngle_val == 1:
                 start_angle = 3.14
-                end_angle = 0
+                end_angle   = 0
             else:
                 start_angle = 0
-                end_angle = math.pi
+                end_angle   = math.pi
                 
             pygame.draw.arc(varGlobals.screen, cc.BLACK, mouth_rect, start_angle, end_angle, 10)
 
         # pygame.draw.aaline(varGlobals.screen, cc.RED, (varGlobals.res[0] // 2, 0), (varGlobals.res[0] // 2, varGlobals.res[1]), 2)
 
         # MENGGAMBAR ALIS
-        eyebrowOffset_leftY = varGlobals.SET_AWAL['eyebrowOffset_leftY']
+        eyebrowOffset_leftY  = varGlobals.SET_AWAL['eyebrowOffset_leftY']
         eyebrowOffset_rightY = varGlobals.SET_AWAL['eyebrowOffset_rightY']
-        eyebrowAngle_left = varGlobals.SET_AWAL['eyebrowAngle_right']
-        eyebrowAngle_right = varGlobals.SET_AWAL['eyebrowAngle_left']
+        eyebrowAngle_left    = varGlobals.SET_AWAL['eyebrowAngle_right']
+        eyebrowAngle_right   = varGlobals.SET_AWAL['eyebrowAngle_left']
         
-        eyebrow_start_left = (varGlobals.eyeLeftX - 20, varGlobals.eyePosY - 40 + eyebrowOffset_leftY)
-        eyebrow_end_left = (varGlobals.eyeLeftX + varGlobals.lebarMata + 15, varGlobals.eyePosY - 40 + eyebrowOffset_leftY)
+        eyebrow_start_left  = (varGlobals.eyeLeftX - 20, varGlobals.eyePosY - 40 + eyebrowOffset_leftY)
+        eyebrow_end_left    = (varGlobals.eyeLeftX + varGlobals.lebarMata + 15, varGlobals.eyePosY - 40 + eyebrowOffset_leftY)
         eyebrow_start_right = (varGlobals.eyeRightX - 20, varGlobals.eyePosY - 40 + eyebrowOffset_rightY)
-        eyebrow_end_right = (varGlobals.eyeRightX + varGlobals.lebarMata + 15, varGlobals.eyePosY - 40 + eyebrowOffset_rightY)
+        eyebrow_end_right   = (varGlobals.eyeRightX + varGlobals.lebarMata + 15, varGlobals.eyePosY - 40 + eyebrowOffset_rightY)
 
         rotated_start_left = rotatePoint(eyebrow_start_left, eyeLeft.center, eyebrowAngle_left)
-        rotated_end_left = rotatePoint(eyebrow_end_left, eyeLeft.center, eyebrowAngle_left)
+        rotated_end_left   = rotatePoint(eyebrow_end_left, eyeLeft.center, eyebrowAngle_left)
         pygame.draw.line(varGlobals.screen, cc.BLACK, rotated_start_left, rotated_end_left, 10)
 
         rotated_start_right = rotatePoint(eyebrow_start_right, eyeRight.center, eyebrowAngle_right)
-        rotated_end_right = rotatePoint(eyebrow_end_right, eyeRight.center, eyebrowAngle_right)
+        rotated_end_right   = rotatePoint(eyebrow_end_right, eyeRight.center, eyebrowAngle_right)
         pygame.draw.line(varGlobals.screen, cc.BLACK, rotated_start_right, rotated_end_right, 10)
 
         varGlobals.clock.tick(60)
@@ -913,24 +912,24 @@ def eyeUI():
 def staffConfiguration():
 
     # RESET
-    goBack = time.time()
-    numpad = {}
-    selectedMeja = None
+    goBack                   = time.time()
+    numpad                   = {}
+    selectedMeja             = None
     varGlobals.selectedMeja1 = None
     varGlobals.selectedMeja2 = None
     
     # BOOLEAN
-    tray1 = False
-    tray2 = False
-    trayMeja = False
-    varGlobals.runPID = False
-    varGlobals.runSim = False
-    varGlobals.runEye = False
-    varGlobals.runStaff = True
-    varGlobals.runMenu = False
-    varGlobals.runOrder = False
-    varGlobals.runConfig = False
-    varGlobals.runMakeOrder = False
+    tray1                    = False
+    tray2                    = False
+    trayMeja                 = False
+    varGlobals.runPID        = False
+    varGlobals.runSim        = False
+    varGlobals.runEye        = False
+    varGlobals.runStaff      = True
+    varGlobals.runMenu       = False
+    varGlobals.runOrder      = False
+    varGlobals.runConfig     = False
+    varGlobals.runMakeOrder  = False
     
     while varGlobals.runStaff:
 
@@ -970,13 +969,13 @@ def staffConfiguration():
                                     
                                     # KODE YANG DIPINDAHKAN
                                     if tray1:
-                                        varGlobals.mejaPesanan1 = f'Meja {selectedMeja}'
+                                        varGlobals.mejaPesanan1  = f'Meja {selectedMeja}'
                                         varGlobals.selectedMeja1 = selectedMeja
-                                        tray1 = False
+                                        tray1                    = False
                                     elif tray2:
-                                        varGlobals.mejaPesanan2 = f'Meja {selectedMeja}'
+                                        varGlobals.mejaPesanan2  = f'Meja {selectedMeja}'
                                         varGlobals.selectedMeja2 = selectedMeja
-                                        tray2 = False
+                                        tray2                    = False
                                     
                                     trayMeja = False
 
@@ -987,7 +986,7 @@ def staffConfiguration():
                                         # data[2] = int(selectedMeja2)
                                         # send(data)
 
-                                        varGlobals.runEye = True
+                                        varGlobals.runEye   = True
                                         varGlobals.runStaff = False
                                         return varGlobals.selectedMeja1, varGlobals.selectedMeja2
                                     
@@ -1002,12 +1001,12 @@ def staffConfiguration():
                         if rect.collidepoint(mx, my):
                             if button == varGlobals.mejaPesanan1:
                                 trayMeja = True
-                                tray1 = True
-                                tray2 = False
+                                tray1    = True
+                                tray2    = False
                             elif button == varGlobals.mejaPesanan2:
                                 trayMeja = True
-                                tray2 = True
-                                tray1 = False
+                                tray2    = True
+                                tray1    = False
                             elif button == "Back":
                                 varGlobals.newSurface.blit(varGlobals.bgMenu, (0, 0))
                                 transition(varGlobals.oldSurface, varGlobals.newSurface, direction="right", speed=20)
@@ -1017,8 +1016,8 @@ def staffConfiguration():
         #     eyeUI()
 
         # MENGAMBIL DATA PESANAN (MEJA)
-        listOrder = getOrders()
-        varGlobals.allMeja = getMeja(listOrder)
+        listOrder              = getOrders()
+        varGlobals.allMeja     = getMeja(listOrder)
         varGlobals.updateOrder = False
 
         # MENGGAMBAR OPSI TRAY (1 ATAU 2)
@@ -1061,27 +1060,27 @@ def makeOrder():
     varGlobals.newSurface = None
 
     # VARIABLE LOCAL
-    contentY = 0
+    contentY   = 0
     lastAction = time.time()
 
     # SCROLL DENGAN DRAG MOUSE
-    scrolling = False
+    scrolling    = False
     last_mouse_y = 0
 
     # BOOLEAN
     click = False
-    varGlobals.list = False
-    varGlobals.runPID = False
-    varGlobals.runEye = False
-    varGlobals.runSim = False
-    varGlobals.runMenu = False
-    varGlobals.runOrder = False
-    varGlobals.runConfig = False
-    varGlobals.updateOrder = True
+    varGlobals.list         = False
+    varGlobals.runPID       = False
+    varGlobals.runEye       = False
+    varGlobals.runSim       = False
+    varGlobals.runMenu      = False
+    varGlobals.runOrder     = False
+    varGlobals.runConfig    = False
+    varGlobals.updateOrder  = True
     varGlobals.runMakeOrder = True
 
     buttons = {
-        "Back": moButton.BACK,
+        "Back"      : moButton.BACK,
         "List Order": moButton.LIST_PESANAN
     }
 
@@ -1099,8 +1098,8 @@ def makeOrder():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 varGlobals.trueSound.play()
                 lastAction = time.time()
-                scrolling = False
-                click = True
+                scrolling  = False
+                click      = True
                 
             # --- LOGIKA SCROLLING ---
             if varGlobals.list:
@@ -1116,13 +1115,13 @@ def makeOrder():
                 popupRect = pygame.Rect(65, 110, 400, 460)
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if popupRect.collidepoint(event.pos):
-                        scrolling = True
+                        scrolling    = True
                         last_mouse_y = event.pos[1]
 
                 if event.type == pygame.MOUSEMOTION and scrolling:
                     current_mouse_y = event.pos[1]
-                    mouse_dy = current_mouse_y - last_mouse_y
-                    last_mouse_y = current_mouse_y
+                    mouse_dy        = current_mouse_y - last_mouse_y
+                    last_mouse_y    = current_mouse_y
 
         # CEK TIMEOUT
         if time.time() - lastAction >= 15:
@@ -1130,8 +1129,8 @@ def makeOrder():
             lastAction = time.time()
 
         if varGlobals.updateOrder:
-            listOrder = getOrders()
-            varGlobals.allOrders = tampilanOrder(listOrder)
+            listOrder              = getOrders()
+            varGlobals.allOrders   = tampilanOrder(listOrder)
             varGlobals.updateOrder = False
 
         varGlobals.screen.blit(varGlobals.bgMakeOrder, (0, 0))
@@ -1167,17 +1166,17 @@ def makeOrder():
             pygame.draw.rect(varGlobals.screen, cc.BLACK, popupRect, 3, border_radius=20)
             
             total_content_height = sum(group['height'] + 30 for group in varGlobals.allOrders)
-            maxScroll = max(0, total_content_height - popupRect.height)
-            contentY = max(-maxScroll, min(10, contentY))
+            maxScroll            = max(0, total_content_height - popupRect.height)
+            contentY             = max(-maxScroll, min(10, contentY))
 
             clipping_rect = pygame.Rect(popupRect.x, popupRect.y + 10, popupRect.width, popupRect.height - 20)
             varGlobals.screen.set_clip(clipping_rect)
             
             currentY = 0
             for group in varGlobals.allOrders:
-                yPosOffset = currentY + contentY + popupRect.y
-                mejaLine = group['lines'][0]
-                xPos = mejaLine['rect'].x - 45
+                yPosOffset    = currentY + contentY + popupRect.y
+                mejaLine      = group['lines'][0]
+                xPos          = mejaLine['rect'].x - 45
                 tinggiDinamis = group['height'] - 30
                 
                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (xPos, yPosOffset, 380, tinggiDinamis), 3, border_radius=20)
@@ -1211,32 +1210,32 @@ def mainMenu():
     popUp = False
 
     # BOOLEAN
-    click = False
-    varGlobals.runPID = False
-    varGlobals.runEye = False
-    varGlobals.runSim = False
-    varGlobals.runMenu = True
-    varGlobals.runOrder = False
-    varGlobals.runConfig = False
+    click                   = False
+    varGlobals.runPID       = False
+    varGlobals.runEye       = False
+    varGlobals.runSim       = False
+    varGlobals.runMenu      = True
+    varGlobals.runOrder     = False
+    varGlobals.runConfig    = False
     varGlobals.runMakeOrder = False
     
     # BUTTON
     buttons = {
-        "Run" : mmButton.RUN,
-        "Simulation" : mmButton.SIMULATION,
+        "Run"           : mmButton.RUN,
+        "Simulation"    : mmButton.SIMULATION,
         "Configuration" : mmButton.CONFIGURATION,
-        "Exit" : mmButton.EXIT,
+        "Exit"          : mmButton.EXIT,
     }
 
     pilihan = {
-        "Configuration" : mmButton.SOCKET,
-        "PID Configuration" : mmButton.PID,
-        "Staff Configuration" : mmButton.STAFF
+        "Configuration"         : mmButton.SOCKET,
+        "PID Configuration"     : mmButton.PID,
+        "Staff Configuration"   : mmButton.STAFF
     }
 
     # STATUS
     status = {
-        varGlobals.conServiceBot : mmButton.STATUS
+        varGlobals.conServiceBot: mmButton.STATUS
     }
 
     while varGlobals.runMenu:
@@ -1286,7 +1285,6 @@ def mainMenu():
                         simulation()
 
                     elif button == "Configuration":
-                        runCom()
                         popUp = True
 
                     elif button == "Exit":
@@ -1349,22 +1347,22 @@ def simulation():
     path_index = 0
 
     # MENGAMBIL DATA PESANAN (MEJA)
-    listOrder = getOrders()
-    varGlobals.allMeja = getMeja(listOrder)
+    listOrder              = getOrders()
+    varGlobals.allMeja     = getMeja(listOrder)
     varGlobals.updateOrder = False
 
     # BOOLEAN
-    click = False
-    varGlobals.runSim = True
-    varGlobals.runPID = False
-    varGlobals.runEye = False
-    varGlobals.runMenu = False
-    varGlobals.runOrder = False
-    varGlobals.runConfig = False
+    click                   = False
+    varGlobals.runSim       = True
+    varGlobals.runPID       = False
+    varGlobals.runEye       = False
+    varGlobals.runMenu      = False
+    varGlobals.runOrder     = False
+    varGlobals.runConfig    = False
     varGlobals.runMakeOrder = False
 
     buttons = {
-        "Back" : simButton.BACK,
+        "Back"   : simButton.BACK,
         "Demo 1" : simButton.DEMO_1
     }
 
@@ -1422,11 +1420,11 @@ def simulation():
             if event.type == pygame.KEYDOWN:
                 if event.key in varGlobals.keys_pressed:
                     varGlobals.keys_pressed[event.key] = True
-                    varGlobals.notAutonomus = True
+                    varGlobals.notAutonomus            = True
             elif event.type == pygame.KEYUP:
                 if event.key in varGlobals.keys_pressed:
                     varGlobals.keys_pressed[event.key] = False
-                    varGlobals.notAutonomus = False
+                    varGlobals.notAutonomus            = False
 
         # MENGIRIM DATA PRESS ARROW 
         data = bytearray(2)
@@ -1506,6 +1504,11 @@ def simulation():
         click = False
         pygame.display.flip()
         varGlobals.clock.tick(60)
+
+
+###################################################################################################
+#                                           PROGRAM MAIN                                          #
+###################################################################################################
 
 # reset_database()
 mainMenu()
