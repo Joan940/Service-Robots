@@ -542,56 +542,56 @@ def numpadConfig(screen, popup_x, popup_y, outline):
 #                                          A* ALGORITHM                                           #
 ###################################################################################################
 
-# def aStar(start, goal):
+def aStar(start, goal):
 
-#     # DRAW MAP
-#     map = np.array([
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#     ])
+    # DRAW MAP
+    map = np.array([
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ])
 
-#     grid_rows, grid_cols = map.shape
-#     open_set = []
-#     heapq.heappush(open_set, (0, start))
-#     came_from = {}
-#     g_score = { (x, y): float('inf') for y in range(grid_rows) for x in range(grid_cols) }
-#     g_score[start] = 0
-#     f_score = { (x, y): float('inf') for y in range(grid_rows) for x in range(grid_cols) }
-#     f_score[start] = heuristic(start, goal)
+    grid_rows, grid_cols = map.shape
+    open_set = []
+    heapq.heappush(open_set, (0, start))
+    came_from = {}
+    g_score = { (x, y): float('inf') for y in range(grid_rows) for x in range(grid_cols) }
+    g_score[start] = 0
+    f_score = { (x, y): float('inf') for y in range(grid_rows) for x in range(grid_cols) }
+    f_score[start] = heuristic(start, goal)
 
-#     while open_set:
-#         current_f, current = heapq.heappop(open_set)
+    while open_set:
+        current_f, current = heapq.heappop(open_set)
 
-#         if current == goal:
-#             path = []
-#             while current in came_from:
-#                 path.append(current)
-#                 current = came_from[current]
-#             path.append(start)
-#             return path[::-1]
+        if current == goal:
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            return path[::-1]
 
-#         for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-#             neighbor = (current[0] + dx, current[1] + dy)
+        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            neighbor = (current[0] + dx, current[1] + dy)
             
-#             # Periksa apakah tetangga valid dan bisa dilewati (nilai 1)
-#             if 0 <= neighbor[0] < grid_cols and 0 <= neighbor[1] < grid_rows and map[neighbor[1], neighbor[0]] == 1:
-#                 tentative_g_score = g_score[current] + 1
+            # Periksa apakah tetangga valid dan bisa dilewati (nilai 1)
+            if 0 <= neighbor[0] < grid_cols and 0 <= neighbor[1] < grid_rows and map[neighbor[1], neighbor[0]] == 1:
+                tentative_g_score = g_score[current] + 1
 
-#                 if tentative_g_score < g_score.get(neighbor, float('inf')):
-#                     came_from[neighbor] = current
-#                     g_score[neighbor] = tentative_g_score
-#                     f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
-#                     heapq.heappush(open_set, (f_score[neighbor], neighbor))
+                if tentative_g_score < g_score.get(neighbor, float('inf')):
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g_score
+                    f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
+                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
     
-#     return None # Tidak ada jalur yang ditemukan
+    return None # Tidak ada jalur yang ditemukan

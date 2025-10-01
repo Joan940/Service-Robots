@@ -26,19 +26,19 @@ print(int(screen_width), int(screen_height))
 ###################################################################################################
 
 # KOSONGAN
-IP = ''
-PORT = ''
-P = ''
-I = ''
-D = ''
-jumlah = ''
-nomorMeja = ''
+IP           = ''
+PORT         = ''
+P            = ''
+I            = ''
+D            = ''
+jumlah       = ''
+nomorMeja    = ''
 mejaPesanan1 = 'Meja 1'
 mejaPesanan2 = 'Meja 2'
 
 # NONE
 # -- List Pesanan
-meja = None
+meja       = None
 checkboxes = []
 
 # -- Transisi Surface
@@ -46,81 +46,81 @@ oldSurface = None
 newSurface = None
 
 # -- Lainnya
-input = None
-warna = None
-pesanan = None
-temporary = None
+input         = None
+warna         = None
+pesanan       = None
+temporary     = None
 selectedMeja1 = None
 selectedMeja2 = None
 
 # BOOLEAN
 # -- Surface
 runMakeOrder = bool
-runConfig = bool
-runStaff = bool
-runOrder = bool
-runMenu = bool
-runPID = bool
-runSim = bool
-runEye = bool
-updateOrder = True
+runConfig    = bool
+runStaff     = bool
+runOrder     = bool
+runMenu      = bool
+runPID       = bool
+runSim       = bool
+runEye       = bool
+updateOrder  = True
 
 # -- Animasi Mata
 isLookingRight = bool
-isLookingLeft = bool
-newExpression = bool
-isBlinking = bool
-mouseActive = bool
+isLookingLeft  = bool
+newExpression  = bool
+isBlinking     = bool
+mouseActive    = bool
 
 # -- Komunikasi
-ser = None
-udp = bool
-uart = bool
+ser          = None
+udp          = bool
+uart         = bool
 notAutonomus = bool
-serviceBot = False
+serviceBot   = False
 
 # -- List Pesanan
 list = bool
 
 # STACK
-allMeja = []
-allOrders = []
+allMeja         = []
+allOrders       = []
 startProperties = {}
 targetPropertis = {}
 
 # RESOLUSI WINDOW
 offsetX = res[0] / 13.1
 offsetY = res[1] / 2.76
-skala = res[1] / 1200
+skala   = res[1] / 1200
 
 # UKURAN BUTTON
-PANJANG_BUTTON = res[0] * 0.1
-LEBAR_BUTTON = res[1] * 0.06
-PANJANG_STATUS = res[0] * 0.064
-LEBAR_STATUS = res[1] * 0.02
+PANJANG_BUTTON      = res[0] * 0.1
+LEBAR_BUTTON        = res[1] * 0.06
+PANJANG_STATUS      = res[0] * 0.064
+LEBAR_STATUS        = res[1] * 0.02
 PANJANG_SAVE_BUTTON = res[0] * 0.094
-LEBAR_SAVE_BUTTON = res[1] * 0.06
-PANJANG_INP_BUTTON = res[0] * 0.1
-LEBAR_INP_BUTTON = res[1] * 0.06
+LEBAR_SAVE_BUTTON   = res[1] * 0.06
+PANJANG_INP_BUTTON  = res[0] * 0.1
+LEBAR_INP_BUTTON    = res[1] * 0.06
 
 # DEKLARASI AWAL MATA
 SET_AWAL = {
     # MATA
-    'eyeHeight': 150,
+    'eyeHeight' : 150,
     'eyeOffsetX': 0,
     'eyeOffsetY': 0,
     
     # ALIS
-    'eyebrowOffset_leftY': 0,
+    'eyebrowOffset_leftY' : 0,
     'eyebrowOffset_rightY': 0,
-    'eyebrowAngle_left': 0,
-    'eyebrowAngle_right': 0,
+    'eyebrowAngle_left'   : 0,
+    'eyebrowAngle_right'  : 0,
 
     # MULUT
-    'mouthY': 0,
-    'mouthWidth': 0,
+    'mouthY'     : 0,
+    'mouthWidth' : 0,
     'mouthHeight': 0,
-    'mouthAngle': 0,
+    'mouthAngle' : 0,
 }
 
 # ANIMASI MATA
@@ -172,7 +172,7 @@ conServiceBot = 'Disconnected'
 font = pygame.font.Font("C:\BMP-Robotics\Assets\Oregano-Regular.ttf", 25)
 
 # SOUND EFFECT
-trueSound = pygame.mixer.Sound(r"C:\BMP-Robotics\Assets\true.wav")
+trueSound  = pygame.mixer.Sound(r"C:\BMP-Robotics\Assets\true.wav")
 falseSound = pygame.mixer.Sound(r"C:\BMP-Robotics\Assets\false.wav")
 ketikSound = pygame.mixer.Sound(r"C:\BMP-Robotics\Assets\ketik.wav")
 
@@ -182,13 +182,13 @@ ketikSound = pygame.mixer.Sound(r"C:\BMP-Robotics\Assets\ketik.wav")
 ###################################################################################################
 
 bgSocketConfig = pygame.image.load("C:\BMP-Robotics\Assets\socketConfig.png").convert_alpha()
-bgPidConfig = pygame.image.load("C:\BMP-Robotics\Assets\pidConfig.png").convert_alpha()
-bgMakeOrder = pygame.image.load("C:\BMP-Robotics\Assets\makeOrder.png").convert_alpha()
-bgSim = pygame.image.load("C:\BMP-Robotics\Assets\simulator.png").convert_alpha()
-bgOrder = pygame.image.load("C:\BMP-Robotics\Assets\order.png").convert_alpha()
-bgStaff = pygame.image.load("C:\BMP-Robotics\Assets\staff.png").convert_alpha()
-bgMenu = pygame.image.load("C:\BMP-Robotics\Assets\menu.png").convert_alpha()
-bgEyes = pygame.image.load("C:\BMP-Robotics\Assets\eye.png").convert_alpha()
+bgPidConfig    = pygame.image.load("C:\BMP-Robotics\Assets\pidConfig.png").convert_alpha()
+bgMakeOrder    = pygame.image.load("C:\BMP-Robotics\Assets\makeOrder.png").convert_alpha()
+bgSim          = pygame.image.load("C:\BMP-Robotics\Assets\simulator.png").convert_alpha()
+bgOrder        = pygame.image.load("C:\BMP-Robotics\Assets\order.png").convert_alpha()
+bgStaff        = pygame.image.load("C:\BMP-Robotics\Assets\staff.png").convert_alpha()
+bgMenu         = pygame.image.load("C:\BMP-Robotics\Assets\menu.png").convert_alpha()
+bgEyes         = pygame.image.load("C:\BMP-Robotics\Assets\eye.png").convert_alpha()
 
 bot = pygame.image.load(r"C:\BMP-Robotics\Assets\bot.png").convert_alpha()
 bot = pygame.transform.scale(bot, (25, 25))
@@ -363,7 +363,25 @@ class simulasi:
         window_rect.centerx - (PANJANG_BUTTON * (-1)),
         window_rect.centery - (LEBAR_BUTTON * 0),
         PANJANG_BUTTON,
-        LEBAR_BUTTON * 6.7
+        LEBAR_BUTTON * 3.2
+    )
+    DEMO_2 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-2.1)),
+        window_rect.centery - (LEBAR_BUTTON * 0),
+        PANJANG_BUTTON,
+        LEBAR_BUTTON * 3.2
+    )
+    DEMO_3 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-1)),
+        window_rect.centery - (LEBAR_BUTTON * (-3.4)),
+        PANJANG_BUTTON,
+        LEBAR_BUTTON * 3.2
+    )
+    DEMO_4 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-2.1)),
+        window_rect.centery - (LEBAR_BUTTON * (-3.4)),
+        PANJANG_BUTTON,
+        LEBAR_BUTTON * 3.2
     )
 
 class config:

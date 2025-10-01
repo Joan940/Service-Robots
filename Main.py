@@ -11,7 +11,10 @@ from Modules.communication import (
     send
 )
 from Skills.demoMode import (
-    demo1
+    meja1,
+    meja2,
+    meja3,
+    meja4
 )
 from Modules.algorithm import (
     drawNumberPad,
@@ -25,6 +28,7 @@ from Modules.algorithm import (
     drawGrid,
     getMeja,
     lerp,
+    aStar
 )
 from Modules.database import (
     reset_database,
@@ -68,13 +72,22 @@ varGlobals.D    = '0'
 
 def pencetButton(text):
 
-    # data = bytearray(3)
+    data = bytearray(3)
 
     # PAKSA HURUF KECIL
     text = text.lower()
 
-    if text == "demo 1":
-        demo1()
+    if text == "meja 1":
+        meja1()
+
+    elif text == "meja 2":
+        meja2()
+
+    elif text == "meja 3":
+        meja3()
+
+    elif text == "meja 4":
+        meja4()
 
     elif text == "exit":
         sys.exit(0)
@@ -1363,7 +1376,10 @@ def simulation():
 
     buttons = {
         "Back"   : simButton.BACK,
-        "Demo 1" : simButton.DEMO_1
+        "Meja 1" : simButton.DEMO_1,
+        "Meja 2" : simButton.DEMO_2,
+        "Meja 3" : simButton.DEMO_3,
+        "Meja 4" : simButton.DEMO_4
     }
 
     # path = aStar((dataRobot.xpos // 25, dataRobot.ypos // 25), varGlobals.allMeja[6])
