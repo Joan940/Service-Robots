@@ -1,4 +1,5 @@
 import time
+import errno
 import socket
 import struct
 import threading
@@ -63,14 +64,18 @@ def runCom():
 ###################################################################################################
 
 def send(data):
-
     kirim = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     if varGlobals.udp:
         try:
             kirim.sendto(data, (varGlobals.IP, int(varGlobals.PORT)))
             print(f"Data terkirim : {data}")
+        except socket.error as e:
+            print(f"Pengiriman Gagal, Socket Error: {e}")
+            print(f"Kode Error: {e.errno}")
+            if e.errno == errno.WSAECONNRESET:
+                print("Error ini sering terjadi di Windows ketika port tujuan tidak merespons.")
         except Exception as e:
-            print("Pengiriman Gagal : ", e)
+            print("Terjadi error yang tidak terduga: ", e)
     else:
         kirim.close()

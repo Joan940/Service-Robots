@@ -59,7 +59,7 @@ from Modules.varGlobals import (
 
 pygame.mixer.init()
 
-varGlobals.IP   = '192.168.110.15'
+varGlobals.IP   = '192.168.110.195'
 varGlobals.PORT = '8081'
 varGlobals.P    = '0'
 varGlobals.I    = '0'
@@ -72,7 +72,7 @@ varGlobals.D    = '0'
 
 def pencetButton(text):
 
-    data = bytearray(3)
+    # data = bytearray(3)
 
     # PAKSA HURUF KECIL
     text = text.lower()
@@ -327,12 +327,20 @@ def pidConfig():
                     varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
 
                     if button == "Save":
-                        data = bytearray(4)
+                        data = bytearray(7)
                         
                         data[0] = 200
-                        data[1] = int(varGlobals.P)
-                        data[2] = int(varGlobals.I)
-                        data[3] = int(varGlobals.D)
+                        valueP = int(varGlobals.P)
+                        data[1] = (valueP >> 8) & 0xFF
+                        data[2] = valueP & 0xFF
+
+                        valueI = int(varGlobals.I)
+                        data[3] = (valueI >> 8) & 0xFF
+                        data[4] = valueI & 0xFF
+
+                        valueD = int(varGlobals.D)
+                        data[5] = (valueD >> 8) & 0xFF
+                        data[6] = valueD & 0xFF
                         send(data)
                     
                     elif button == "Back":
@@ -769,16 +777,16 @@ def eyeUI():
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 dragging = True
-                wait = time.time()
+                wait     = time.time()
                 startPos = event.pos
                 distance = 0
 
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 adminSense = time.time() - wait
 
-                endPos = event.pos
-                dx = endPos[0] - startPos[0]
-                dy = endPos[1] - startPos[1]
+                endPos   = event.pos
+                dx       = endPos[0] - startPos[0]
+                dy       = endPos[1] - startPos[1]
                 distance = (dx ** 2 + dy ** 2) ** 0.5
 
                 if adminSense > 5 and distance < 5:
@@ -1443,28 +1451,32 @@ def simulation():
                     varGlobals.notAutonomus            = False
 
         # MENGIRIM DATA PRESS ARROW 
-        data = bytearray(2)
+        data = bytearray(3)
         keys = pygame.key.get_pressed()
         for key in varGlobals.keys_pressed.keys():
             if keys[key]:
                 if pygame.key.name(key) == "down":
                     data[0] = 99
                     data[1] = 55
+                    data[2] = 90
                     send(data)
                     print(data[0], data[1])
                 elif pygame.key.name(key) == "up":
                     data[0] = 99
                     data[1] = 56
+                    data[2] = 90
                     send(data)
                     print(data[0], data[1])
                 elif pygame.key.name(key) == "left":
                     data[0] = 99
                     data[1] = 57
+                    data[2] = 90
                     send(data)
                     print(data[0], data[1])
                 elif pygame.key.name(key) == "right":
                     data[0] = 99
                     data[1] = 58
+                    data[2] = 90
                     send(data)
                     print(data[0], data[1])
 
