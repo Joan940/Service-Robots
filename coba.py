@@ -1,197 +1,318 @@
-# import serial
-# import threading
-# import time
+import pygame
+import sys
+import time
+import random
+import math
 
-# class VarGlobals:
-#     ser_tx = None   # TX (pengirim)
-#     ser_rx = None   # RX (penerima)
-#     uart = False
+# =============================================================================
+# KELAS UNTUK MENGELOLA VARIABEL GLOBAL (PENGGANTI varGlobals)
+# =============================================================================
+class GlobalVars:
+    def __init__(self):
+        # Pengaturan dasar
+        self.res = (800, 600)
+        self.screen = pygame.display.set_mode(self.res)
+        self.clock = pygame.time.Clock()
+        self.bgEyes = pygame.Surface(self.res)
+        self.bgEyes.fill((200, 200, 255)) # Warna latar belakang biru muda
 
-# varGlobals = VarGlobals()
+        # Status program
+        self.runEye = True
 
-# # ==============================
-# # INIT UART
-# # ==============================
-# def init_uart(port_tx="COM14", port_rx="COM15", baudrate=115200):
-#     try:
-#         varGlobals.ser_tx = serial.Serial(port_tx, baudrate, timeout=0.25)
-#         varGlobals.ser_rx = serial.Serial(port_rx, baudrate, timeout=0.25)
-#         print(f"[UART] Port TX: {varGlobals.ser_tx.name}, Port RX: {varGlobals.ser_rx.name}")
-#     except Exception as e:
-#         print("[UART] Gagal buka port:", e)
+        # Properti mata & transisi
+        self.lebarMata = 100
+        self.eyeLeftX = self.res[0] // 2 - 120
+        self.eyeRightX = self.res[0] // 2 + 20
+        self.eyePosY = self.res[1] // 2 - 100
+        self.durasiTransisi = 0.3
 
-# # ==============================
-# # TERIMA DATA dari RX
-# # ==============================
-# def receive():
-#     while varGlobals.uart:
-#         try:
-#             if varGlobals.ser_rx and varGlobals.ser_rx.in_waiting > 0:
-#                 data = varGlobals.ser_rx.read(varGlobals.ser_rx.in_waiting)
-#                 print("[UART RX] Data diterima:", list(data))
-#         except Exception as e:
-#             print("[UART] Error saat baca:", e)
-#         time.sleep(0.05)
+        # Variabel state yang diubah di dalam eyeUI
+        self.isBlinking = False
+        self.startTransisi = 0
+        self.startProperties = {}
+        self.targetPropertis = {}
+        self.SET_AWAL = {}
 
-# # ==============================
-# # JALANKAN THREAD RECEIVE
-# # ==============================
-# def runCom():
-#     if varGlobals.ser_tx is None or not varGlobals.ser_tx.is_open:
-#         init_uart()
-#     varGlobals.uart = True
-#     threading.Thread(target=receive, daemon=True).start()
-#     print("[UART] Thread RX aktif")
+# Inisialisasi variabel global
+varGlobals = GlobalVars()
 
-# # ==============================
-# # KIRIM DATA lewat TX
-# # ==============================
-# def send(data):
-#     if varGlobals.ser_tx is None or not varGlobals.ser_tx.is_open:
-#         print("[UART] TX tidak aktif / belum dibuka")
-#         return
+# =============================================================================
+# KONSTANTA WARNA (PENGGANTI cc)
+# =============================================================================
+class Colors:
+    BLACK = (0, 0, 0)
+    RED = (255, 0, 0)
 
-#     if varGlobals.uart:
-#         try:
-#             if isinstance(data, (list, tuple)):
-#                 data = bytes(data)
-#             elif isinstance(data, int):
-#                 data = data.to_bytes(2, "big")  # default 16-bit
+cc = Colors()
 
-#             varGlobals.ser_tx.write(data)
-#             print("[UART TX] Data terkirim:", list(data))
-#         except Exception as e:
-#             print("[UART] Gagal kirim:", e)
+# =============================================================================
+# DEKLARASI PROPERTI DAN ANIMASI
+# =============================================================================
+# DEKLARASI AWAL MATA
+varGlobals.SET_AWAL = {
+    # MATA
+    'eyeHeight' : 150,
+    'eyeOffsetX': 0,
+    'eyeOffsetY': 0,
+    
+    # ALIS
+    'eyebrowOffset_leftY' : 0,
+    'eyebrowOffset_rightY': 0,
+    'eyebrowAngle_left'   : 0,
+    'eyebrowAngle_right'  : 0,
 
-# # ==============================
-# # MAIN PROGRAM
-# # ==============================
-# if __name__ == "__main__":
-#     # COM14 kirim → COM15 terima
-#     init_uart("COM14", "COM15", 115200)
-#     runCom()
+    # MULUT
+    'mouthY'      : 0,
+    'mouthWidth'  : 0,
+    'mouthHeight' : 0,
+    'mouthAngle'  : 0,
+}
 
-#     try:
-#         while True:
-#             packet = [1, 2, 3, 4, 5]
-#             send(packet)
-#             time.sleep(1)
-#     except KeyboardInterrupt:
-#         print("\n[UART] Program dihentikan")
-#         varGlobals.uart = False
-#         if varGlobals.ser_tx: varGlobals.ser_tx.close()
-#         if varGlobals.ser_rx: varGlobals.ser_rx.close()
+# ANIMASI MATA
+ANIMATIONS = {
+    'buka': {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': 0.1, 'eyebrowAngle_right': -0.1, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
+    'kedip': {'eyeHeight': 10, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': 0.1, 'eyebrowAngle_right': -0.1, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
+    
+    # EKSPRESI
+    'marah': {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 15, 'eyebrowOffset_rightY': 15, 'eyebrowAngle_left': 0.3, 'eyebrowAngle_right': -0.3, 'mouthY': 120, 'mouthWidth': 120, 'mouthHeight': 50, 'mouthAngle': 180},
+    'sedih': {'eyeHeight': 130, 'eyeOffsetX': 0, 'eyeOffsetY': 30, 'eyebrowOffset_leftY': -10, 'eyebrowOffset_rightY': -10, 'eyebrowAngle_left': -0.3, 'eyebrowAngle_right': 0.3, 'mouthY': 130, 'mouthWidth': 80, 'mouthHeight': 60, 'mouthAngle': 0},
+    'terkejut': {'eyeHeight': 180, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': -40, 'eyebrowOffset_rightY': -40, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 50, 'mouthAngle': 0},
+    'senyum': {'eyeHeight': 130, 'eyeOffsetX': 0, 'eyeOffsetY': 10, 'eyebrowOffset_leftY': -15, 'eyebrowOffset_rightY': -15, 'eyebrowAngle_left': -0.2, 'eyebrowAngle_right': 0.2, 'mouthY': 120, 'mouthWidth': 120, 'mouthHeight': 60, 'mouthAngle': 1}
+}
+varGlobals.ANIMATIONS = ANIMATIONS # Menyimpan ke global vars
 
-#################################################
-#                   trayPesanan                 #
-#################################################
+# =============================================================================
+# FUNGSI PEMBANTU (HELPER FUNCTIONS)
+# =============================================================================
+def lerp(a, b, t):
+    """Interpolasi Linear"""
+    return a + (b - a) * t
 
-# # MENAMPILKAN PESANAN BERDASARKAN MEJA
-        # if trayPesanan:
+def easeInOut(t):
+    """Fungsi Easing untuk transisi yang lebih halus"""
+    return t * t * (3.0 - 2.0 * t)
 
-        #     if not varGlobals.checkboxes:   # hanya buat sekali
-        #         pesanan_lines = getPesananByMeja(varGlobals.allOrders, selectedMeja)
+def rotatePoint(point, center, angle):
+    """Memutar sebuah titik di sekitar titik pusat"""
+    ox, oy = center
+    px, py = point
+    
+    qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
+    qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
+    return qx, qy
 
-        #         varGlobals.checkboxes = []
-        #         start_x = scButton.BOX_SETUP.x + 30
-        #         start_y = scButton.BOX_SETUP.y + 40
-        #         offset_y = 35
+def mainMenu():
+    """Fungsi placeholder jika pengguna menahan klik lama"""
+    print("Masuk ke Main Menu...")
+    # Di sini Anda bisa menambahkan logika untuk beralih ke layar menu
+    # varGlobals.runEye = False # Contoh: menghentikan UI mata
+    # menu_function()
 
-        #         pesanan_idx = 0
-        #         for line in pesanan_lines:
-        #             if line['type'] == 'meja':
-        #                 continue
+# =============================================================================
+# FUNGSI UTAMA eyeUI
+# =============================================================================
+def eyeUI():
+    # RESET
+    wait = None
+    startPos = None
+    
+    # LOCAL VARIABLE
+    blink_interval = random.uniform(3, 6)
+    blinkDuration = 0.5
+    blinkStartTime = 0
 
-        #             rect_custom = line['rect'].copy()
-        #             rect_custom.topleft = (start_x + 40, start_y + (pesanan_idx + 1) * offset_y)
+    # Variabel baru untuk melacak aktivitas mouse
+    lastMouseActivityTime = time.time()       # Kapan aktivitas mouse terakhir terjadi
+    continuousActivityStartTime = None      # Kapan gerakan mouse *terus-menerus* dimulai
 
-        #             cb = CheckBox(start_x, rect_custom.y + 2, 20, False, None, varGlobals.font)
-        #             cb.data_id = line['id']
-        #             cb.label = getattr(line, 'menu', str(line.get('id')))
-        #             varGlobals.checkboxes.append(cb)
+    lastBlinkTime = time.time()
+    
+    # Inisialisasi awal
+    varGlobals.startTransisi = time.time()
+    varGlobals.startProperties = varGlobals.SET_AWAL.copy()
+    varGlobals.targetPropertis = varGlobals.SET_AWAL.copy()
 
-        #             pesanan_idx += 1
+    while varGlobals.runEye:
+        # Menambahkan variabel untuk mendeteksi gerakan mouse per frame
+        mouseMovedThisFrame = False
 
-        #     # MENGGAMBAR OVERLAY (OPACITY)
-        #     overlay = pygame.Surface((varGlobals.res[0], varGlobals.res[1]), pygame.SRCALPHA)
-        #     pygame.draw.rect(overlay, (0, 0, 0, 100), overlay.get_rect())
-        #     varGlobals.screen.blit(overlay, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                varGlobals.runEye = False
+                pygame.quit()
+                sys.exit()
 
-        #     pygame.draw.rect(varGlobals.screen, cc.WHITE, scButton.BOX_SETUP, border_radius=20)
-        #     pygame.draw.rect(varGlobals.screen, cc.BLACK, scButton.BOX_SETUP, 3, border_radius=20)
+            # Menambahkan MOUSEMOTION ke dalam kondisi
+            # Melacak semua aktivitas mouse (gerakan atau klik)
+            if event.type in [pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION]:
+                lastMouseActivityTime = time.time() # Update waktu aktivitas terakhir
+                mouseMovedThisFrame = True          # Tandai bahwa ada aktivitas di frame ini
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                wait = time.time()
+                startPos = event.pos
+
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                # Cek apakah klik ditahan lama (untuk masuk menu admin)
+                if wait and startPos: # Pastikan wait dan startPos sudah di-set
+                    adminSense = time.time() - wait
+                    endPos = event.pos
+                    dx = endPos[0] - startPos[0]
+                    dy = endPos[1] - startPos[1]
+                    distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                    if adminSense > 5 and distance < 5:
+                        mainMenu()
+                
+                # Reset setelah mouse dilepas
+                wait = None
+                startPos = None
+
+        # Memperbarui timer untuk gerakan kontinu
+        currentTime = time.time()
+        if mouseMovedThisFrame:
+            # Jika mouse bergerak dan timer belum dimulai, mulai timer sekarang.
+            if continuousActivityStartTime is None:
+                continuousActivityStartTime = currentTime
+        else:
+            # Jika mouse berhenti bergerak di frame ini, reset timer.
+            continuousActivityStartTime = None
+
+        # UPDATE POSISI MENGIKUTI MOUSE
+        mx, my = pygame.mouse.get_pos()
+        center_x = varGlobals.res[0] // 2
+        center_y = varGlobals.res[1] // 2
+        max_offset = 30
+        mouse_offset_x = max(-max_offset, min(max_offset, (mx - center_x) / 10))
+        mouse_offset_y = max(-max_offset, min(max_offset, (my - center_y) / 10))
+        
+        # Simpan offset mouse untuk digabungkan dengan ekspresi nanti
+        current_mouse_offset = {'eyeOffsetX': mouse_offset_x, 'eyeOffsetY': mouse_offset_y}
+
+        # RANDOM BLINK
+        if time.time() - lastBlinkTime > blink_interval and not varGlobals.isBlinking:
+            varGlobals.isBlinking = True
+            blinkStartTime = time.time()
+            lastBlinkTime = time.time()
+            blink_interval = random.uniform(3, 6)
+
+        if varGlobals.isBlinking and time.time() - blinkStartTime > blinkDuration:
+            varGlobals.isBlinking = False
+
+        # --- BLOK LOGIKA EKSPRESI BARU ---
+        expression_key = 'buka' # Default state adalah 'buka'
+
+        if continuousActivityStartTime is not None:
+            # Jika ada aktivitas mouse yang kontinu...
+            activityDuration = currentTime - continuousActivityStartTime
+            if activityDuration > 5:
+                # MARAH: Jika mouse digerakkan terus-menerus > 5 detik
+                expression_key = 'marah'
+            else:
+                # SENYUM: Jika mouse sedang aktif, tapi belum mencapai 5 detik
+                expression_key = 'senyum'
+        elif currentTime - lastMouseActivityTime > 10:
+            # SEDIH: Jika tidak ada aktivitas sama sekali > 10 detik
+            expression_key = 'sedih'
+        
+        # Prioritaskan berkedip di atas ekspresi lain
+        if varGlobals.isBlinking:
+            expression_key = 'kedip'
+
+        new_expression = varGlobals.ANIMATIONS[expression_key].copy()
+        
+        # UPDATE KE EKSPRESI BARU
+        # Gabungkan offset mouse dengan ekspresi yang dipilih
+        final_expression = new_expression.copy()
+        final_expression['eyeOffsetX'] += current_mouse_offset['eyeOffsetX']
+        final_expression['eyeOffsetY'] += current_mouse_offset['eyeOffsetY']
+
+        if final_expression != varGlobals.targetPropertis:
+            varGlobals.startProperties = varGlobals.SET_AWAL.copy()
+            varGlobals.targetPropertis = final_expression
+            varGlobals.startTransisi = time.time()
+
+        # MENGGUNAKAN RUMUS AGAR LEBIH HALUS
+        elapsed = time.time() - varGlobals.startTransisi
+        t = min(elapsed / varGlobals.durasiTransisi, 1.0)
+        tEased = easeInOut(t)
+        for key in varGlobals.targetPropertis:
+            varGlobals.SET_AWAL[key] = lerp(
+                varGlobals.startProperties.get(key, 0),
+                varGlobals.targetPropertis.get(key, 0),
+                tEased
+            )
+
+        # --- DRAWING SECTION ---
+        varGlobals.screen.blit(varGlobals.bgEyes, (0, 0))
+
+        # UPDATE PROPERTI MATA
+        tinggiMata = int(varGlobals.SET_AWAL.get('eyeHeight', 0))
+        eyeOffsetX_val = varGlobals.SET_AWAL.get('eyeOffsetX', 0)
+        eyeOffsetY_val = varGlobals.SET_AWAL.get('eyeOffsetY', 0)
+        
+        eyeLeftX = varGlobals.eyeLeftX + eyeOffsetX_val
+        eyeRightX = varGlobals.eyeRightX + eyeOffsetX_val
+        eyePosY = varGlobals.eyePosY + eyeOffsetY_val
+
+        eyeLeft = pygame.Rect(eyeLeftX, eyePosY, varGlobals.lebarMata, tinggiMata)
+        eyeRight = pygame.Rect(eyeRightX, eyePosY, varGlobals.lebarMata, tinggiMata)
+
+        pygame.draw.rect(varGlobals.screen, cc.BLACK, eyeLeft, border_radius=50)
+        pygame.draw.rect(varGlobals.screen, cc.BLACK, eyeRight, border_radius=50)
+
+        # UPDATE PROPERTI MULUT
+        mouthY_val = varGlobals.SET_AWAL.get('mouthY', 0)
+        mouthWidth_val = varGlobals.SET_AWAL.get('mouthWidth', 0)
+        mouthHeight_val = varGlobals.SET_AWAL.get('mouthHeight', 0)
+        mouthAngle_val = varGlobals.SET_AWAL.get('mouthAngle', 0)
+        
+        if mouthWidth_val > 0 and mouthHeight_val > 0:
+            mouth_pos_y = varGlobals.res[1] // 2 + mouthY_val
+            mouth_rect = pygame.Rect(varGlobals.res[0] // 2 - (mouthWidth_val // 2), mouth_pos_y, mouthWidth_val, mouthHeight_val)
             
-        #     for penyesuaian, rect in adjust.items():
-        #         if rect.collidepoint(mx, my):
-        #             pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 4, border_radius=20)
-        #             tts(penyesuaian, cc.RED_BROWN, rect, varGlobals.screen, 35)
-        #         else:
-        #             pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, rect, 3, border_radius=20)
-        #             tts(penyesuaian, cc.RED_BROWN, rect, varGlobals.screen, 30)
+            if mouthAngle_val == 1: # Senyum
+                start_angle = math.pi
+                end_angle = 2 * math.pi
+                pygame.draw.arc(varGlobals.screen, cc.BLACK, mouth_rect, start_angle, end_angle, 10)
+            elif mouthAngle_val == 180: # Marah (garis lurus)
+                start_point = (mouth_rect.left, mouth_rect.centery)
+                end_point = (mouth_rect.right, mouth_rect.centery)
+                pygame.draw.line(varGlobals.screen, cc.BLACK, start_point, end_point, 10)
+            else: # Sedih / Terkejut
+                start_angle = 0
+                end_angle = math.pi
+                pygame.draw.arc(varGlobals.screen, cc.BLACK, mouth_rect, start_angle, end_angle, 10)
+        
+        # MENGGAMBAR ALIS
+        eyebrowOffset_leftY = varGlobals.SET_AWAL.get('eyebrowOffset_leftY', 0)
+        eyebrowOffset_rightY = varGlobals.SET_AWAL.get('eyebrowOffset_rightY', 0)
+        eyebrowAngle_left = varGlobals.SET_AWAL.get('eyebrowAngle_left', 0)
+        eyebrowAngle_right = varGlobals.SET_AWAL.get('eyebrowAngle_right', 0)
+        
+        eyebrow_start_left = (eyeLeft.centerx - varGlobals.lebarMata / 2 - 10, eyeLeft.top - 20 + eyebrowOffset_leftY)
+        eyebrow_end_left = (eyeLeft.centerx + varGlobals.lebarMata / 2 + 10, eyeLeft.top - 20 + eyebrowOffset_leftY)
+        eyebrow_start_right = (eyeRight.centerx - varGlobals.lebarMata / 2 - 10, eyeRight.top - 20 + eyebrowOffset_rightY)
+        eyebrow_end_right = (eyeRight.centerx + varGlobals.lebarMata / 2 + 10, eyeRight.top - 20 + eyebrowOffset_rightY)
 
-        #     tts(antar, cc.RED_BROWN, scButton.TOTAL, varGlobals.screen, 25)
+        rotated_start_left = rotatePoint(eyebrow_start_left, eyeLeft.center, eyebrowAngle_left)
+        rotated_end_left = rotatePoint(eyebrow_end_left, eyeLeft.center, eyebrowAngle_left)
+        pygame.draw.line(varGlobals.screen, cc.BLACK, rotated_start_left, rotated_end_left, 10)
 
-        #     for boxes, rect in box.items():
-        #         if rect.collidepoint(mx, my):
-        #             pygame.draw.rect(varGlobals.screen, cc.WHITE, rect, border_radius=20)
-        #             pygame.draw.rect(varGlobals.screen, cc.BLACK, rect, 4, border_radius=20)
-        #             tts(boxes, cc.BLACK, rect, varGlobals.screen, 30)
-        #         else:
-        #             pygame.draw.rect(varGlobals.screen, cc.WHITE, rect, border_radius=20)
-        #             pygame.draw.rect(varGlobals.screen, cc.BLACK, rect, 3, border_radius=20)
-        #             tts(boxes, cc.BLACK, rect, varGlobals.screen, 25)
+        rotated_start_right = rotatePoint(eyebrow_start_right, eyeRight.center, eyebrowAngle_right)
+        rotated_end_right = rotatePoint(eyebrow_end_right, eyeRight.center, eyebrowAngle_right)
+        pygame.draw.line(varGlobals.screen, cc.BLACK, rotated_start_right, rotated_end_right, 10)
 
-        #     # MENEMPATKAN TEXT PADA SAMPING CHECKBOXS
-        #     mejaList = [m for m in varGlobals.allMeja if m == selectedMeja]
-        #     startX = scButton.BOX_SETUP.x + 30
-        #     startY = scButton.BOX_SETUP.y + 40
-        #     offsetY = 35
-        #     offsetMeja = 50
+        # UPDATE TAMPILAN
+        varGlobals.clock.tick(60)
+        pygame.display.flip()
 
-        #     for mejaData in mejaList:
-        #         nomor_meja = mejaData
-        #         pesanan_lines = getPesananByMeja(varGlobals.allOrders, nomor_meja)
-
-        #         title_surface = varGlobals.font.render(f"Meja {nomor_meja}", True, cc.BLACK)
-        #         varGlobals.screen.blit(title_surface, (startX, startY - 20))
-
-        #         pesanan_idx = 0
-        #         for line, cb in zip([l for l in pesanan_lines if l['type'] != 'meja'], varGlobals.checkboxes):
-        #             rect_custom = line['rect'].copy()
-        #             rect_custom.topleft = (startX + 40, startY + (pesanan_idx + 1) * offsetY)
-
-        #             # gambar teks
-        #             varGlobals.screen.blit(line['surface'], rect_custom)
-
-        #             # gambar checkbox
-        #             cb.draw(varGlobals.screen)
-        #             pesanan_idx += 1
-
-        #         startY += (pesanan_idx + 1) * offsetY + offsetMeja
-
-
-# # PENANGANAN POPUP PESANAN BERDASARKAN MEJA
-                # elif trayPesanan:
-                #     if scButton.BACK.collidepoint(mx, my) and trayPesanan and not trayMeja:
-                #         trayPesanan = False
-                #         trayMeja = True
-
-                #     # PENANGANAN TOMBOL KONFIRMASI
-                #     elif scButton.BOX_KONFIRMASI.collidepoint(mx, my):
-                #         selected_ids = [cb.data_id for cb in varGlobals.checkboxes if cb.checked]
-
-                #         if selected_ids:
-                #             delete_orders(selected_ids)
-                #             print("Terhapus:", selected_ids)
-
-                #             # Refresh data
-                #             varGlobals.allOrders = getOrders()
-                #             varGlobals.allOrders = tampilanOrder(varGlobals.allOrders)
-                #             varGlobals.checkboxes = []
-
-                #     elif scButton.PLUS.collidepoint(mx, my):
-                #         antar += 1
-                #     elif scButton.MIN.collidepoint(mx, my):
-                #             if antar > 0:
-                #                 antar -= 1
-                #             else:
-                #                 pass
+# =============================================================================
+# BLOK EKSEKUSI UTAMA
+# =============================================================================
+if __name__ == '__main__':
+    pygame.init()
+    pygame.display.set_caption("Interactive Eye UI")
+    eyeUI()
+    pygame.quit()
+    sys.exit()

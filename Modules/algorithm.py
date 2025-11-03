@@ -131,7 +131,7 @@ def tampilanOrder(orders_list):
 
         # Tampilkan nomor meja
         text_surf_meja, text_rect_meja = tts2(
-            f"{meja}", cc.WHITE, 40, (padding_text, yStart + 60)
+            f"{meja}", cc.WHITE, (padding_text, yStart + 60, 40)
         )
         group_lines.append({
             'type': 'meja',
@@ -145,7 +145,7 @@ def tampilanOrder(orders_list):
         for item in items:
             text_surf_pesanan, text_rect_pesanan = tts2(
                 f"{item['nama']} ({item['jumlah']})",
-                cc.BLACK, 18, (pesanan_x, yStart + group_height)
+                cc.BLACK, (pesanan_x, yStart + group_height), 18
             )
             group_lines.append({
                 'type': 'pesanan',

@@ -50,20 +50,28 @@ input         = None
 warna         = None
 pesanan       = None
 temporary     = None
+pilihSayur    = None
+takenOrder    = None
+pilihDaging   = None
 selectedMeja1 = None
 selectedMeja2 = None
 
 # BOOLEAN
 # -- Surface
-runMakeOrder = bool
-runConfig    = bool
-runStaff     = bool
-runOrder     = bool
-runMenu      = bool
-runPID       = bool
-runSim       = bool
-runEye       = bool
-updateOrder  = True
+runServiceSatisfied = bool
+runDaftarMenu       = bool
+runMakeOrder        = bool
+runJavanese         = bool
+runPaketCB          = bool
+runChinese          = bool
+runPaketMM          = bool
+runConfig           = bool
+runStaff            = bool
+runMenu             = bool
+runPID              = bool
+runSim              = bool
+runEye              = bool
+updateOrder         = True
 
 # -- Animasi Mata
 isLookingRight = bool
@@ -80,7 +88,9 @@ notAutonomus = bool
 serviceBot   = False
 
 # -- List Pesanan
-list = bool
+list    = bool
+protein = bool
+sayuran = bool
 
 # STACK
 allMeja         = []
@@ -125,16 +135,14 @@ SET_AWAL = {
 
 # ANIMASI MATA
 ANIMATIONS = {
-    'buka': {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
-    'kedip': {'eyeHeight': 10, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': -0.1, 'eyebrowAngle_right': 0.1, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
-    'kanan': {'eyeHeight': 150, 'eyeOffsetX': 100, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
-    'kiri': {'eyeHeight': 150, 'eyeOffsetX': -100, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
+    'buka': {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': 0.1, 'eyebrowAngle_right': -0.1, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
+    'kedip': {'eyeHeight': 10, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 0, 'eyebrowOffset_rightY': 0, 'eyebrowAngle_left': 0.1, 'eyebrowAngle_right': -0.1, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 40, 'mouthAngle': 1},
     
     # EKSPRESI
-    'marah': {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 5, 'eyebrowOffset_rightY': 5, 'eyebrowAngle_left': -10, 'eyebrowAngle_right': 10, 'mouthY': 100, 'mouthWidth': 120, 'mouthHeight': 50, 'mouthAngle': 180},
-    'sedih': {'eyeHeight': 130, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': -10, 'eyebrowOffset_rightY': -10, 'eyebrowAngle_left': 10, 'eyebrowAngle_right': -10, 'mouthY': 100, 'mouthWidth': 80, 'mouthHeight': 10, 'mouthAngle': 0},
+    'marah': {'eyeHeight': 150, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': 15, 'eyebrowOffset_rightY': 15, 'eyebrowAngle_left': -5, 'eyebrowAngle_right': 5, 'mouthY': 120, 'mouthWidth': 120, 'mouthHeight': 50, 'mouthAngle': 180},
+    'sedih': {'eyeHeight': 130, 'eyeOffsetX': 0, 'eyeOffsetY': 30, 'eyebrowOffset_leftY': -10, 'eyebrowOffset_rightY': -10, 'eyebrowAngle_left': -0.3, 'eyebrowAngle_right': 0.3, 'mouthY': 130, 'mouthWidth': 80, 'mouthHeight': 60, 'mouthAngle': 0},
     'terkejut': {'eyeHeight': 180, 'eyeOffsetX': 0, 'eyeOffsetY': 20, 'eyebrowOffset_leftY': -40, 'eyebrowOffset_rightY': -40, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 100, 'mouthWidth': 100, 'mouthHeight': 50, 'mouthAngle': 0},
-    'senyum': {'eyeHeight': 80, 'eyeOffsetX': 0, 'eyeOffsetY': 10, 'eyebrowOffset_leftY': 5, 'eyebrowOffset_rightY': 5, 'eyebrowAngle_left': 0, 'eyebrowAngle_right': 0, 'mouthY': 120, 'mouthWidth': 120, 'mouthHeight': 40, 'mouthAngle': 0}
+    'senyum': {'eyeHeight': 130, 'eyeOffsetX': 0, 'eyeOffsetY': 10, 'eyebrowOffset_leftY': -15, 'eyebrowOffset_rightY': -15, 'eyebrowAngle_left': -0.2, 'eyebrowAngle_right': 0.2, 'mouthY': 120, 'mouthWidth': 120, 'mouthHeight': 60, 'mouthAngle': 1}
 }
 
 # NUMERIK
@@ -181,14 +189,17 @@ ketikSound = pygame.mixer.Sound(r"C:\BMP-Robotics\Assets\ketik.wav")
 #                                           BACKGROUND                                            #
 ###################################################################################################
 
-bgSocketConfig = pygame.image.load("C:\BMP-Robotics\Assets\socketConfig.png").convert_alpha()
-bgPidConfig    = pygame.image.load("C:\BMP-Robotics\Assets\pidConfig.png").convert_alpha()
-bgMakeOrder    = pygame.image.load("C:\BMP-Robotics\Assets\makeOrder.png").convert_alpha()
-bgSim          = pygame.image.load("C:\BMP-Robotics\Assets\simulator.png").convert_alpha()
-bgOrder        = pygame.image.load("C:\BMP-Robotics\Assets\order.png").convert_alpha()
-bgStaff        = pygame.image.load("C:\BMP-Robotics\Assets\staff.png").convert_alpha()
-bgMenu         = pygame.image.load("C:\BMP-Robotics\Assets\menu.png").convert_alpha()
-bgEyes         = pygame.image.load("C:\BMP-Robotics\Assets\eye.png").convert_alpha()
+bgSocketConfig  = pygame.image.load("C:\BMP-Robotics\Assets\socketConfig.png").convert_alpha()
+bgPidConfig     = pygame.image.load("C:\BMP-Robotics\Assets\pidConfig.png").convert_alpha()
+bgMakeOrder     = pygame.image.load("C:\BMP-Robotics\Assets\makeOrder.png").convert_alpha()
+bgSim           = pygame.image.load("C:\BMP-Robotics\Assets\simulator.png").convert_alpha()
+bgOrder         = pygame.image.load("C:\BMP-Robotics\Assets\order.png").convert_alpha()
+bgStaff         = pygame.image.load("C:\BMP-Robotics\Assets\staff.png").convert_alpha()
+bgMenu          = pygame.image.load("C:\BMP-Robotics\Assets\menu.png").convert_alpha()
+bgEyes          = pygame.image.load("C:\BMP-Robotics\Assets\eye.png").convert_alpha()
+bgPaket1        = pygame.image.load("C:\BMP-Robotics\Assets\paket1.png").convert_alpha()
+bgChineseCusine = pygame.image.load("C:\BMP-Robotics\Assets\chineseCusine.png").convert_alpha()
+bgSatisfied     = pygame.image.load("C:\BMP-Robotics\Assets\satisfiedConfig.png").convert_alpha()
 
 bot = pygame.image.load(r"C:\BMP-Robotics\Assets\bot.png").convert_alpha()
 bot = pygame.transform.scale(bot, (25, 25))
@@ -213,37 +224,37 @@ class orderan:
     # SETIAP KE KANAN DIKURANGI 1.6
     MENU_1 = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * 4.4),
-        window_rect.centery - (LEBAR_BUTTON * 4),
+        window_rect.centery - (LEBAR_BUTTON * 2.2),
         PANJANG_BUTTON * 1.5,
         LEBAR_BUTTON * 1.5
     )
     MENU_2 = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * 4.4),
-        window_rect.centery - (LEBAR_BUTTON * 2.2),
+        window_rect.centery - (LEBAR_BUTTON * .4),
         PANJANG_BUTTON * 1.5,
         LEBAR_BUTTON * 1.5
     )
     MENU_3 = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * 4.4),
-        window_rect.centery - (LEBAR_BUTTON * 0.4),
+        window_rect.centery - (LEBAR_BUTTON * (-1.4)),
         PANJANG_BUTTON * 1.5,
         LEBAR_BUTTON * 1.5
     )
     MENU_4 = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * 4.4),
-        window_rect.centery - (LEBAR_BUTTON * (-1.4)),
+        window_rect.centery - (LEBAR_BUTTON * (-3.2)),
         PANJANG_BUTTON * 1.5,
         LEBAR_BUTTON * 1.5
     )
     MENU_5 = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * 4.4),
-        window_rect.centery - (LEBAR_BUTTON * (-3.2)),
+        window_rect.centery - (LEBAR_BUTTON * (-5)),
         PANJANG_BUTTON * 1.5,
         LEBAR_BUTTON * 1.5
     )
     MENU_6 = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 4.4),
-        window_rect.centery - (LEBAR_BUTTON * (-5)),
+        window_rect.centerx - (PANJANG_BUTTON * 2.8),
+        window_rect.centery - (LEBAR_BUTTON * 5.8),
         PANJANG_BUTTON * 1.5,
         LEBAR_BUTTON * 1.5
     )
@@ -284,20 +295,26 @@ class orderan:
         LEBAR_BUTTON * 1.5
     )
     MENU_13 = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 4.4),
-        window_rect.centery - (LEBAR_BUTTON * (-16.6)),
+        window_rect.centerx - (PANJANG_BUTTON * 1.2),
+        window_rect.centery - (LEBAR_BUTTON * 4),
         PANJANG_BUTTON * 1.5,
         LEBAR_BUTTON * 1.5
     )
     MENU_14 = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 4.4),
-        window_rect.centery - (LEBAR_BUTTON * (-18.4)),
+        window_rect.centerx - (PANJANG_BUTTON * 1.2),
+        window_rect.centery - (LEBAR_BUTTON * 2.2),
         PANJANG_BUTTON * 1.5,
         LEBAR_BUTTON * 1.5
     )
     MENU_15 = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_BUTTON * 4.4),
-        window_rect.centery - (LEBAR_BUTTON * (-20.2)),
+        window_rect.centerx - (PANJANG_BUTTON * 1.2),
+        window_rect.centery - (LEBAR_BUTTON * 0.4),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    MENU_16 = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 1.2),
+        window_rect.centery - (LEBAR_BUTTON * (-1.4)),
         PANJANG_BUTTON * 1.5,
         LEBAR_BUTTON * 1.5
     )
@@ -352,6 +369,90 @@ class main_menu:
         LEBAR_BUTTON * 1.7
     )
 
+class daftar_menu:
+    PAKET_MM = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 3.75),
+        window_rect.centery - (LEBAR_BUTTON * 3.5),
+        PANJANG_BUTTON * 3.5,
+        LEBAR_BUTTON * 4
+    )
+    PAKET_CB = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-.25)),
+        window_rect.centery - (LEBAR_BUTTON * 3.5),
+        PANJANG_BUTTON * 3.5,
+        LEBAR_BUTTON * 4
+    )
+    CHINESE_CUISINE = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 3.75),
+        window_rect.centery - (LEBAR_BUTTON * (-1)),
+        PANJANG_BUTTON * 3.5,
+        LEBAR_BUTTON * 4
+    )
+    JAVANESE_CUISINE = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-.25)),
+        window_rect.centery - (LEBAR_BUTTON * (-1)),
+        PANJANG_BUTTON * 3.5,
+        LEBAR_BUTTON * 4
+    )  
+
+class paketMM:
+    EXIT = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-3.2)),
+        window_rect.centery - (LEBAR_BUTTON * 7.5),
+        PANJANG_BUTTON * 1.5,
+        LEBAR_BUTTON * 1.5
+    )
+    PROTEIN = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 3.5),
+        window_rect.centery - (LEBAR_BUTTON),
+        PANJANG_BUTTON * 3,
+        LEBAR_BUTTON * 2.5
+    )
+    VEGETABLES = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * (-.5)),
+        window_rect.centery - (LEBAR_BUTTON),
+        PANJANG_BUTTON * 3,
+        LEBAR_BUTTON * 2.5
+    )
+    BOX = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 2),
+        window_rect.centery - (LEBAR_BUTTON * 4.5),
+        PANJANG_BUTTON * 4,
+        LEBAR_BUTTON * 9
+    )
+
+    AYAM = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 1.5),
+        window_rect.centery - (LEBAR_BUTTON * 2.75),
+        PANJANG_BUTTON * 3,
+        LEBAR_BUTTON * 2
+    )
+    IKAN = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 1.5),
+        window_rect.centery - (LEBAR_BUTTON * 0.5),
+        PANJANG_BUTTON * 3,
+        LEBAR_BUTTON * 2
+    )
+    SAPI = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 1.5),
+        window_rect.centery - (LEBAR_BUTTON * (-1.75)),
+        PANJANG_BUTTON * 3,
+        LEBAR_BUTTON * 2
+    )
+
+    SAYUR = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 1.5),
+        window_rect.centery - (LEBAR_BUTTON * 2.5),
+        PANJANG_BUTTON * 3,
+        LEBAR_BUTTON * 2
+    )
+    OLAHAN = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_BUTTON * 1.5),
+        window_rect.centery - (LEBAR_BUTTON * .25),
+        PANJANG_BUTTON * 3,
+        LEBAR_BUTTON * 2
+    )
+
 class simulasi:
     BACK = pygame.rect.Rect(
         window_rect.centerx - (PANJANG_BUTTON * (-3.75)),
@@ -400,7 +501,7 @@ class config:
 
     # POSISI INPUT USER
     INP_IP_RECT = pygame.rect.Rect(
-        window_rect.centerx - (PANJANG_INP_BUTTON * 2.8),
+        window_rect.centerx - (PANJANG_INP_BUTTON * 2.75),
         window_rect.centery - (LEBAR_INP_BUTTON * 1.2),
         PANJANG_INP_BUTTON * 2,
         LEBAR_INP_BUTTON * 1.7
@@ -494,4 +595,18 @@ class PID:
         window_rect.centery - LEBAR_SAVE_BUTTON * (-5.2),
         PANJANG_SAVE_BUTTON * 1,
         LEBAR_SAVE_BUTTON * 1.7
+    )
+
+class satisfied:
+    YES = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * (-.075)),
+        window_rect.centery - LEBAR_SAVE_BUTTON * (-3.2),
+        PANJANG_SAVE_BUTTON * 2,
+        LEBAR_SAVE_BUTTON * 2.7
+    )
+    NO = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * (-2.5)),
+        window_rect.centery - LEBAR_SAVE_BUTTON * (-3.2),
+        PANJANG_SAVE_BUTTON * 2,
+        LEBAR_SAVE_BUTTON * 2.7
     )
