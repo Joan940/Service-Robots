@@ -45,9 +45,6 @@ def getUDP():
                     dataRobot.robotService(data, address)
                 elif data[7] == 0:
                     varGlobals.serviceBot = False
-                elif data[7] == 2:
-                    varGlobals.runEye              = False
-                    varGlobals.runServiceSatisfied = True
 
         except BlockingIOError:
             if not printed:

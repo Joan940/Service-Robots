@@ -1058,6 +1058,7 @@ def eyeUI():
     # BOOLEAN
     dragging                 = False
     varGlobals.list          = False
+    varGlobals.diantar       = False
     varGlobals.isBlinking    = False
     varGlobals.updateOrder   = True
     varGlobals.mouseActive   = False
@@ -1112,6 +1113,18 @@ def eyeUI():
 
                         if adminSense > 5 and distance < 5:
                             mainMenu()
+
+                if varGlobals.diantar:
+                    varGlobals.oldSurface = varGlobals.screen.copy()
+                    varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+                    varGlobals.newSurface.blit(varGlobals.bgSatisfied, (0, 0))
+                    satisfiedConfiguration()
+
+                        # elif adminSense < 5:
+                        #     varGlobals.oldSurface = varGlobals.screen.copy()
+                        #     varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+                        #     varGlobals.newSurface.blit(varGlobals.bgSatisfied, (0, 0))
+                        #     satisfiedConfiguration()
 
                 # elif dragging:
                 #     if distance <= threshold or dy < -20:

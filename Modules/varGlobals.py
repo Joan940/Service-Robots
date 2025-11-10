@@ -68,6 +68,7 @@ runPaketMM          = bool
 runConfig           = bool
 runStaff            = bool
 runMenu             = bool
+diantar             = bool
 runPID              = bool
 runSim              = bool
 runEye              = bool
