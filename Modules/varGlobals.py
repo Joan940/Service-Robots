@@ -610,3 +610,15 @@ class satisfied:
         PANJANG_SAVE_BUTTON * 2,
         LEBAR_SAVE_BUTTON * 2.7
     )
+    GET = pygame.rect.Rect(
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * 1),
+        window_rect.centery - LEBAR_SAVE_BUTTON * 1.35,
+        PANJANG_SAVE_BUTTON * 2,
+        LEBAR_SAVE_BUTTON * 2.7
+    )
+    MESSAGE = pygame.Rect(
+        window_rect.centerx - (PANJANG_SAVE_BUTTON * 2.5),
+        window_rect.centery - LEBAR_SAVE_BUTTON * 3.35,
+        PANJANG_SAVE_BUTTON * 5,
+        LEBAR_SAVE_BUTTON * 6.7
+    )

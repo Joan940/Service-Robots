@@ -483,7 +483,7 @@ def configuration():
 def satisfiedConfiguration():
 
     # BOOLEAN
-
+    taken = True
     varGlobals.runPID              = False
     varGlobals.runEye              = False
     varGlobals.runSim              = False
@@ -515,15 +515,20 @@ def satisfiedConfiguration():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 varGlobals.trueSound.play()
-                for button, rect in buttons.items():
-                    if rect.collidepoint(mx, my):
-                        if button == "Yes":
-                            varGlobals.takenOrder = 1
-                        elif button == "No":
-                            varGlobals.takenOrder = 0
-                        varGlobals.runServiceSatisfied = False
-                        varGlobals.runEye              = True
-                        eyeUI()
+                if taken:
+                    for button, rect in buttons.items():
+                        if rect.collidepoint(mx, my):
+                            if button == "Yes":
+                                varGlobals.takenOrder = 1
+                                taken                 = True
+                                varGlobals.runServiceSatisfied = False
+                                varGlobals.runEye              = True
+                                eyeUI()
+                            elif button == "No":
+                                varGlobals.takenOrder = 0
+                                taken                 = False
+                else:
+                    taken = not taken
 
         for button, rect in buttons.items():
             if rect.collidepoint(mx, my):
@@ -534,6 +539,18 @@ def satisfiedConfiguration():
                 pygame.draw.rect(varGlobals.screen, cc.WHITE, rect, border_radius=20)
                 pygame.draw.rect(varGlobals.screen, cc.BLACK, rect, 3, border_radius=20)
                 tts(button, cc.BLACK, rect, varGlobals.screen, 45)
+
+        if not taken:
+            boxPenghalang = pygame.Rect(0, 0, varGlobals.res[0], varGlobals.res[1])
+            overlay       = pygame.Surface((boxPenghalang.width, boxPenghalang.height), pygame.SRCALPHA)
+
+            pygame.draw.rect(overlay, (0, 0, 0, 100), overlay.get_rect())
+            varGlobals.screen.blit(overlay, (0, 0))
+
+            pygame.draw.rect(varGlobals.screen, cc.WHITE, sfButton.MESSAGE, border_radius=20)
+            pygame.draw.rect(varGlobals.screen, cc.BLACK, sfButton.MESSAGE, 5, border_radius=20)
+            tts("Get Your Food!", cc.BLACK, sfButton.MESSAGE, varGlobals.screen, 65)
+
 
         varGlobals.clock.tick(120)
         pygame.display.flip()
@@ -1870,4 +1887,4 @@ def simulation():
 ###################################################################################################
 
 reset_database()
-satisfiedConfiguration()
+mainMenu()
