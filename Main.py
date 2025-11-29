@@ -63,7 +63,7 @@ from Modules.varGlobals import (
 
 pygame.mixer.init()
 
-varGlobals.IP   = '192.168.110.195'
+varGlobals.IP   = '192.168.110.15'
 varGlobals.PORT = '8081'
 varGlobals.P    = '0'
 varGlobals.I    = '0'

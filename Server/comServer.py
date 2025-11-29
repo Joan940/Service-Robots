@@ -1,14 +1,17 @@
 import errno
 import socket
 import threading
-import Modules.dataRobot as dataRobot
-import Modules.varGlobals as varGlobals
+
+# === VARIABLE GLOBALS ===
+udp  = bool
+IP   = '192.168.110.15'
+PORT = '8081'
 
 def runCom():
-    before = varGlobals.udp
-    varGlobals.udp = True
+    before = udp
+    udp = True
 
-    if varGlobals.udp != before:
+    if udp != before:
         print("Masuk thread komunikasi!")
     
     runThread = threading.Thread(target=getUDP, daemon=True)
@@ -26,24 +29,15 @@ def getUDP():
     get.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     
     # MENGGUNAKAN UNICAST
-    get.bind((varGlobals.IP, int(varGlobals.PORT)))
+    get.bind((IP, int(PORT)))
     get.setblocking(0)
 
     printed = False
     
-    while varGlobals.udp:
+    while udp:
         try:
             data, address = get.recvfrom(1024)
             print("Data diterima :", data)
-            
-            if len(data) == 8:
-                if data[7] == 1:
-                    varGlobals.serviceBot    = True
-                    varGlobals.conServiceBot = 'Connected'
-                    dataRobot.robotService(data, address)
-                elif data[7] == 0:
-                    varGlobals.serviceBot = False
-
         except BlockingIOError:
             if not printed:
                 print("Data tidak diterima")
@@ -64,9 +58,9 @@ def getUDP():
 def send(data):
     kirim = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    if varGlobals.udp:
+    if udp:
         try:
-            kirim.sendto(data, (varGlobals.IP, int(varGlobals.PORT)))
+            kirim.sendto(data, (IP, int(PORT)))
             print(f"Data terkirim : {data}")
         except socket.error as e:
             print(f"Pengiriman Gagal, Socket Error: {e}")
