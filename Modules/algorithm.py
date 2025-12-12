@@ -107,7 +107,11 @@ def tampilanOrder(orders_list):
     ySpacing = 10
     box_lebar_kiri = 80
     padding_text = 120
+    
+    # Pastikan path font benar (gunakan r"" agar aman di Windows)
+    font_path = r"C:\BMP-Robotics\Assets\Oregano-Regular.ttf"
 
+    # 1. Mengelompokkan Pesanan berdasarkan Meja
     grouped_orders = {}
     for pesanan_data in orders_list:
         pesanan_id = pesanan_data[0]
@@ -125,47 +129,55 @@ def tampilanOrder(orders_list):
 
     yStart = 80
 
+    # 2. Membuat Surface untuk setiap grup
     for meja, items in grouped_orders.items():
         group_lines = []
         group_height = 0
 
-        # Tampilkan nomor meja
-        text_surf_meja, text_rect_meja = tts2(
-            f"{meja}", cc.WHITE, (padding_text, yStart + 60, 40)
-        )
+        # --- BAGIAN NOMOR MEJA ---
+        font_meja = pygame.font.Font(font_path, 40)
+        # UBAH DISINI: Render teks menjadi surface (gambar), jangan langsung blit
+        text_surf_meja = font_meja.render(f"{meja}", True, cc.WHITE)
+        target_rect_meja = text_surf_meja.get_rect(midtop=(padding_text, yStart + 60))
+        
         group_lines.append({
             'type': 'meja',
-            'surface': text_surf_meja,
-            'rect': text_rect_meja
+            'surface': text_surf_meja,  # <--- PENTING: Ini yang dicari oleh loop utama Anda
+            'rect': target_rect_meja
         })
-        group_height += text_rect_meja.height + ySpacing
+        group_height += target_rect_meja.height + ySpacing
 
-        # Tampilkan daftar pesanan
+        # --- BAGIAN LIST PESANAN ---
         pesanan_x = box_lebar_kiri + padding_text
+        
         for item in items:
-            text_surf_pesanan, text_rect_pesanan = tts2(
-                f"{item['nama']} ({item['jumlah']})",
-                cc.BLACK, (pesanan_x, yStart + group_height), 18
-            )
+            text_str = f"{item['nama']} ({item['jumlah']})"
+            
+            font_pesanan = pygame.font.Font(font_path, 18)
+            # UBAH DISINI: Render teks pesanan menjadi surface
+            text_surf_pesanan = font_pesanan.render(text_str, True, cc.BLACK)
+            target_rect_pesanan = text_surf_pesanan.get_rect(midtop=(pesanan_x, yStart + group_height + 60))
+            
             group_lines.append({
                 'type': 'pesanan',
                 'id': item['id'],
-                'nama': item['nama'],        # tambahin nama
-                'jumlah': item['jumlah'],    # tambahin jumlah
-                'surface': text_surf_pesanan,
-                'rect': text_rect_pesanan
+                'nama': item['nama'],
+                'jumlah': item['jumlah'],
+                'surface': text_surf_pesanan, # <--- PENTING: Ini juga harus ada
+                'rect': target_rect_pesanan
             })
 
-            group_height += text_rect_pesanan.height + ySpacing
+            group_height += target_rect_pesanan.height + ySpacing
 
+        # Masukkan ke stack utama
         orderStack.append({
             'meja': meja,
             'height': group_height,
             'lines': group_lines
         })
 
-        # Pindahkan ke bawah untuk meja berikutnya
-        yStart += group_height - 20
+        # Geser posisi Y untuk meja berikutnya
+        yStart += group_height + 20 
 
     return orderStack
 

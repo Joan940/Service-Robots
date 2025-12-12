@@ -1113,6 +1113,13 @@ def eyeUI():
 
                         if adminSense > 5 and distance < 5:
                             mainMenu()
+                        # if adminSense < 3 and distance < 5:
+                            # varGlobals.trueSound.play()
+                            # varGlobals.oldSurface = varGlobals.screen.copy()
+                            # varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+                            # varGlobals.newSurface.blit(varGlobals.bgOrder, (0, 0))
+                            # transition(varGlobals.oldSurface, varGlobals.newSurface, direction="up", speed=20)
+                            # daftarMenu()
 
                 if varGlobals.diantar:
                     varGlobals.oldSurface = varGlobals.screen.copy()
@@ -1127,7 +1134,7 @@ def eyeUI():
                         #     satisfiedConfiguration()
 
                 # elif dragging:
-                #     if distance <= threshold or dy < -20:
+                #     if distance <= 5 or dy < -20:
                 #         varGlobals.trueSound.play()
                 #         varGlobals.oldSurface = varGlobals.screen.copy()
                 #         varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
@@ -1343,16 +1350,15 @@ def staffConfiguration():
                                     
                                     trayMeja = False
 
-                                    if varGlobals.selectedMeja1 and varGlobals.selectedMeja2:
+                                    # if varGlobals.selectedMeja1 and varGlobals.selectedMeja2:
                                         # data = bytearray(3)
                                         # data[0] = 100
                                         # data[1] = int(selectedMeja1)
                                         # data[2] = int(selectedMeja2)
                                         # send(data)
 
-                                        varGlobals.runEye   = True
-                                        varGlobals.runStaff = False
-                                        return varGlobals.selectedMeja1, varGlobals.selectedMeja2
+                                        # varGlobals.runStaff = False
+                                        # varGlobals.runEye   = True
                                     
                                 elif number == "Back":
                                     trayMeja = False
@@ -1417,153 +1423,153 @@ def staffConfiguration():
 #                                            MAKE ORDER                                           #
 ###################################################################################################
 
-# def makeOrder():
+def makeOrder():
 
-#     # RESET
-#     varGlobals.oldSurface = None
-#     varGlobals.newSurface = None
+    # RESET
+    varGlobals.oldSurface = None
+    varGlobals.newSurface = None
 
-#     # VARIABLE LOCAL
-#     contentY   = 0
-#     lastAction = time.time()
+    # VARIABLE LOCAL
+    contentY   = 0
+    lastAction = time.time()
 
-#     # SCROLL DENGAN DRAG MOUSE
-#     scrolling    = False
-#     last_mouse_y = 0
+    # SCROLL DENGAN DRAG MOUSE
+    scrolling    = False
+    last_mouse_y = 0
 
-#     # BOOLEAN
-#     click = False
-#     varGlobals.list          = False
-#     varGlobals.updateOrder   = True
+    # BOOLEAN
+    click = False
+    varGlobals.list          = False
+    varGlobals.updateOrder   = True
 
-#     varGlobals.runPID        = False
-#     varGlobals.runEye        = False
-#     varGlobals.runSim        = False
-#     varGlobals.runMenu       = False
-#     varGlobals.runStaff      = False
-#     varGlobals.runConfig     = False
-#     varGlobals.runPaketCB    = False
-#     varGlobals.runPaketMM    = False
-#     varGlobals.runChinese    = False
-#     varGlobals.runJavanese   = False
-#     varGlobals.runMakeOrder  = True
-#     varGlobals.runDaftarMenu = False
+    varGlobals.runPID        = False
+    varGlobals.runEye        = False
+    varGlobals.runSim        = False
+    varGlobals.runMenu       = False
+    varGlobals.runStaff      = False
+    varGlobals.runConfig     = False
+    varGlobals.runPaketCB    = False
+    varGlobals.runPaketMM    = False
+    varGlobals.runChinese    = False
+    varGlobals.runJavanese   = False
+    varGlobals.runMakeOrder  = True
+    varGlobals.runDaftarMenu = False
 
-#     buttons = {
-#         "Back"       : moButton.BACK,
-#         "List Order" : moButton.LIST_PESANAN
-#     }
+    buttons = {
+        "Back"       : moButton.BACK,
+        "List Order" : moButton.LIST_PESANAN
+    }
 
-#     while varGlobals.runMakeOrder:
+    while varGlobals.runMakeOrder:
         
-#         # DITAMBAHKAN: Reset perubahan posisi mouse setiap frame
-#         mouse_dy = 0
+        # DITAMBAHKAN: Reset perubahan posisi mouse setiap frame
+        mouse_dy = 0
 
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 varGlobals.runMenu = False
-#                 pygame.quit()
-#                 sys.exit()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                varGlobals.runMenu = False
+                pygame.quit()
+                sys.exit()
 
-#             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-#                 varGlobals.trueSound.play()
-#                 lastAction = time.time()
-#                 scrolling  = False
-#                 click      = True
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                varGlobals.trueSound.play()
+                lastAction = time.time()
+                scrolling  = False
+                click      = True
                 
-#             # --- LOGIKA SCROLLING ---
-#             if varGlobals.list:
-#                 if event.type == pygame.MOUSEBUTTONDOWN:
-#                     if event.button == 4:
-#                         contentY += 30
-#                         lastAction = time.time()
-#                     elif event.button == 5:
-#                         contentY -= 30
-#                         lastAction = time.time()
+            # --- LOGIKA SCROLLING ---
+            if varGlobals.list:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 4:
+                        contentY += 30
+                        lastAction = time.time()
+                    elif event.button == 5:
+                        contentY -= 30
+                        lastAction = time.time()
                 
-#                 # LOGIKA DRAG MOUSE
-#                 popupRect = pygame.Rect(65, 110, 400, 460)
-#                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-#                     if popupRect.collidepoint(event.pos):
-#                         scrolling    = True
-#                         last_mouse_y = event.pos[1]
+                # LOGIKA DRAG MOUSE
+                popupRect = pygame.Rect(65, 110, 400, 460)
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    if popupRect.collidepoint(event.pos):
+                        scrolling    = True
+                        last_mouse_y = event.pos[1]
 
-#                 if event.type == pygame.MOUSEMOTION and scrolling:
-#                     current_mouse_y = event.pos[1]
-#                     mouse_dy        = current_mouse_y - last_mouse_y
-#                     last_mouse_y    = current_mouse_y
+                if event.type == pygame.MOUSEMOTION and scrolling:
+                    current_mouse_y = event.pos[1]
+                    mouse_dy        = current_mouse_y - last_mouse_y
+                    last_mouse_y    = current_mouse_y
 
-#         # CEK TIMEOUT
-#         if time.time() - lastAction >= 15:
-#             eyeUI()
-#             lastAction = time.time()
+        # CEK TIMEOUT
+        if time.time() - lastAction >= 15:
+            eyeUI()
+            lastAction = time.time()
 
-#         if varGlobals.updateOrder:
-#             listOrder              = getOrders()
-#             varGlobals.allOrders   = tampilanOrder(listOrder)
-#             varGlobals.updateOrder = False
+        if varGlobals.updateOrder:
+            listOrder              = getOrders()
+            varGlobals.allOrders   = tampilanOrder(listOrder)
+            varGlobals.updateOrder = False
 
-#         varGlobals.screen.blit(varGlobals.bgMakeOrder, (0, 0))
+        varGlobals.screen.blit(varGlobals.bgMakeOrder, (0, 0))
 
-#         # LOGIKA TOMBOL
-#         mx, my = pygame.mouse.get_pos()
-#         for button in buttons:
-#             if buttons[button].collidepoint(mx, my):
-#                 pygame.draw.rect(varGlobals.screen, cc.WHITE, buttons[button], border_radius=20)
-#                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 5, border_radius=20)
-#                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 30)
-#                 if click:
-#                     pencetButton(button)
-#                     varGlobals.oldSurface = varGlobals.screen.copy()
-#                     varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
-#                     if button == "List Order":
-#                         varGlobals.list = not varGlobals.list
-#                         varGlobals.updateOrder = True
-#                     elif button == "Back":
-#                         varGlobals.newSurface.blit(varGlobals.bgEyes, (0, 0))
-#                         transition(varGlobals.oldSurface, varGlobals.newSurface, direction="down", speed=20)
-#                         eyeUI()
-#             else:
-#                 pygame.draw.rect(varGlobals.screen, cc.WHITE, buttons[button], border_radius=20)
-#                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 3, border_radius=20)
-#                 tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 20)
+        # LOGIKA TOMBOL
+        mx, my = pygame.mouse.get_pos()
+        for button in buttons:
+            if buttons[button].collidepoint(mx, my):
+                pygame.draw.rect(varGlobals.screen, cc.WHITE, buttons[button], border_radius=20)
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 5, border_radius=20)
+                tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 30)
+                if click:
+                    pencetButton(button)
+                    varGlobals.oldSurface = varGlobals.screen.copy()
+                    varGlobals.newSurface = pygame.Surface((varGlobals.res[0], varGlobals.res[1]))
+                    if button == "List Order":
+                        varGlobals.list = not varGlobals.list
+                        varGlobals.updateOrder = True
+                    elif button == "Back":
+                        varGlobals.newSurface.blit(varGlobals.bgEyes, (0, 0))
+                        transition(varGlobals.oldSurface, varGlobals.newSurface, direction="down", speed=20)
+                        eyeUI()
+            else:
+                pygame.draw.rect(varGlobals.screen, cc.WHITE, buttons[button], border_radius=20)
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, buttons[button], 3, border_radius=20)
+                tts(button, cc.RED_BROWN, buttons[button], varGlobals.screen, 20)
 
-#         # MENAMBAHKAN DRAG MOUSE KE VARIABLE 'contentY'
-#         contentY += mouse_dy
-#         if varGlobals.list:
-#             popupRect = pygame.Rect(65, 110, 400, 460)
-#             pygame.draw.rect(varGlobals.screen, cc.WHITE, popupRect, border_radius=20)
-#             pygame.draw.rect(varGlobals.screen, cc.BLACK, popupRect, 3, border_radius=20)
+        # MENAMBAHKAN DRAG MOUSE KE VARIABLE 'contentY'
+        contentY += mouse_dy
+        if varGlobals.list:
+            popupRect = pygame.Rect(65, 110, 400, 460)
+            pygame.draw.rect(varGlobals.screen, cc.WHITE, popupRect, border_radius=20)
+            pygame.draw.rect(varGlobals.screen, cc.BLACK, popupRect, 3, border_radius=20)
             
-#             total_content_height = sum(group['height'] + 30 for group in varGlobals.allOrders)
-#             maxScroll            = max(0, total_content_height - popupRect.height)
-#             contentY             = max(-maxScroll, min(10, contentY))
+            total_content_height = sum(group['height'] + 30 for group in varGlobals.allOrders)
+            maxScroll            = max(0, total_content_height - popupRect.height)
+            contentY             = max(-maxScroll, min(10, contentY))
 
-#             clipping_rect = pygame.Rect(popupRect.x, popupRect.y + 10, popupRect.width, popupRect.height - 20)
-#             varGlobals.screen.set_clip(clipping_rect)
+            clipping_rect = pygame.Rect(popupRect.x, popupRect.y + 10, popupRect.width, popupRect.height - 20)
+            varGlobals.screen.set_clip(clipping_rect)
             
-#             currentY = 0
-#             for group in varGlobals.allOrders:
-#                 yPosOffset    = currentY + contentY + popupRect.y
-#                 mejaLine      = group['lines'][0]
-#                 xPos          = mejaLine['rect'].x - 45
-#                 tinggiDinamis = group['height'] - 30
+            currentY = 0
+            for group in varGlobals.allOrders:
+                yPosOffset    = currentY + contentY + popupRect.y
+                mejaLine      = group['lines'][0]
+                xPos          = mejaLine['rect'].x - 45
+                tinggiDinamis = group['height'] - 30
                 
-#                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (xPos, yPosOffset, 380, tinggiDinamis), 3, border_radius=20)
-#                 pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (xPos, yPosOffset, 100, tinggiDinamis), border_radius=20)
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (xPos, yPosOffset, 380, tinggiDinamis), 3, border_radius=20)
+                pygame.draw.rect(varGlobals.screen, cc.RED_BROWN, (xPos, yPosOffset, 100, tinggiDinamis), border_radius=20)
 
-#                 for line in group['lines']:
-#                     line_rect = line['rect'].copy()
-#                     line_rect.y += contentY
-#                     varGlobals.screen.blit(line['surface'], line_rect)
+                for line in group['lines']:
+                    line_rect = line['rect'].copy()
+                    line_rect.y += contentY
+                    varGlobals.screen.blit(line['surface'], line_rect)
 
-#                 currentY += tinggiDinamis + 10
+                currentY += tinggiDinamis + 10
             
-#             varGlobals.screen.set_clip(None)
+            varGlobals.screen.set_clip(None)
 
-#         click = False
-#         varGlobals.clock.tick(60)
-#         pygame.display.flip()
+        click = False
+        varGlobals.clock.tick(60)
+        pygame.display.flip()
 
 
 ###################################################################################################
