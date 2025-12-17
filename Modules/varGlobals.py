@@ -161,17 +161,18 @@ antrian = 1
 # -- Animasi Mata
 eyeRightX = 565
 lebarMata = 100
-eyeLeftX = 365
-eyePosY = 170
+eyeLeftX  = 365
+eyePosY   = 170
 
 # KEYBOARD
 keys_pressed = {
-    pygame.K_UP : False,
-    pygame.K_DOWN : False,
-    pygame.K_LEFT : False,
-    pygame.K_RIGHT : False,
+    pygame.K_UP     : False,
+    pygame.K_DOWN   : False,
+    pygame.K_LEFT   : False,
+    pygame.K_RIGHT  : False,
     pygame.K_LSHIFT : False,
-    pygame.K_LCTRL : False
+    pygame.K_LCTRL  : False,
+    pygame.K_1      : False
 }
 
 # TEXT

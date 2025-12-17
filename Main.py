@@ -1245,8 +1245,6 @@ def eyeUI():
                 end_angle   = math.pi
                 pygame.draw.arc(varGlobals.screen, cc.BLACK, mouth_rect, start_angle, end_angle, 10)
 
-        # pygame.draw.aaline(varGlobals.screen, cc.RED, (varGlobals.res[0] // 2, 0), (varGlobals.res[0] // 2, varGlobals.res[1]), 2)
-
         # MENGGAMBAR ALIS
         eyebrowOffset_leftY  = varGlobals.SET_AWAL['eyebrowOffset_leftY']
         eyebrowOffset_rightY = varGlobals.SET_AWAL['eyebrowOffset_rightY']
@@ -1265,6 +1263,12 @@ def eyeUI():
         rotated_start_right = rotatePoint(eyebrow_start_right, eyeRight.center, eyebrowAngle_right)
         rotated_end_right   = rotatePoint(eyebrow_end_right, eyeRight.center, eyebrowAngle_right)
         pygame.draw.line(varGlobals.screen, cc.BLACK, rotated_start_right, rotated_end_right, 10)
+
+        # keys = pygame.key.get_pressed()
+        # for key in varGlobals.keys_pressed.keys():
+        #     if keys[key]:
+        #         if pygame.key.name(key) == "1":
+        #             satisfiedConfiguration()
 
         varGlobals.clock.tick(60)
         pygame.display.flip()
@@ -1907,3 +1911,4 @@ def simulation():
 
 reset_database()
 mainMenu()
+# satisfiedConfiguration()
