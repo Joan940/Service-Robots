@@ -36,12 +36,12 @@ def getUDP():
             data, address = get.recvfrom(1024)
             print("Data diterima :", data)
             
-            if len(data) == 8:
-                if data[7] == 1:
+            if len(data) == 12:
+                if data[11] == 1:
                     varGlobals.serviceBot    = True
                     varGlobals.conServiceBot = 'Connected'
                     dataRobot.robotService(data, address)
-                elif data[7] == 0:
+                elif data[11] == 0:
                     varGlobals.serviceBot = False
 
         except BlockingIOError:
